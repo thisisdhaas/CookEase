@@ -96,7 +96,6 @@ public class MainActivity extends Activity {
                 android.R.layout.simple_list_item_multiple_choice, list);
 	    
 	    taskList.setAdapter(adapter);
-	    
 
 	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -122,15 +121,20 @@ public class MainActivity extends Activity {
 	        String calYellow = "#FFAA3C";
 	        String whiteSmoke = "#F5F5F5";
 	        String grayBg = "#88676767";
+	        String blueBg = "#7d94f0";
+	        
+
 	        if (selectedTasks.contains(itemText)) {
 //	        	item.setBackgroundColor(Color.parseColor(grayBg));
+	        	item.setBackgroundColor(Color.parseColor("#109494"));
 	        	item.setTextColor(Color.parseColor(whiteSmoke));
 	            item.setChecked(false);
 	        	int index = selectedTasks.indexOf(itemText);
 	        	selectedTasks.remove(index);     
 	        } else {
+	        	item.setBackgroundColor(Color.parseColor("#B139ED"));
 //	        	item.setBackgroundColor(Color.parseColor(yaleBlue));
-	        	item.setTextColor(Color.parseColor(calYellow));
+	        	item.setTextColor(Color.parseColor(whiteSmoke));
 	            item.setChecked(true);
 	        	selectedTasks.add(itemText);
 		        // For demo only, run 5 second timer and pop up alert

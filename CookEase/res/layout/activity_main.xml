@@ -3,23 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_blur"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
-
+	
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:alpha="0.5"
+        android:background="#14D0E1"
+	 />
+    
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="25dp"
         android:text="@string/cookease"
-        android:textSize="46sp"
+        android:textSize="50sp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#f5f5f5" 
+        android:textColor="#F5F5F5"
         android:fontFamily ="sans-serif"/>
 
     <TextView
@@ -28,55 +35,60 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:textColor="#f5f5f5"
+        android:layout_marginTop="2dp"
+        android:textColor="#F5F5F5"
         android:text="@string/slogan"
         android:textSize="21sp"
         android:textStyle="italic"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <LinearLayout
+        android:id="@+id/linearlayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
 
     <TextView
         android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="38dp"
-        android:textColor="#3C94D3"
+        android:layout_weight="1"
+        android:textColor="#F5F5F5"
         android:text="@string/home"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView3"
-        android:layout_alignBottom="@+id/textView3"
-        android:layout_centerHorizontal="true"
+        android:layout_weight="1"
         android:textColor="#f5f5f5"
         android:text="@string/notifications"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/textView5"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView4"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="39dp"
+        android:layout_weight="1"
         android:textColor="#f5f5f5"
         android:text="@string/analytics"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/listView1"
         android:layout_width="450dp"
         android:layout_height="258dp"
-        android:layout_above="@+id/textView3"
+        android:layout_above="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
-        android:background="#88676767"
+        android:background="#109494"
+        android:alpha="0.7"
         android:textColor="#f5f5f5" >
     </ListView>
 
@@ -88,8 +100,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="17dp"
         android:text="@string/instruction"
-        android:textColor="#575757"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textColor="#f5f5f5"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
         
 
 </RelativeLayout>
