@@ -100,7 +100,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="17dp"
         android:text="@string/instruction"
-        android:textColor="#f5f5f5"
+        android:textColor="#ffffff"
         android:textAppearance="?android:attr/textAppearanceMedium" />
         
 
