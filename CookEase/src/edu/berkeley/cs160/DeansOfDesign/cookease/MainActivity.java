@@ -96,7 +96,6 @@ public class MainActivity extends Activity {
                 android.R.layout.simple_list_item_multiple_choice, list);
 	    
 	    taskList.setAdapter(adapter);
-
 	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 	      @SuppressLint("NewApi")
@@ -105,36 +104,27 @@ public class MainActivity extends Activity {
 	          int position, long id) {
 
 	          CheckedTextView item = (CheckedTextView) view;
-	          /*
-	          //The change color logic is here!
-	          if(item.isChecked()) {
-	              item.setTextColor(Color.BLACK);
-	              item.setChecked(false);
-	          }
-	          else {
-	              item.setTextColor(Color.RED);
-	              item.setChecked(true);
-	          }*/
 	    	  
 	        String itemText = (String) parent.getItemAtPosition(position);
-	        String yaleBlue = "#3C94D3";
+	       /* String yaleBlue = "#3C94D3";
 	        String calYellow = "#FFAA3C";
 	        String whiteSmoke = "#F5F5F5";
 	        String grayBg = "#88676767";
-	        String blueBg = "#7d94f0";
+	        String blueBg = "#7d94f0";*/
+	        String greyBg = "#84a689";
+	        String purpleBg = "#a684a1";
+	        String white = "#ffffff";
 	        
 
 	        if (selectedTasks.contains(itemText)) {
-//	        	item.setBackgroundColor(Color.parseColor(grayBg));
-	        	item.setBackgroundColor(Color.parseColor("#109494"));
-	        	item.setTextColor(Color.parseColor(whiteSmoke));
+	        	item.setBackgroundColor(Color.parseColor(greyBg));
+	        	item.setTextColor(Color.parseColor(white));
 	            item.setChecked(false);
 	        	int index = selectedTasks.indexOf(itemText);
 	        	selectedTasks.remove(index);     
 	        } else {
-	        	item.setBackgroundColor(Color.parseColor("#B139ED"));
-//	        	item.setBackgroundColor(Color.parseColor(yaleBlue));
-	        	item.setTextColor(Color.parseColor(whiteSmoke));
+	        	item.setBackgroundColor(Color.parseColor(purpleBg));
+	        	item.setTextColor(Color.parseColor(white));
 	            item.setChecked(true);
 	        	selectedTasks.add(itemText);
 		        // For demo only, run 5 second timer and pop up alert
@@ -154,24 +144,13 @@ public class MainActivity extends Activity {
 	      }
 	    });
 	    
-	    // Click all tasks to be on by default
-//	    int firstPosition = taskList.getFirstVisiblePosition() - taskList.getHeaderViewsCount(); // This is the same as child #0
-//	    for (int i = 0; i < 4; i++) {
-//	    	 View rowView = taskList.getChildAt(i);
-//		    	System.out.println("getChildCount is: "+taskList.getChildCount()+"\n");
-//		    	System.out.println("i is: "+i+"\n");
-//		    	System.out.println("curView is: "+rowView);
-//             if(rowView != null)
-//             {
-//                 // do whatever you want here
-//            	 rowView.performClick();
-//             }
-	    	
-//	    	View curView = taskList.getChildAt(i);
-//	    	System.out.println("i is: "+i+"\n");
-//	    	System.out.println("curView is: "+curView);
-//	    	curView.performClick();
-//	    }
+	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+	    for (int i = 0; i < 4; i++) { //hardcoded, 4 kitchen tasks
+	    	taskList.setItemChecked(i, true);
+	    	String itemText = (String) taskList.getItemAtPosition(i);
+	    	selectedTasks.add(itemText);
+	    }
+	    
 	    
 /*	    int wantedPosition = 10; // Whatever position you're looking for
 	    

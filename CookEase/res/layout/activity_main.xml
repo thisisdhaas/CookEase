@@ -12,8 +12,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:alpha="0.5"
-        android:background="#14D0E1"
+        android:alpha="0.4"
+        android:background="#474747"
 	 />
     
     <TextView
@@ -26,7 +26,7 @@
         android:text="@string/cookease"
         android:textSize="50sp"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#F5F5F5"
+        android:textColor="#FFFFFF"
         android:fontFamily ="sans-serif"/>
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="2dp"
-        android:textColor="#F5F5F5"
+        android:textColor="#FFFFFF"
         android:text="@string/slogan"
         android:textSize="21sp"
         android:textStyle="italic"
@@ -54,7 +54,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="#F5F5F5"
+        android:textColor="#FFFFFF"
         android:text="@string/home"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -64,7 +64,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="#f5f5f5"
+        android:textColor="#FFFFFF"
         android:text="@string/notifications"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -74,7 +74,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColor="#f5f5f5"
+        android:textColor="#FFFFFF"
         android:text="@string/analytics"
         android:gravity="center"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -87,9 +87,9 @@
         android:layout_above="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
-        android:background="#109494"
-        android:alpha="0.7"
-        android:textColor="#f5f5f5" >
+        android:background= "#a684a1"
+        android:alpha="0.9"
+        android:textColor="#ffffff" >
     </ListView>
 
     <TextView
