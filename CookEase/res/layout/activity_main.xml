@@ -80,18 +80,19 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
-    <ListView
+   <ListView
         android:id="@+id/listView1"
         android:layout_width="450dp"
-        android:layout_height="258dp"
-        android:layout_above="@+id/linearlayout1"
+        android:layout_height="195dp"
+		android:layout_above="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:background= "#a684a1"
         android:alpha="0.9"
         android:textColor="#ffffff" >
-    </ListView>
 
+    </ListView>
+    
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.zip.Inflater;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -57,6 +58,8 @@ public class MainActivity extends Activity {
     public String friends_title = "Who do you want to alert?";
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
+    StableArrayAdapter adapter = null;
+  
     
     // For demo only, a timer:
     private Timer timer = new Timer(); 
@@ -110,11 +113,11 @@ public class MainActivity extends Activity {
 	      list.add(tasks[i]); 
 	    }
 
-//	    final StableArrayAdapter adapter = new StableArrayAdapter(this,
-//	        android.R.layout.simple_list_item_1, list);
+	   //adapter = new StableArrayAdapter(this,
+       // android.R.layout.simple_list_item_1, list);
 
-        final StableArrayAdapter adapter = new StableArrayAdapter(this,
-                android.R.layout.simple_list_item_multiple_choice, list);
+        adapter = new StableArrayAdapter(this,
+        		android.R.layout.simple_list_item_multiple_choice, list);
 	    
 	    taskList.setAdapter(adapter);
 	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,10 +206,12 @@ public class MainActivity extends Activity {
 	  private class StableArrayAdapter extends ArrayAdapter<String> {
 
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
+	    Context c;
 
 	    public StableArrayAdapter(Context context, int textViewResourceId,
 	        List<String> objects) {
 	      super(context, textViewResourceId, objects);
+	      this.c = context;
 	      for (int i = 0; i < objects.size(); ++i) {
 	        mIdMap.put(objects.get(i), i);
 	      }
@@ -223,19 +228,36 @@ public class MainActivity extends Activity {
 	      return true;
 	    }
 	    
-	   /* @Override
+	    @Override
 	    public View getView(int position, View convertView, ViewGroup parent) {
-
+	    	View view = convertView;
+	    	 if( view == null ){
+	    	        //We must create a View:
+	    		 	LayoutInflater inflater=getLayoutInflater();
+	    	        view = inflater.inflate(R.layout.custom_row, parent, false);
+	    	 }
+	    	 CheckedTextView temp = (CheckedTextView) view.findViewById(R.id.text1);
+	    	 if (position == 0) {
+	    		 temp.setText(water);
+	    	 } else if (position == 1) {
+	    		 temp.setText(microDone);
+	    	 } else if (position == 2) {
+	    		 temp.setText(microExplo);
+	    	 } else if (position == 3) {
+	    		 temp.setText(other);
+	    	 }
+	    	
 	    	if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
 	    			(position == 2 && tasksToSelected.get(microExplo)) ||
 	    			(position == 3 && tasksToSelected.get(other))) {
-	    				convertView.setBackgroundColor(Color.parseColor(purpleBg));
+	    				view.setBackgroundColor(Color.parseColor(purpleBg));
 	    	} else {
-	    		convertView.setBackgroundColor(Color.parseColor(greyBg));
+	    		view.setBackgroundColor(Color.parseColor(greyBg));
 	    	}
-	    	return convertView;
-	    }*/
+	    	adapter.notifyDataSetChanged();
+	    	return view;
+	    }
 
 	  }
 
