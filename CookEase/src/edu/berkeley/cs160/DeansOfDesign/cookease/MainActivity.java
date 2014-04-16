@@ -2,6 +2,7 @@ package edu.berkeley.cs160.DeansOfDesign.cookease;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,14 +13,18 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -41,10 +46,17 @@ public class MainActivity extends Activity {
     
     public String alert_message = "Your water is boiling!\nYour microwave is done!";
     public String alert_title = "CookEase Alert";
-    
+    public String water = "Water boiling";
+    public String microDone = "Microwave Done";
+    public String microExplo = "Microwave Explosion";
+    public String other = "Other Kitchen Tasks";
+    String greyBg = "#84a689";
+    String purpleBg = "#a684a1";
+    String white = "#ffffff";
 
     public String friends_title = "Who do you want to alert?";
-    public ArrayList<String> selectedTasks = new ArrayList<String>();
+    public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
+    public ListView taskList;
     
     // For demo only, a timer:
     private Timer timer = new Timer(); 
@@ -53,6 +65,14 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		// Restore preferences
+	    SharedPreferences settings = getSharedPreferences("settings", 0);
+	    tasksToSelected.put(water, settings.getBoolean(water, true));
+	    tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
+	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
+	    tasksToSelected.put(other,settings.getBoolean(other, true));
+	    
 		
 		// Set up notifications button
 		settingsText = (TextView) findViewById(R.id.textView4);
@@ -83,16 +103,17 @@ public class MainActivity extends Activity {
             }
         );
 		
-		final ListView taskList = (ListView) findViewById(R.id.listView1);
-		String tasks[] ={"Water boil","Microwave finish","Microwave explosion","Other kitchen sounds"};
+		taskList = (ListView) findViewById(R.id.listView1);
+		String tasks[] ={water, microDone, microExplo, other};
 		final ArrayList<String> list = new ArrayList<String>();
 	    for (int i = 0; i < tasks.length; ++i) {
-	      list.add(tasks[i]);
+	      list.add(tasks[i]); 
 	    }
+
 //	    final StableArrayAdapter adapter = new StableArrayAdapter(this,
 //	        android.R.layout.simple_list_item_1, list);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        final StableArrayAdapter adapter = new StableArrayAdapter(this,
                 android.R.layout.simple_list_item_multiple_choice, list);
 	    
 	    taskList.setAdapter(adapter);
@@ -111,26 +132,22 @@ public class MainActivity extends Activity {
 	        String whiteSmoke = "#F5F5F5";
 	        String grayBg = "#88676767";
 	        String blueBg = "#7d94f0";*/
-	        String greyBg = "#84a689";
-	        String purpleBg = "#a684a1";
-	        String white = "#ffffff";
 	        
 
-	        if (selectedTasks.contains(itemText)) {
+	        if (tasksToSelected.get(itemText)) { //selected already
 	        	item.setBackgroundColor(Color.parseColor(greyBg));
 	        	item.setTextColor(Color.parseColor(white));
 	            item.setChecked(false);
-	        	int index = selectedTasks.indexOf(itemText);
-	        	selectedTasks.remove(index);     
-	        } else {
+	        	tasksToSelected.put(itemText, false);
+	        } else { //not selected yet
 	        	item.setBackgroundColor(Color.parseColor(purpleBg));
 	        	item.setTextColor(Color.parseColor(white));
 	            item.setChecked(true);
-	        	selectedTasks.add(itemText);
+	            tasksToSelected.put(itemText, true);
+	        }
 		        // For demo only, run 5 second timer and pop up alert
 //	            timer.schedule(new MyTimerTask(), 5000);
 		        // End demo stuff here
-	        }
 	        
 //	        view.animate().setDuration(2000).alpha(0)
 //	            .withEndAction(new Runnable() {
@@ -145,11 +162,11 @@ public class MainActivity extends Activity {
 	    });
 	    
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-	    for (int i = 0; i < 4; i++) { //hardcoded, 4 kitchen tasks
-	    	taskList.setItemChecked(i, true);
-	    	String itemText = (String) taskList.getItemAtPosition(i);
-	    	selectedTasks.add(itemText);
-	    }
+	    taskList.setItemChecked(0, tasksToSelected.get(water));
+	    taskList.setItemChecked(1, tasksToSelected.get(microDone));
+	    taskList.setItemChecked(2, tasksToSelected.get(microExplo));
+	    taskList.setItemChecked(3, tasksToSelected.get(other));
+
 	    
 	    
 /*	    int wantedPosition = 10; // Whatever position you're looking for
@@ -205,11 +222,23 @@ public class MainActivity extends Activity {
 	    public boolean hasStableIds() {
 	      return true;
 	    }
+	    
+	   /* @Override
+	    public View getView(int position, View convertView, ViewGroup parent) {
+
+	    	if ((position == 0 && tasksToSelected.get(water)) ||
+	    			(position == 1 && tasksToSelected.get(microDone)) ||
+	    			(position == 2 && tasksToSelected.get(microExplo)) ||
+	    			(position == 3 && tasksToSelected.get(other))) {
+	    				convertView.setBackgroundColor(Color.parseColor(purpleBg));
+	    	} else {
+	    		convertView.setBackgroundColor(Color.parseColor(greyBg));
+	    	}
+	    	return convertView;
+	    }*/
 
 	  }
 
-	        
-//	}
 	
 	// User clicked on the Analytics button
 	protected void doAnalytics(View view) {
@@ -293,5 +322,63 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+
+	
+	@Override
+    protected void onResume(){
+		super.onResume();
+		
+       // Restore preferences
+       SharedPreferences settings = getSharedPreferences("settings", 0);
+       tasksToSelected = new HashMap<String, Boolean>();
+       tasksToSelected.put(water, settings.getBoolean(water, true));
+	   tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
+	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
+	   tasksToSelected.put(other,settings.getBoolean(other, true));
+	  /* View v = taskList.getAdapter().getView(0, null, null);
+	   Log.e("hi",""+taskList.getChildCount());
+	   if (tasksToSelected.get(water)){
+   				v.setBackgroundColor(Color.parseColor(purpleBg));
+   		} else {
+   			v.setBackgroundColor(Color.parseColor(greyBg));
+   		}
+	   v = taskList.getChildAt(1-taskList.getFirstVisiblePosition());
+	   if (tasksToSelected.get(microDone)){
+   				v.setBackgroundColor(Color.parseColor(purpleBg));
+   		} else {
+   			v.setBackgroundColor(Color.parseColor(greyBg));
+   		}
+	   v = taskList.getChildAt(2-taskList.getFirstVisiblePosition());
+	   if (tasksToSelected.get(microExplo)){
+   				v.setBackgroundColor(Color.parseColor(purpleBg));
+   		} else {
+   			v.setBackgroundColor(Color.parseColor(greyBg));
+   		}
+	   v = taskList.getChildAt(3-taskList.getFirstVisiblePosition());
+	   if (tasksToSelected.get(other)){
+   				v.setBackgroundColor(Color.parseColor(purpleBg));
+   		} else {
+   			v.setBackgroundColor(Color.parseColor(greyBg));
+   		}*/
+    }
+
+    @Override
+    protected void onPause(){
+       super.onPause();
+
+      // We need an Editor object to make preference changes.
+      // All objects are from android.context.Context
+      SharedPreferences settings = getSharedPreferences("settings", 0);
+      SharedPreferences.Editor editor = settings.edit();
+      editor.putBoolean(water, tasksToSelected.get(water));
+      editor.putBoolean(microDone, tasksToSelected.get(microDone));
+      editor.putBoolean(microExplo, tasksToSelected.get(microExplo));
+      editor.putBoolean(other, tasksToSelected.get(other));
+
+      // Commit the edits!
+      editor.commit();
+    }
+    
 
 }
