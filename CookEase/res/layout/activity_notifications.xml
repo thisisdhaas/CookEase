@@ -81,12 +81,12 @@
     </LinearLayout>
     
         <ListView
-        android:id="@+id/listView1"
+        android:id="@+id/listView2"
         android:layout_width="450dp"
-        android:layout_height="258dp"
+        android:layout_height="145dp"
         android:layout_above="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="100dp"
         android:background= "#a684a1"
         android:alpha="0.9"
         android:textColor="#ffffff" >
@@ -96,7 +96,7 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/listView1"
+        android:layout_above="@+id/listView2"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="17dp"
         android:text="@string/notify_instruction"

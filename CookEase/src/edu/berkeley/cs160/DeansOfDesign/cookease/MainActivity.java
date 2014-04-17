@@ -130,12 +130,6 @@ public class MainActivity extends Activity {
 	          CheckedTextView item = (CheckedTextView) view;
 	    	  
 	        String itemText = (String) parent.getItemAtPosition(position);
-	       /* String yaleBlue = "#3C94D3";
-	        String calYellow = "#FFAA3C";
-	        String whiteSmoke = "#F5F5F5";
-	        String grayBg = "#88676767";
-	        String blueBg = "#7d94f0";*/
-	        
 
 	        if (tasksToSelected.get(itemText)) { //selected already
 	        	item.setBackgroundColor(Color.parseColor(greyBg));
@@ -358,31 +352,6 @@ public class MainActivity extends Activity {
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
 	   tasksToSelected.put(other,settings.getBoolean(other, true));
-	  /* View v = taskList.getAdapter().getView(0, null, null);
-	   Log.e("hi",""+taskList.getChildCount());
-	   if (tasksToSelected.get(water)){
-   				v.setBackgroundColor(Color.parseColor(purpleBg));
-   		} else {
-   			v.setBackgroundColor(Color.parseColor(greyBg));
-   		}
-	   v = taskList.getChildAt(1-taskList.getFirstVisiblePosition());
-	   if (tasksToSelected.get(microDone)){
-   				v.setBackgroundColor(Color.parseColor(purpleBg));
-   		} else {
-   			v.setBackgroundColor(Color.parseColor(greyBg));
-   		}
-	   v = taskList.getChildAt(2-taskList.getFirstVisiblePosition());
-	   if (tasksToSelected.get(microExplo)){
-   				v.setBackgroundColor(Color.parseColor(purpleBg));
-   		} else {
-   			v.setBackgroundColor(Color.parseColor(greyBg));
-   		}
-	   v = taskList.getChildAt(3-taskList.getFirstVisiblePosition());
-	   if (tasksToSelected.get(other)){
-   				v.setBackgroundColor(Color.parseColor(purpleBg));
-   		} else {
-   			v.setBackgroundColor(Color.parseColor(greyBg));
-   		}*/
     }
 
     @Override
