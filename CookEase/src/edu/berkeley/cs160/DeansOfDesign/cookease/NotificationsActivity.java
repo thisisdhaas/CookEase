@@ -13,6 +13,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,9 +48,9 @@ public class NotificationsActivity extends Activity {
     String alarm = "Alarm";
     String email = "Email";
     String text = "Text";
-    String tone = "Default Tone";
-    String enterEmail = "Enter email";
-    String enterText = "Enter phone #";
+    String selectedTone = "Default Tone";
+    String selectedEmail = "Enter email";
+    String selectedText = "Enter phone #";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +63,9 @@ public class NotificationsActivity extends Activity {
 	    tasksToSelected.put(email, settings.getBoolean(email, false));
 	    tasksToSelected.put(text,settings.getBoolean(text, false));
 	    SharedPreferences texts = getSharedPreferences("texts", 0);
-	    methodsToSelected.put(alarm, texts.getString(alarm, tone));
-	    methodsToSelected.put(email, texts.getString(email, enterEmail));
-	    methodsToSelected.put(text, texts.getString(text, enterText));
+	    methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
+	    methodsToSelected.put(email, texts.getString(email, selectedEmail));
+	    methodsToSelected.put(text, texts.getString(text, selectedText));
 		
 		// Set up notifications button
 		homeText = (TextView) findViewById(R.id.textView3);
@@ -109,15 +111,15 @@ public class NotificationsActivity extends Activity {
 	      list.add(tasks[i]); 
 	    }
 
-        CustomListAdapter adapter = new CustomListAdapter(this, list);
+        adapter = new CustomListAdapter(this, list);
 
         taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        	
   	      @SuppressLint("NewApi")
-  		@Override
+  	      @Override
   	      public void onItemClick(AdapterView<?> parent, final View view,
   	          int position, long id) {
-  	    	  System.out.println("click!");
+  	    	  
             	RelativeLayout item = (RelativeLayout) view;
             	CheckBox check = (CheckBox) item.getChildAt(2);
     	        String itemText;
@@ -143,25 +145,15 @@ public class NotificationsActivity extends Activity {
     	        	item.setBackgroundColor(Color.parseColor(purpleBg));
     	            check.setChecked(true);
     	            tasksToSelected.put(itemText, true);
-    	        }
+    	        }  
     	        
-    	        if (position == 0) {
-    	        	//pop up intent to select desired alarm
-    	        	//(spinner should be selectable from notif screen if messed up first time)
-    	        } else if (position == 1) {
-    	        	//pop up option to enter email address
-    	        	//if already entered before, old email will be displayed
-    	        	//(should also be able to change email from notif screen if messed up first time)
-    	        } else if (position == 2) {
-    	        	//pop up address book to select contact
-    	        	//(should also be able to select contact from notif screen if messed up the first time)
-    	        }
-            	
     	        
             }
         });
 
         taskList.setAdapter(adapter);
+        
+        
       
     }
 
@@ -255,15 +247,16 @@ public class NotificationsActivity extends Activity {
 
 	    public View getView(int position, View convertView, ViewGroup viewGroup) {
 	    	View view = convertView;
+	    	final int pos = position;
 	        if (view == null) {
 	            LayoutInflater inflater = (LayoutInflater) context
 	                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	            view = inflater.inflate(R.layout.custom_notif_row, null);
 	        }
 	        
-	        TextView textview = (TextView) view.findViewById(R.id.text1);
-	        Button button = (Button) view.findViewById(R.id.button1);
-	        CheckBox cb = (CheckBox) view.findViewById(R.id.check1);
+	        final TextView textview = (TextView) view.findViewById(R.id.text1);
+	        final Button button = (Button) view.findViewById(R.id.button1);
+	        final CheckBox cb = (CheckBox) view.findViewById(R.id.check1);
 	   	 	
 	        //set text for notification method and button
 	        if (position == 0) {
@@ -288,14 +281,41 @@ public class NotificationsActivity extends Activity {
 	   	 		cb.setChecked(false);
 	   	 	}
 	   	 	
+	   	 	//if button clicked, we want to set the item to "checked"
+	   	 	//and start intent to set alarm/email/text
+	        button.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View v) {
+	            	//System.out.println("button clicked");
+	            	if (pos == 0) {
+	            		//TODO Emily: select default tone oncreate
+	            		//System.out.println("set alarm clicked");
+	    	        	//pop up intent to select desired alarm
+	            		Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+	            		intent.putExtra("position", pos);
+	            		startActivityForResult(intent, 0);
+	            		
+	    	        } else if (pos == 1) {
+	    	        	//TODO Armando
+	    	        	//pop up option to enter email address
+	    	        	//if already entered before, old email will be displayed
+	    	        	//(should also be able to change email from notif screen if messed up first time): implemented
+	    	        } else if (pos == 2) {
+	    	        	//TODO Emily
+	    	        	//pop up address book to select contact
+
+	    	        }
+	            }
+	            
+	            
+	        });
+	        
+	   	 	
 	   	 	notifyDataSetChanged();
 	   	 	return view;
 	   	
-	        /*TextView tvContact = (TextView) convertView.findViewById(R.id.tvContact);
-	        tvContact.setText(entry.getName());
-
-	        TextView tvPhone = (TextView) convertView.findViewById(R.id.tvMobile);
-	        tvPhone.setText(entry.getPhone());*/
 
 	        // Set the onClick Listener on this button
 //	        Button btnRemove = (Button) convertView.findViewById(R.id.btnRemove);
@@ -308,12 +328,11 @@ public class NotificationsActivity extends Activity {
 	        // the item
 	        // that was clicked.
 //	        btnRemove.setTag(entry);
-
 	        // btnRemove.setId(position);
-	        
-
 	        //return convertView;
 	    }
+	    
+	    
 
 	    @Override
 	    public void onClick(View view) {
@@ -330,6 +349,30 @@ public class NotificationsActivity extends Activity {
 	    }
 
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if (resultCode == Activity.RESULT_OK && requestCode == 0) {
+             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+             int pos = intent.getExtras().getInt("position");
+             System.out.println("pos " + pos);
+             if (uri != null) {
+                 selectedTone = uri.toString();
+                 methodsToSelected.put(alarm, selectedTone);
+                 /*System.out.println("item 0: " + taskList.getItemAtPosition(pos));
+                 RelativeLayout item = (RelativeLayout) taskList
+                 Button button = (Button) item.getChildAt(1);
+                 button.setText(selectedTone);*/
+                 //adapter.notifyDataSetChanged();
+                 //TODO Emily display new alarm text on button
+             } //else nothing
+         }   //TODO Emily, Armando: add if-else cases for email, text  
+			//logic: listview "item" aka relativelayout, and button, both are clickable. 
+			//if item clicked: it goes from highlighted -> non or non -> highlighted (and selection intent triggered)
+			//if button clicked: selection intent triggered and item selected (always)
+			
+        
+     }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -350,9 +393,9 @@ public class NotificationsActivity extends Activity {
 	   tasksToSelected.put(text,settings.getBoolean(text, false));
 	   methodsToSelected = new HashMap<String, String>();
 	   SharedPreferences texts = getSharedPreferences("texts", 0);
-	   methodsToSelected.put(alarm, texts.getString(alarm, tone));
-	   methodsToSelected.put(email, texts.getString(email, enterEmail));
-	   methodsToSelected.put(text, texts.getString(text, enterText));
+	   methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
+	   methodsToSelected.put(email, texts.getString(email, selectedEmail));
+	   methodsToSelected.put(text, texts.getString(text, selectedText));
     }
 
     @Override
