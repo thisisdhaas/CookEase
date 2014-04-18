@@ -3,6 +3,7 @@ package edu.berkeley.cs160.DeansOfDesign.cookease;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import android.view.ViewGroup;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,8 +21,11 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class NotificationsActivity extends Activity {
@@ -36,11 +40,15 @@ public class NotificationsActivity extends Activity {
     String white = "#ffffff";
     String darkPurple = "#1A0637";
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
+    public HashMap<String, String> methodsToSelected = new HashMap<String, String>();
     public ListView taskList;
     CustomListAdapter adapter = null;
     String alarm = "Alarm";
     String email = "Email";
     String text = "Text";
+    String tone = "Default Tone";
+    String enterEmail = "Enter email";
+    String enterText = "Enter phone #";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +60,10 @@ public class NotificationsActivity extends Activity {
 	    tasksToSelected.put(alarm, settings.getBoolean(alarm, true)); //by default, only alarm selected
 	    tasksToSelected.put(email, settings.getBoolean(email, false));
 	    tasksToSelected.put(text,settings.getBoolean(text, false));
+	    SharedPreferences texts = getSharedPreferences("texts", 0);
+	    methodsToSelected.put(alarm, texts.getString(alarm, tone));
+	    methodsToSelected.put(email, texts.getString(email, enterEmail));
+	    methodsToSelected.put(text, texts.getString(text, enterText));
 		
 		// Set up notifications button
 		homeText = (TextView) findViewById(R.id.textView3);
@@ -86,12 +98,18 @@ public class NotificationsActivity extends Activity {
 		taskList = (ListView) findViewById(R.id.listView2);
         taskList.setClickable(true);
 
-        final List<CustomList> listOfPhonebook = new ArrayList<CustomList>();
+        /*final List<CustomList> listOfPhonebook = new ArrayList<CustomList>();
         listOfPhonebook.add(new CustomList(alarm, "Happy Tone"));
         listOfPhonebook.add(new CustomList(email, "joe@berkeley.edu"));
-        listOfPhonebook.add(new CustomList(text, "Armando Mota"));
+        listOfPhonebook.add(new CustomList(text, "Armando Mota"));*/
+        
+        String tasks[] ={alarm, email, text};
+		final ArrayList<String> list = new ArrayList<String>();
+	    for (int i = 0; i < tasks.length; ++i) {
+	      list.add(tasks[i]); 
+	    }
 
-        CustomListAdapter adapter = new CustomListAdapter(this, listOfPhonebook);
+        CustomListAdapter adapter = new CustomListAdapter(this, list);
 
         taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -99,10 +117,9 @@ public class NotificationsActivity extends Activity {
   		@Override
   	      public void onItemClick(AdapterView<?> parent, final View view,
   	          int position, long id) {
-
-            	
-            	CheckedTextView item = (CheckedTextView) view;
-            	System.out.println(item);
+  	    	  System.out.println("click!");
+            	RelativeLayout item = (RelativeLayout) view;
+            	CheckBox check = (CheckBox) item.getChildAt(2);
     	        String itemText;
     	        
     	        // User selected "Alarm"
@@ -120,18 +137,16 @@ public class NotificationsActivity extends Activity {
             	
     	        if (tasksToSelected.get(itemText)) { //selected already
     	        	item.setBackgroundColor(Color.parseColor(greyBg));
-    	        	item.setTextColor(Color.parseColor(white));
-    	            item.setChecked(false);
+    	            check.setChecked(false);
     	        	tasksToSelected.put(itemText, false);
     	        } else { //not selected yet
     	        	item.setBackgroundColor(Color.parseColor(purpleBg));
-    	        	item.setTextColor(Color.parseColor(white));
-    	            item.setChecked(true);
+    	            check.setChecked(true);
     	            tasksToSelected.put(itemText, true);
     	        }
     	        
     	        if (position == 0) {
-    	        	//pop up spinner? to select desired alarm
+    	        	//pop up intent to select desired alarm
     	        	//(spinner should be selectable from notif screen if messed up first time)
     	        } else if (position == 1) {
     	        	//pop up option to enter email address
@@ -142,97 +157,13 @@ public class NotificationsActivity extends Activity {
     	        	//(should also be able to select contact from notif screen if messed up the first time)
     	        }
             	
-    	        /*if (selectedTasks.contains(itemText)) {
-    	        	item.setTextColor(Color.parseColor(white));
-//    	            item.setChecked(false);
-    	        	int pos = selectedTasks.indexOf(itemText);
-    	        	selectedTasks.remove(pos);	                
-    	        } else {
-//    	        	item.setBackgroundColor(Color.parseColor(yaleBlue));
-    	        	item.setTextColor(Color.parseColor(darkPurple));
-//    	            item.setChecked(true);
-    	        	selectedTasks.add(itemText);
-    	        }*/
-//                showToast(listOfPhonebook.get(position).getName());
+    	        
             }
         });
 
         taskList.setAdapter(adapter);
-        
-        taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-	    taskList.setItemChecked(0, tasksToSelected.get(alarm));
-	    taskList.setItemChecked(1, tasksToSelected.get(email));
-	    taskList.setItemChecked(2, tasksToSelected.get(text));
+      
     }
-
-//    private void showToast(String message) {
-//        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-//    }
-		
-/*		final ListView taskList = (ListView) findViewById(R.id.listView1);
-		String tasks[] ={"Phone Alarm","Email a friend","Text a friend"};
-		final ArrayList<String> list = new ArrayList<String>();
-	    for (int i = 0; i < tasks.length; ++i) {
-	      list.add(tasks[i]);
-	    }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, list);
-	    
-	    taskList.setAdapter(adapter);
-	    
-	    for (int i=0; i < tasks.length-1; i++) {
-	    	taskList.setItemChecked(i, true);
-	    }
-
-	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-	      @SuppressLint("NewApi")
-		@Override
-	      public void onItemClick(AdapterView<?> parent, final View view,
-	          int position, long id) {
-
-	          TextView item = (TextView) view;
-	          
-	          //The change color logic is here!
-	          if(item.isChecked()) {
-	              item.setTextColor(Color.BLACK);
-	              item.setChecked(false);
-	          }
-	          else {
-	              item.setTextColor(Color.RED);
-	              item.setChecked(true);
-	          }
-	    	  
-	        final String itemText = (String) parent.getItemAtPosition(position);
-	        String yaleBlue = "#3C94D3";
-	        String calYellow = "#FFAA3C";
-	        String whiteSmoke = "#F5F5F5";
-	        String grayBg = "#88676767";
-	        if (selectedTasks.contains(itemText)) {
-//	        	item.setBackgroundColor(Color.parseColor(grayBg));
-	        	item.setTextColor(Color.parseColor(whiteSmoke));
-//	            item.setChecked(false);
-	        	int index = selectedTasks.indexOf(itemText);
-	        	selectedTasks.remove(index);     
-	        } else {
-//	        	item.setBackgroundColor(Color.parseColor(yaleBlue));
-	        	item.setTextColor(Color.parseColor(calYellow));
-//	            item.setChecked(true);
-	        	selectedTasks.add(itemText);
-	        }
-	        
-//	        view.animate().setDuration(2000).alpha(0)
-//	            .withEndAction(new Runnable() {
-//	              @Override
-//	              public void run() {
-//	                list.remove(item);
-//	                adapter.notifyDataSetChanged();
-//	                view.setAlpha(1);
-//	              }
-//	            });
-	      }
-	    });		*/
 
 	// User clicked on the Analytics button
 	protected void doAnalytics(View view) {
@@ -300,22 +231,22 @@ public class NotificationsActivity extends Activity {
 	public class CustomListAdapter extends BaseAdapter implements OnClickListener {
 	    private Context context;
 
-	    private List<CustomList> listPhonebook;
+	    private List<String> list;
 	    String alarm = "Alarm";
 	    String email = "Email";
 	    String text = "Text";
 
-	    public CustomListAdapter(Context context, List<CustomList> listPhonebook) {
+	    public CustomListAdapter(Context context, List<String> list) {
 	        this.context = context;
-	        this.listPhonebook = listPhonebook;
+	        this.list = list;
 	    }
 
 	    public int getCount() {
-	        return listPhonebook.size();
+	        return list.size();
 	    }
 
 	    public Object getItem(int position) {
-	        return listPhonebook.get(position);
+	        return list.get(position);
 	    }
 
 	    public long getItemId(int position) {
@@ -330,22 +261,33 @@ public class NotificationsActivity extends Activity {
 	            view = inflater.inflate(R.layout.custom_notif_row, null);
 	        }
 	        
-	        CheckedTextView temp = (CheckedTextView) view.findViewById(R.id.text1);
-	   	 	if (position == 0) {
-	   	 		temp.setText(alarm);
+	        TextView textview = (TextView) view.findViewById(R.id.text1);
+	        Button button = (Button) view.findViewById(R.id.button1);
+	        CheckBox cb = (CheckBox) view.findViewById(R.id.check1);
+	   	 	
+	        //set text for notification method and button
+	        if (position == 0) {
+	   	 		textview.setText(alarm);
+	   	 		button.setText(methodsToSelected.get(alarm));
 	   	 	} else if (position == 1) {
-	   	 		temp.setText(email);
+	   	 		textview.setText(email);
+	   	 		button.setText(methodsToSelected.get(email));
 	   	 	} else if (position == 2) {
-	   	 		temp.setText(text);
+	   	 		textview.setText(text);
+	   	 		button.setText(methodsToSelected.get(text));
 	   	 	}
 	   	
+	        //set background color + ischecked of list item
 	   	 	if ((position == 0 && tasksToSelected.get(alarm)) ||
 	   			(position == 1 && tasksToSelected.get(email)) ||
 	   			(position == 2 && tasksToSelected.get(text))) {
 	   				view.setBackgroundColor(Color.parseColor(purpleBg));
+	   				cb.setChecked(true);
 	   	 	} else {
 	   	 		view.setBackgroundColor(Color.parseColor(greyBg));
+	   	 		cb.setChecked(false);
 	   	 	}
+	   	 	
 	   	 	notifyDataSetChanged();
 	   	 	return view;
 	   	
@@ -376,7 +318,7 @@ public class NotificationsActivity extends Activity {
 	    @Override
 	    public void onClick(View view) {
 	    	CustomList entry = (CustomList) view.getTag();
-	        listPhonebook.remove(entry);
+	        list.remove(entry);
 	        // listPhonebook.remove(view.getId());
 	        notifyDataSetChanged();
 
@@ -406,6 +348,11 @@ public class NotificationsActivity extends Activity {
        tasksToSelected.put(alarm, settings.getBoolean(alarm, true));
 	   tasksToSelected.put(email, settings.getBoolean(email, false));
 	   tasksToSelected.put(text,settings.getBoolean(text, false));
+	   methodsToSelected = new HashMap<String, String>();
+	   SharedPreferences texts = getSharedPreferences("texts", 0);
+	   methodsToSelected.put(alarm, texts.getString(alarm, tone));
+	   methodsToSelected.put(email, texts.getString(email, enterEmail));
+	   methodsToSelected.put(text, texts.getString(text, enterText));
     }
 
     @Override
@@ -419,6 +366,11 @@ public class NotificationsActivity extends Activity {
       editor.putBoolean(alarm, tasksToSelected.get(alarm));
       editor.putBoolean(email, tasksToSelected.get(email));
       editor.putBoolean(text, tasksToSelected.get(text));
+      SharedPreferences texts = getSharedPreferences("texts", 0);
+      editor = texts.edit();
+      editor.putString(alarm, methodsToSelected.get(alarm));
+      editor.putString(email, methodsToSelected.get(email));
+      editor.putString(text, methodsToSelected.get(text));
 
       // Commit the edits!
       editor.commit();
