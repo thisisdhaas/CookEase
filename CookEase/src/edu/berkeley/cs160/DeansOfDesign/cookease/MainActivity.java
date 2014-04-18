@@ -45,6 +45,8 @@ public class MainActivity extends Activity {
     private static TextView settingsText = null;
     private static TextView instructionText = null;
     
+    public String Namkyu = "rocks";
+    
     public String alert_message = "Your water is boiling!\nYour microwave is done!";
     public String alert_title = "CookEase Alert";
     public String water = "Water boiling";
