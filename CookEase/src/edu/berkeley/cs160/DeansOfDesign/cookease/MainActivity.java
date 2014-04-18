@@ -45,6 +45,9 @@ public class MainActivity extends Activity {
     private static TextView settingsText = null;
     private static TextView instructionText = null;
     
+    // Testing Steven's GitHub, don't mind this
+    private String steven = "Steven sucks";
+    
     public String alert_message = "Your water is boiling!\nYour microwave is done!";
     public String alert_title = "CookEase Alert";
     public String water = "Water boiling";
