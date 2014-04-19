@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,9 +49,12 @@ public class NotificationsActivity extends Activity {
     String alarm = "Alarm";
     String email = "Email";
     String text = "Text";
-    String selectedTone = "Default Tone";
+    String deftone = "Default Tone";
+    String selectedTone = deftone;
     String selectedEmail = "Enter email";
     String selectedText = "Enter phone #";
+    Button mButton;
+    Ringtone rTone = null;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +67,15 @@ public class NotificationsActivity extends Activity {
 	    tasksToSelected.put(email, settings.getBoolean(email, false));
 	    tasksToSelected.put(text,settings.getBoolean(text, false));
 	    SharedPreferences texts = getSharedPreferences("texts", 0);
-	    methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
+	    if (rTone == null) {
+	    	rTone = RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+	    	methodsToSelected.put(alarm, deftone);
+	    } else {
+	    	methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
+	    }
 	    methodsToSelected.put(email, texts.getString(email, selectedEmail));
 	    methodsToSelected.put(text, texts.getString(text, selectedText));
-		
+	    
 		// Set up notifications button
 		homeText = (TextView) findViewById(R.id.textView3);
 		homeText.setOnClickListener(
@@ -86,13 +95,14 @@ public class NotificationsActivity extends Activity {
                 }
             }
         );
-		// Demo only, click instructions for friends list
+		// prototype only, click instructions to sound chosen alarm
 		instructionsText = (TextView) findViewById(R.id.textView6);
 		instructionsText.setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
 //		                	alert();
-                	showFriends();  
+                	//showFriends();  
+                	rTone.play();
                 }
             }
         );
@@ -246,6 +256,7 @@ public class NotificationsActivity extends Activity {
 	    }
 
 	    public View getView(int position, View convertView, ViewGroup viewGroup) {
+	    	System.out.println("in get view");
 	    	View view = convertView;
 	    	final int pos = position;
 	        if (view == null) {
@@ -255,19 +266,19 @@ public class NotificationsActivity extends Activity {
 	        }
 	        
 	        final TextView textview = (TextView) view.findViewById(R.id.text1);
-	        final Button button = (Button) view.findViewById(R.id.button1);
+	        Button b = (Button) view.findViewById(R.id.button1);
 	        final CheckBox cb = (CheckBox) view.findViewById(R.id.check1);
 	   	 	
 	        //set text for notification method and button
 	        if (position == 0) {
 	   	 		textview.setText(alarm);
-	   	 		button.setText(methodsToSelected.get(alarm));
+	   	 		b.setText(methodsToSelected.get(alarm));
 	   	 	} else if (position == 1) {
 	   	 		textview.setText(email);
-	   	 		button.setText(methodsToSelected.get(email));
+	   	 		b.setText(methodsToSelected.get(email));
 	   	 	} else if (position == 2) {
 	   	 		textview.setText(text);
-	   	 		button.setText(methodsToSelected.get(text));
+	   	 		b.setText(methodsToSelected.get(text));
 	   	 	}
 	   	
 	        //set background color + ischecked of list item
@@ -283,7 +294,7 @@ public class NotificationsActivity extends Activity {
 	   	 	
 	   	 	//if button clicked, we want to set the item to "checked"
 	   	 	//and start intent to set alarm/email/text
-	        button.setOnClickListener(new View.OnClickListener() {
+	        b.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View v) {
 	            	//System.out.println("button clicked");
 	            	if (pos == 0) {
@@ -295,6 +306,7 @@ public class NotificationsActivity extends Activity {
 	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
 	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
 	            		intent.putExtra("position", pos);
+	            		System.out.println("onclick");
 	            		startActivityForResult(intent, 0);
 	            		
 	    	        } else if (pos == 1) {
@@ -352,19 +364,30 @@ public class NotificationsActivity extends Activity {
 	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
 		if (resultCode == Activity.RESULT_OK && requestCode == 0) {
              Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-             int pos = intent.getExtras().getInt("position");
-             System.out.println("pos " + pos);
              if (uri != null) {
                  selectedTone = uri.toString();
-                 methodsToSelected.put(alarm, selectedTone);
-                 /*System.out.println("item 0: " + taskList.getItemAtPosition(pos));
-                 RelativeLayout item = (RelativeLayout) taskList
-                 Button button = (Button) item.getChildAt(1);
-                 button.setText(selectedTone);*/
-                 //adapter.notifyDataSetChanged();
-                 //TODO Emily display new alarm text on button
+                 rTone = RingtoneManager.getRingtone(getBaseContext(), uri);
+                 String name;
+                 if (rTone.getTitle(getApplicationContext()).equals(RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(getApplicationContext()))) {
+                	 //System.out.println("RTONE IS DEFAULT");
+                	 name = deftone;
+                 } else {
+                	 name = rTone.getTitle(getBaseContext());
+                 }
+                 methodsToSelected.put(alarm, name);
+                 tasksToSelected.put(alarm, true);
+                 SharedPreferences texts = getSharedPreferences("texts", 0);
+                 SharedPreferences.Editor editor = texts.edit();
+                 editor.putString(alarm, methodsToSelected.get(alarm));
+                 editor.commit();
+                 SharedPreferences settings = getSharedPreferences("settings", 0);
+                 editor = settings.edit();
+                 editor.putBoolean(alarm, tasksToSelected.get(alarm));
+                 editor.commit();
+                 System.out.println("onactresult");
              } //else nothing
          }   //TODO Emily, Armando: add if-else cases for email, text  
 			//logic: listview "item" aka relativelayout, and button, both are clickable. 
@@ -387,15 +410,17 @@ public class NotificationsActivity extends Activity {
 		
        // Restore preferences
        SharedPreferences settings = getSharedPreferences("settings", 0);
-       tasksToSelected = new HashMap<String, Boolean>();
        tasksToSelected.put(alarm, settings.getBoolean(alarm, true));
 	   tasksToSelected.put(email, settings.getBoolean(email, false));
 	   tasksToSelected.put(text,settings.getBoolean(text, false));
-	   methodsToSelected = new HashMap<String, String>();
-	   SharedPreferences texts = getSharedPreferences("texts", 0);
+	   SharedPreferences texts = getSharedPreferences("texts", 0); 
+	   //System.out.println("resume alarm " + texts.getString(alarm, "poop"));
 	   methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
 	   methodsToSelected.put(email, texts.getString(email, selectedEmail));
 	   methodsToSelected.put(text, texts.getString(text, selectedText));
+
+	   //System.out.println("methodsToSelected is " + methodsToSelected);
+	   adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -409,14 +434,18 @@ public class NotificationsActivity extends Activity {
       editor.putBoolean(alarm, tasksToSelected.get(alarm));
       editor.putBoolean(email, tasksToSelected.get(email));
       editor.putBoolean(text, tasksToSelected.get(text));
+      editor.commit();
+      
       SharedPreferences texts = getSharedPreferences("texts", 0);
       editor = texts.edit();
+      if (rTone.getTitle(getApplicationContext()).equals(RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(getApplicationContext()))) {
+       	 methodsToSelected.put(alarm, deftone);
+      }
       editor.putString(alarm, methodsToSelected.get(alarm));
       editor.putString(email, methodsToSelected.get(email));
       editor.putString(text, methodsToSelected.get(text));
-
-      // Commit the edits!
       editor.commit();
+      
     }
 
 }
