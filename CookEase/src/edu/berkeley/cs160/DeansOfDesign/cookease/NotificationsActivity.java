@@ -159,6 +159,20 @@ public class NotificationsActivity extends Activity {
     	        	item.setBackgroundColor(Color.parseColor(purpleBg));
     	            check.setChecked(true);
     	            tasksToSelected.put(itemText, true);
+    	            // Even though the whole bar has been clicked, we still want to show the contact list
+    	            // and set the chosen contact's email to selectedEmail
+    	            if (position == 0){
+    	            	Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+	            		intent.putExtra("position", position);
+	            		System.out.println("onclick");
+	            		startActivityForResult(intent, 0);
+    	            } else {
+    	            	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+    	            	startActivityForResult(intent, position);
+    	            }
     	        }  
     	        
     	        
@@ -298,6 +312,8 @@ public class NotificationsActivity extends Activity {
 	   	 	
 	   	 	//if button clicked, we want to set the item to "checked"
 	   	 	//and start intent to set alarm/email/text
+	   	 	Log.d("POSITION", "" + position);
+	   	 	Log.d("POS", "" + pos);
 	        b.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View v) {
 	            	//System.out.println("button clicked");
@@ -313,24 +329,13 @@ public class NotificationsActivity extends Activity {
 	            		System.out.println("onclick");
 	            		startActivityForResult(intent, 0);
 	            		
-	    	        } else if (pos == 1) {
-	    	        	// Show contact list and set the chosen contact's email to selectedEmail
+	    	        } else {
+	    	        	// Show contact list and set the chosen contact's email or phone number to selectedEmail/selectedText
 	    	        	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-	    	        	startActivityForResult(intent, 1);
-	    	        } else if (pos == 2) {
-	    	        	//TODO Emily
-	    	        	//pop up address book to select contact
-	    	        	// Armando - it was the same line of code so I just put it here.  You can change it if you want.
-	    	        	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-	    	        	startActivityForResult(intent, 2);
-
+	    	        	startActivityForResult(intent, pos);
 	    	        }
-	            }
-	            
-	            
+	            }  
 	        });
-	        
-	   	 	
 	   	 	notifyDataSetChanged();
 	   	 	return view;
 	   	
@@ -450,16 +455,11 @@ public class NotificationsActivity extends Activity {
 				}
 			}
 			// For testing purposes - to make sure these are changing appropriately
-			//Log.d("Phone number is: ", selectedText);
-			//Log.d("Email is: ", selectedEmail);
-			//Log.d("Alarm tone is: ", selectedTone);
-         } //TODO Emily, Armando: add if-else cases for email, text  
-		   //logic: listview "item" aka relativelayout, and button, both are clickable. 
-		   //if item clicked: it goes from highlighted -> non or non -> highlighted (and selection intent triggered)
-		   //if button clicked: selection intent triggered and item selected (always)
-			
-        
-     }
+			//Log.d("Phone number is now: ", selectedText);
+			//Log.d("Email is now: ", selectedEmail);
+			//Log.d("Alarm tone is now: ", selectedTone);
+        }
+    }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
