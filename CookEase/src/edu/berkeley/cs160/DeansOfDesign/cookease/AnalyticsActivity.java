@@ -18,12 +18,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class AnalyticsActivity extends Activity {
 
 	private static TextView homeText;
 	private static TextView notificatonsText;
+	
+	// For analytics testing
+	private static Button waterButton;
+	private static Button microwaveButton;
+	
+	private Boolean waterListening = false;
+	private Boolean microwaveListening = false;
+	
 	private long waterTime = 0;
 	private long microwaveTime = 0;
 	
@@ -54,6 +64,39 @@ public class AnalyticsActivity extends Activity {
                 }
             }
         );
+		
+		// Set up test water button
+		waterButton = (Button) findViewById(R.id.button1);
+		waterButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						if (waterListening) {
+							waterListening = false;
+							finishTime("water");
+						} else {
+							waterListening = true;
+							startTime("water");
+						}
+					}
+				}
+		);
+		
+		// Set up test microwave button
+		microwaveButton = (Button) findViewById(R.id.button2);
+		microwaveButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						if (microwaveListening) {
+							microwaveListening = false;
+							finishTime("microwave");
+						} else {
+							microwaveListening = true;
+							startTime("microwave");
+						}
+					}
+				}
+		);
+		displayStats();
 	}
 	
 	public void doHome(View view) {
@@ -122,6 +165,7 @@ public class AnalyticsActivity extends Activity {
         	} else {
             // File not found?
             	FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            	fos.write("".getBytes());
             	fos.close();
                 fis = new FileInputStream(fileName);
             }
@@ -164,5 +208,58 @@ public class AnalyticsActivity extends Activity {
 /*		FileOutputStream fos = openFileOutput(file, Context.MODE_PRIVATE);
 		fos.write(string.getBytes());
 		fos.close();*/
+	}
+	
+	public void displayStats() {
+		TextView waterText = (TextView) findViewById(R.id.textView8);
+		TextView microwaveText = (TextView) findViewById(R.id.textView9);
+		String waterFile = "waterAnalyticsRecord";
+		String microwaveFile = "microwaveAnalyticsRecord";
+		
+		int i = 0;
+		while (i < 2) {
+			String fileName = null;
+			TextView curText = null;
+			if (i == 0) {
+				fileName = waterFile;
+				curText = waterText;
+			} else {
+				fileName = microwaveFile;
+				curText = microwaveText;
+			}
+	        FileInputStream fis = null;
+	        BufferedReader reader = null;
+			try {
+				// Open file and inputstream and stuff like that 
+		    	File myFile = new File(fileName);
+		    	if (myFile.exists()) {
+		    		fis = new FileInputStream(fileName);
+		    	} else {
+		    		// File not found?
+		        	return;
+		        }
+	            reader = new BufferedReader(new InputStreamReader(fis));
+	            // Print these lines
+	            String line = reader.readLine();
+	            while(line != null){
+	            	curText.append(line);
+	                line = reader.readLine();
+	            } 
+			}  catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				try {
+					if (reader == null || fis == null) {
+						return;
+					}
+					reader.close();
+					fis.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }
