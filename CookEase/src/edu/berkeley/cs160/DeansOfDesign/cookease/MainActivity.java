@@ -60,6 +60,8 @@ public class MainActivity extends Activity {
     
     
   
+    // For audio processing
+    private BoilingWaterDetector boilingWaterDetector;
     
     // For demo only, a timer:
     //private Timer timer = new Timer(); 
@@ -111,6 +113,10 @@ public class MainActivity extends Activity {
                 }
             }
         );
+		
+		// Setup audio processing
+		boilingWaterDetector = new BoilingWaterDetector(this);
+		boilingWaterDetector.startDetection(); // TODO: only start when task is selected.
 		
 		taskList = (ListView) findViewById(R.id.listView1);
 		String tasks[] ={water, microDone, microExplo, other};
@@ -354,6 +360,9 @@ public class MainActivity extends Activity {
     protected void onResume(){
 		super.onResume();
 		
+		// Start listening for things!
+		boilingWaterDetector.startDetection();
+		
        // Restore preferences
        SharedPreferences settings = getSharedPreferences("settings", 0);
        tasksToSelected = new HashMap<String, Boolean>();
@@ -381,4 +390,12 @@ public class MainActivity extends Activity {
     }
     
 
+    @Override
+    protected void onDestroy(){
+    	super.onDestroy();
+
+    	// Stop listening for things!
+    	boilingWaterDetector.stopDetection();
+    }
+    
 }
