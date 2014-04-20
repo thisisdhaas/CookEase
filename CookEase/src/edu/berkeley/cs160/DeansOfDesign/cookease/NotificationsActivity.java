@@ -54,8 +54,8 @@ public class NotificationsActivity extends Activity {
     String text = "Text";
     String deftone = "Default Tone";
     String selectedTone = deftone;
-    String selectedEmail = "Enter email";
-    String selectedText = "Enter phone #";
+    static String selectedEmail = "Enter email";
+    static String selectedText = "Enter phone #";
     String selectedName = "Name";
     Button mButton;
     Ringtone rTone = null;
@@ -312,8 +312,6 @@ public class NotificationsActivity extends Activity {
 	   	 	
 	   	 	//if button clicked, we want to set the item to "checked"
 	   	 	//and start intent to set alarm/email/text
-	   	 	Log.d("POSITION", "" + position);
-	   	 	Log.d("POS", "" + pos);
 	        b.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View v) {
 	            	//System.out.println("button clicked");
@@ -509,6 +507,14 @@ public class NotificationsActivity extends Activity {
       editor.putString(text, methodsToSelected.get(text));
       editor.commit();
       
+    }
+    
+    static String getEmail() {
+    	return selectedEmail;
+    }
+    
+    static String getNumber() {
+    	return selectedText;
     }
 
 }

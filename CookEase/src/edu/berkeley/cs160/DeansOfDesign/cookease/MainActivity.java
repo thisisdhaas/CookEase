@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
   
     
     // For demo only, a timer:
-    private Timer timer = new Timer(); 
+    //private Timer timer = new Timer(); 
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,52 +122,44 @@ public class MainActivity extends Activity {
 	    taskList.setAdapter(adapter);
 	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-	      @SuppressLint("NewApi")
-		@Override
-	      public void onItemClick(AdapterView<?> parent, final View view,
-	          int position, long id) {
-
-	          CheckedTextView item = (CheckedTextView) view;
-	    	  
-	        String itemText = (String) parent.getItemAtPosition(position);
-
-	        if (tasksToSelected.get(itemText)) { //selected already
-	        	item.setBackgroundColor(Color.parseColor(greyBg));
-	        	item.setTextColor(Color.parseColor(white));
-	            item.setChecked(false);
-	        	tasksToSelected.put(itemText, false);
-	        } else { //not selected yet
-	        	item.setBackgroundColor(Color.parseColor(purpleBg));
-	        	item.setTextColor(Color.parseColor(white));
-	            item.setChecked(true);
-	            tasksToSelected.put(itemText, true);
-	        }
-		        // For demo only, run 5 second timer and pop up alert
-//	            timer.schedule(new MyTimerTask(), 5000);
-		        // End demo stuff here
-	        
-//	        view.animate().setDuration(2000).alpha(0)
-//	            .withEndAction(new Runnable() {
-//	              @Override
-//	              public void run() {
-//	                list.remove(item);
-//	                adapter.notifyDataSetChanged();
-//	                view.setAlpha(1);
-//	              }
-//	            });
-	      }
-	    });
-	    
+	    	@SuppressLint("NewApi")
+	    	@Override
+	    	public void onItemClick(AdapterView<?> parent, final View view,
+	    			int position, long id) {
+	    		CheckedTextView item = (CheckedTextView) view;
+	    		String itemText = (String) parent.getItemAtPosition(position);
+	    		if (tasksToSelected.get(itemText)) { //selected already
+	    			item.setBackgroundColor(Color.parseColor(greyBg));
+	    			item.setTextColor(Color.parseColor(white));
+	    			item.setChecked(false);
+	    			tasksToSelected.put(itemText, false);
+	    		} else { //not selected yet
+	    			item.setBackgroundColor(Color.parseColor(purpleBg));
+	    			item.setTextColor(Color.parseColor(white));
+	    			item.setChecked(true);
+	    			tasksToSelected.put(itemText, true);
+	    		}
+	    		/*//For demo only, run 5 second timer and pop up alert
+	        	timer.schedule(new MyTimerTask(), 5000);
+		    	// End demo stuff here
+	        	view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
+	              	@Override
+	              	public void run() {
+	                	list.remove(item);
+	                	adapter.notifyDataSetChanged();
+	                	view.setAlpha(1);
+	              	}
+	            	});
+	        	} */
+	    	}
+	    });   
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 	    taskList.setItemChecked(0, tasksToSelected.get(water));
 	    taskList.setItemChecked(1, tasksToSelected.get(microDone));
 	    taskList.setItemChecked(2, tasksToSelected.get(microExplo));
 	    taskList.setItemChecked(3, tasksToSelected.get(other));
-
 	    
-	    
-/*	    int wantedPosition = 10; // Whatever position you're looking for
-	    
+/*	    int wantedPosition = 10; // Whatever position you're looking for  
 	    int wantedChild = wantedPosition - firstPosition;
 	    // Say, first visible position is 8, you want position 10, wantedChild will now be 2
 	    // So that means your view is child #2 in the ViewGroup:
@@ -176,12 +168,9 @@ public class MainActivity extends Activity {
 	      return;
 	    }
 	    // Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
-	    View wantedView = listView.getChildAt(wantedChild);*/
-	    
-	    
-	  }
-
-	
+	    View wantedView = listView.getChildAt(wantedChild);*/  
+	}
+	/*
 	// For demo only
 	private class MyTimerTask extends TimerTask{
 
@@ -196,12 +185,12 @@ public class MainActivity extends Activity {
         }       
     }
 	// Demo end
-
-	  private class StableArrayAdapter extends ArrayAdapter<String> {
-
+ 	*/
+	private class StableArrayAdapter extends ArrayAdapter<String> {
+		
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 	    Context c;
-
+	    
 	    public StableArrayAdapter(Context context, int textViewResourceId,
 	        List<String> objects) {
 	      super(context, textViewResourceId, objects);
@@ -210,7 +199,7 @@ public class MainActivity extends Activity {
 	        mIdMap.put(objects.get(i), i);
 	      }
 	    }
-
+	    
 	    @Override
 	    public long getItemId(int position) {
 	      String item = getItem(position);
@@ -265,16 +254,16 @@ public class MainActivity extends Activity {
         startActivity(intent);
 	}
 	
-	// User clicked on the Notifcations button
+	// User clicked on the Notifications button
 	protected void doNotifications(View view) {
-		// Launch Analytics page
+		// Launch Notifications page
     	Intent intent = new Intent(this, NotificationsActivity.class);
 //    	String img = "sample1";
 //    	intent.putExtra(EXTRA_MESSAGE, img);
         startActivity(intent);
 	}
 	
-	// Alert is ready!
+	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
 	public void alert() {
 		new AlertDialog.Builder(this)
 	    .setTitle(alert_title)
@@ -285,52 +274,39 @@ public class MainActivity extends Activity {
 	        }
 	     })
 	     .show();
+		
+		// emails message to currently selected email
+		sendMessage(1);
+		
+		// texts message to currently selected phone number
+		//sendMessage(2); 
+		
 	}
 	
-	// Select-friend list
-	private ArrayList mSelectedItems = new ArrayList<String>();
-	public void showFriends() {
-		String names[] ={"Daniel","Emily","Armando","Steven","Namkyu"};
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        LayoutInflater inflater = getLayoutInflater();
-        View convertView = (View) inflater.inflate(R.layout.friends_list, null);
-        alertDialog.setView(convertView)
-        
-        // Specify the list array, the items to be selected by default (null for none),
-        // and the listener through which to receive callbacks when items are selected
-               .setMultiChoiceItems(names, null,
-                          new DialogInterface.OnMultiChoiceClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialog, int which,
-                           boolean isChecked) {
-                       if (isChecked) {
-                           // If the user checked the item, add it to the selected items
-                           mSelectedItems.add(which);
-                       } else if (mSelectedItems.contains(which)) {
-                           // Else, if the item is already in the array, remove it 
-                           mSelectedItems.remove(Integer.valueOf(which));
-                       }
-                   }
-               });
-        alertDialog.setTitle(friends_title);
-        
-	    alertDialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) { 
-	            // continue with delete
-	        }
-	     });
-	    
-	    alertDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) { 
-	            // continue with delete
-	        }
-	     });
-	    
-//        ListView lv = (ListView) convertView.findViewById(R.id.listView1);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,names);
-//        lv.setAdapter(adapter);
-        alertDialog.show();
+	// Send email or text message, depending on argument you pass in - 1 is email, 2 is text (phone number)
+	// The email portion hasn't worked on my emulator yet and I'm not sure if it's the emulator or the code - AM
+	public void sendMessage(int mtype) {
+		if (mtype == 1) {
+			// send email
+			String email = NotificationsActivity.getEmail();
+			try {   
+                GMailSender sender = new GMailSender("cookease.app@gmail.com", "deansofdesign");
+                sender.sendMail("This is CookEase",   
+                        "Your shit is boiling",   
+                        "cookease.app@gmail.com",
+                        email);
+                Log.d("Email sent to: ", email);
+            } catch (Exception e) {   
+                Log.e("SendMail", e.getMessage(), e);   
+            }
+		} else {
+			String textnum = NotificationsActivity.getNumber();
+			//TODO - Emily: implement text message send function.  The phone number is stored in the selectedText variable.
+		}
+
 	}
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
