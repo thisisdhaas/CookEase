@@ -51,9 +51,11 @@ public class BoilingWaterDetector implements OnAudioEventListener {
 	}
 	
 	public void startDetection() {
-		mAudioProc.useMic = mUseMic;
-		mAudioProc.listen();
-		Log.d(TAG, "listening!");
+		if (!mAudioProc.isRecording()) {
+			mAudioProc.useMic = mUseMic;
+			mAudioProc.listen();
+			Log.d(TAG, "listening!");
+		}
 	}
 	
 	@Override
