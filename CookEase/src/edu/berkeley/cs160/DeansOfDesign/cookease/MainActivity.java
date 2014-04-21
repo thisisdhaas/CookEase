@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
         );
 		
 		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(this, 0.05);
+		boilingWaterDetector = new BoilingWaterDetector(this, 0.04);
 		boilingWaterDetector.startDetection(); // TODO: only start when task is selected.
 		boilingWaterDetector.setOnBoilingEventListener(this);
 		

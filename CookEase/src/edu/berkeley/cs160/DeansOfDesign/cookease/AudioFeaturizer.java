@@ -73,9 +73,6 @@ public class AudioFeaturizer {
 	}
 	
 	public Instance run(AudioEvent ae) {
-		// TODO: actually use tarsosdsp to build features.
-		// Desired features: RMS, Beat salience, MFCC.
-		// Right now, just generating random features.
 		Instance featureVals = new DenseInstance(mFeatures.length);
 		double mfcc[] = computeMFCC(ae);
 		for (int i = 0; i < mFeatures.length; i++) {
@@ -151,7 +148,7 @@ public class AudioFeaturizer {
 		return 0.0;
 	}
 	
-	private double[] computeMFCC(AudioEvent ae) {
+	private synchronized double[] computeMFCC(AudioEvent ae) {
 		final MFCC mfcc = new MFCC(512, (int)ae.getSampleRate());
 		mfcc.process(ae);
 		float mfccs[] = mfcc.getMFCC();
