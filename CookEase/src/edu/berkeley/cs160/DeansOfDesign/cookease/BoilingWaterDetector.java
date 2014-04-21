@@ -80,14 +80,16 @@ public class BoilingWaterDetector implements OnAudioEventListener {
 		}
 		
 		// Update detection history
-		if (className == "1") {
-			mDetectionHistory.add(1d);
-			Log.d(TAG, "Classified sample as boiling!");
-		} else {
-			mDetectionHistory.add(0d);
-		}
-		if (mDetectionHistory.size() > HISTORY_SIZE) {
-			mDetectionHistory.remove(0);
+		synchronized(this) {
+			if (className == "1") {
+				mDetectionHistory.add(1d);
+				Log.d(TAG, "Classified sample as boiling!");
+			} else {
+				mDetectionHistory.add(0d);
+			}
+			if (mDetectionHistory.size() > HISTORY_SIZE) {
+				mDetectionHistory.remove(0);
+			}
 		}
 		
 		// Check the detection history against the threshold for alert.
