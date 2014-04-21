@@ -49,14 +49,14 @@ public class NotificationsActivity extends Activity {
     public HashMap<String, String> methodsToSelected = new HashMap<String, String>();
     public ListView taskList;
     CustomListAdapter adapter = null;
-    String alarm = "Alarm";
-    String email = "Email";
-    String text = "Text";
-    String deftone = "Default Tone";
-    String selectedTone = deftone;
+    static String alarm = "Alarm";
+    static String email = "Email";
+    static String text = "Text";
+    static String deftone = "Default Tone";
+    static String selectedTone = deftone;
     static String selectedEmail = "Enter email";
     static String selectedText = "Enter phone #";
-    String selectedName = "Name";
+    static String selectedName = "Name";
     Button mButton;
     Ringtone rTone = null;
     
@@ -508,13 +508,4 @@ public class NotificationsActivity extends Activity {
       editor.commit();
       
     }
-    
-    static String getEmail() {
-    	return selectedEmail;
-    }
-    
-    static String getNumber() {
-    	return selectedText;
-    }
-
 }

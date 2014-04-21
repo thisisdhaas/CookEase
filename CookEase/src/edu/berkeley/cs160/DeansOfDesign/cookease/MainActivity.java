@@ -49,11 +49,15 @@ public class MainActivity extends Activity {
     String greyBg = "#84a689";
     String purpleBg = "#a684a1";
     String white = "#ffffff";
+    private Mail sendMail;
+    String sendOkay = "";
 
     public String friends_title = "Who do you want to alert?";
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
     StableArrayAdapter adapter = null;
+    
+    
   
     
     // For demo only, a timer:
@@ -64,12 +68,18 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		// Make a mail object to send email with
+		//make a Mail object to email with
+	    sendMail = new Mail("cookease.app@gmail.com", "deansofdesign");
+		
 		// Restore preferences
 	    SharedPreferences settings = getSharedPreferences("settings", 0);
 	    tasksToSelected.put(water, settings.getBoolean(water, true));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
 	    tasksToSelected.put(other,settings.getBoolean(other, true));
+	    
+	    
 	    
 		
 		// Set up notifications button
@@ -269,38 +279,44 @@ public class MainActivity extends Activity {
 	        }
 	     })
 	     .show();
-		
-		// emails message to currently selected email
+		// sends a test email to the currently selected email address
 		sendMessage(1);
-		
-		// texts message to currently selected phone number
+		// sends a test text to the currently selected phone number
 		//sendMessage(2); 
 		
 	}
 	
-	// Send email or text message, depending on argument you pass in - 1 is email, 2 is text (phone number)
-	// The email portion hasn't worked on my emulator yet and I'm not sure if it's the emulator or the code - AM
+	// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
 	public void sendMessage(int mtype) {
+		SharedPreferences texts = getSharedPreferences("texts", 0);
 		if (mtype == 1) {
-			// send email
-			String email = NotificationsActivity.getEmail();
-			try {   
-                GMailSender sender = new GMailSender("cookease.app@gmail.com", "deansofdesign");
-                sender.sendMail("This is CookEase",   
-                        "Your shit is boiling",   
-                        "cookease.app@gmail.com",
-                        email);
-                Log.d("Email sent to: ", email);
-            } catch (Exception e) {   
-                Log.e("SendMail", e.getMessage(), e);   
-            }
+		    String email = texts.getString(NotificationsActivity.email, NotificationsActivity.selectedEmail);
+			Log.d("EMAIL SENT TO:", email);
+			String[] toArr = {email}; // You can add more emails here if necessary
+			Log.d("EMAIL IS NOW:", toArr[0]);
+			sendMail.setTo(toArr); // load array to setTo function
+			sendMail.setFrom("CookEase Alerts"); // who is sending the email 
+			sendMail.setSubject("Your water is boiling!"); 
+			sendMail.setBody("Your water is boiling.");
+			Runnable r = new Runnable() {
+			    @Override
+			    public void run() {
+			    	try {
+			    		sendMail.send();
+			    	} catch(Exception e) {
+			    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
+			    		// Eventually handling this exception would be nice
+			    	}
+			    }
+			};
+			Thread t = new Thread(r);
+			t.start();
 		} else {
-			String textnum = NotificationsActivity.getNumber();
-			//TODO - Emily: implement text message send function.  The phone number is stored in the selectedText variable.
+			String textnum = texts.getString(NotificationsActivity.text, NotificationsActivity.selectedText);
+			//TODO - Emily: implement text message send function.  The phone number is stored in textnum variable.
+			
 		}
-
 	}
-	
 	
 
 	@Override
