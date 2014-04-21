@@ -322,15 +322,14 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 			Thread t = new Thread(r);
 			t.start();
 		} else {
-			//TODO Comment out the entire block below if it crashes
 			final String textnum = texts.getString(NotificationsActivity.text, NotificationsActivity.selectedText);
 			//Text message send function.  The phone number is stored in textnum variable.
 			Runnable r = new Runnable() {
 			    @Override
 			    public void run() {
 			    	try {
-			    		//sendSMS(textnum, "Your water is boiling!");
-			    		sendSMS("5556", "Your water is boiling!");
+			    		sendSMS(textnum, "Your water is boiling!");
+			    		//sendSMS("5554", "Your water is boiling!"); //for emulator testing
 			    	} catch(Exception e) {
 			    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
 			    		// Eventually handling this exception would be nice
