@@ -4,35 +4,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.view.ViewGroup;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class NotificationsActivity extends Activity {
 
@@ -52,13 +48,9 @@ public class NotificationsActivity extends Activity {
     String alarm = "Alarm";
     String email = "Email";
     String text = "Text";
-    String deftone = "Default Tone";
-    String selectedTone = deftone;
-    static String selectedEmail = "Enter email";
-    static String selectedText = "Enter phone #";
-    String selectedName = "Name";
-    Button mButton;
-    Ringtone rTone = null;
+    String selectedTone = "Default Tone";
+    String selectedEmail = "Enter email";
+    String selectedText = "Enter phone #";
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +63,10 @@ public class NotificationsActivity extends Activity {
 	    tasksToSelected.put(email, settings.getBoolean(email, false));
 	    tasksToSelected.put(text,settings.getBoolean(text, false));
 	    SharedPreferences texts = getSharedPreferences("texts", 0);
-	    if (rTone == null) {
-	    	rTone = RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-	    	methodsToSelected.put(alarm, deftone);
-	    } else {
-	    	methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
-	    }
+	    methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
 	    methodsToSelected.put(email, texts.getString(email, selectedEmail));
 	    methodsToSelected.put(text, texts.getString(text, selectedText));
-	    
+		
 		// Set up notifications button
 		homeText = (TextView) findViewById(R.id.textView3);
 		homeText.setOnClickListener(
@@ -99,14 +86,13 @@ public class NotificationsActivity extends Activity {
                 }
             }
         );
-		// prototype only, click instructions to sound chosen alarm
+		// Demo only, click instructions for friends list
 		instructionsText = (TextView) findViewById(R.id.textView6);
 		instructionsText.setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
 //		                	alert();
-                	//showFriends();  
-                	rTone.play();
+                	showFriends();  
                 }
             }
         );
@@ -159,20 +145,6 @@ public class NotificationsActivity extends Activity {
     	        	item.setBackgroundColor(Color.parseColor(purpleBg));
     	            check.setChecked(true);
     	            tasksToSelected.put(itemText, true);
-    	            // Even though the whole bar has been clicked, we still want to show the contact list
-    	            // and set the chosen contact's email to selectedEmail
-    	            if (position == 0){
-    	            	Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
-	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
-	            		intent.putExtra("position", position);
-	            		System.out.println("onclick");
-	            		startActivityForResult(intent, 0);
-    	            } else {
-    	            	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-    	            	startActivityForResult(intent, position);
-    	            }
     	        }  
     	        
     	        
@@ -274,7 +246,6 @@ public class NotificationsActivity extends Activity {
 	    }
 
 	    public View getView(int position, View convertView, ViewGroup viewGroup) {
-	    	System.out.println("in get view");
 	    	View view = convertView;
 	    	final int pos = position;
 	        if (view == null) {
@@ -284,19 +255,19 @@ public class NotificationsActivity extends Activity {
 	        }
 	        
 	        final TextView textview = (TextView) view.findViewById(R.id.text1);
-	        Button b = (Button) view.findViewById(R.id.button1);
+	        final Button button = (Button) view.findViewById(R.id.button1);
 	        final CheckBox cb = (CheckBox) view.findViewById(R.id.check1);
 	   	 	
 	        //set text for notification method and button
 	        if (position == 0) {
 	   	 		textview.setText(alarm);
-	   	 		b.setText(methodsToSelected.get(alarm));
+	   	 		button.setText(methodsToSelected.get(alarm));
 	   	 	} else if (position == 1) {
 	   	 		textview.setText(email);
-	   	 		b.setText(methodsToSelected.get(email));
+	   	 		button.setText(methodsToSelected.get(email));
 	   	 	} else if (position == 2) {
 	   	 		textview.setText(text);
-	   	 		b.setText(methodsToSelected.get(text));
+	   	 		button.setText(methodsToSelected.get(text));
 	   	 	}
 	   	
 	        //set background color + ischecked of list item
@@ -312,7 +283,7 @@ public class NotificationsActivity extends Activity {
 	   	 	
 	   	 	//if button clicked, we want to set the item to "checked"
 	   	 	//and start intent to set alarm/email/text
-	        b.setOnClickListener(new View.OnClickListener() {
+	        button.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View v) {
 	            	//System.out.println("button clicked");
 	            	if (pos == 0) {
@@ -324,16 +295,24 @@ public class NotificationsActivity extends Activity {
 	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
 	            		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
 	            		intent.putExtra("position", pos);
-	            		System.out.println("onclick");
 	            		startActivityForResult(intent, 0);
 	            		
-	    	        } else {
-	    	        	// Show contact list and set the chosen contact's email or phone number to selectedEmail/selectedText
-	    	        	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-	    	        	startActivityForResult(intent, pos);
+	    	        } else if (pos == 1) {
+	    	        	//TODO Armando
+	    	        	//pop up option to enter email address
+	    	        	//if already entered before, old email will be displayed
+	    	        	//(should also be able to change email from notif screen if messed up first time): implemented
+	    	        } else if (pos == 2) {
+	    	        	//TODO Emily
+	    	        	//pop up address book to select contact
+
 	    	        }
-	            }  
+	            }
+	            
+	            
 	        });
+	        
+	   	 	
 	   	 	notifyDataSetChanged();
 	   	 	return view;
 	   	
@@ -373,91 +352,27 @@ public class NotificationsActivity extends Activity {
 	
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
-		Log.d("RequestCode", requestCode + "");
-		if (resultCode == Activity.RESULT_OK) {
-			if (requestCode == 0) {
-	             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-	             if (uri != null) {
-	                 selectedTone = uri.toString();
-	                 rTone = RingtoneManager.getRingtone(getBaseContext(), uri);
-	                 String name;
-	                 if (rTone.getTitle(getApplicationContext()).equals(RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(getApplicationContext()))) {
-	                	 //System.out.println("RTONE IS DEFAULT");
-	                	 name = deftone;
-	                 } else {
-	                	 name = rTone.getTitle(getBaseContext());
-	                 }
-	                 methodsToSelected.put(alarm, name);
-	                 tasksToSelected.put(alarm, true);
-	                 SharedPreferences texts = getSharedPreferences("texts", 0);
-	                 SharedPreferences.Editor editor = texts.edit();
-	                 editor.putString(alarm, methodsToSelected.get(alarm));
-	                 editor.commit();
-	                 SharedPreferences settings = getSharedPreferences("settings", 0);
-	                 editor = settings.edit();
-	                 editor.putBoolean(alarm, tasksToSelected.get(alarm));
-	                 editor.commit();
-	                 System.out.println("onactresult");
-	             }
-			} else {
-				Uri contactData = intent.getData();
-				ContentResolver resolver = getContentResolver();
-				Cursor cur =  resolver.query(contactData, null, null, null, null);
-				if (cur.moveToFirst()) {
-			      selectedName = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            	}
-				String id = cur.getString(cur.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-				if (requestCode == 1) {
-	                // Get and set email to selectedEmail
-	                Cursor emailCur = resolver.query(
-	                    ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
-	                    ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?", new String[] {id}, null);
-	                if (emailCur.moveToFirst()) {//this sets ContactEmail to the first email - this is not ideal if they have many
-		                selectedEmail = emailCur.getString(emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-			            methodsToSelected.put(email, selectedEmail);
-		                tasksToSelected.put(email, true);
-		                SharedPreferences texts = getSharedPreferences("texts", 0);
-		                SharedPreferences.Editor editor = texts.edit();
-		                editor.putString(email, methodsToSelected.get(email));
-		                editor.commit();
-		                SharedPreferences settings = getSharedPreferences("settings", 0);
-		                editor = settings.edit();
-		                editor.putBoolean(email, tasksToSelected.get(email));
-		                editor.commit();
-		            } else {
-		                Toast.makeText(NotificationsActivity.this, "This contact has a null email.", Toast.LENGTH_SHORT).show();
-		            }
-	                emailCur.close();
-				} else {
-					// Get and set phone number to selectedText
-			        Cursor phoneCur = resolver.query(
-		                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-		                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[] {id}, null);
-		            if (phoneCur.moveToFirst()) {
-		  	            selectedText = phoneCur.getString(phoneCur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));  
-		  	            methodsToSelected.put(text, selectedText);
-		                tasksToSelected.put(text, true);
-		                SharedPreferences texts = getSharedPreferences("texts", 0);
-		                SharedPreferences.Editor editor = texts.edit();
-		                editor.putString(text, methodsToSelected.get(text));
-		                editor.commit();
-		                SharedPreferences settings = getSharedPreferences("settings", 0);
-		                editor = settings.edit();
-		                editor.putBoolean(text, tasksToSelected.get(text));
-		                editor.commit();
-		            } else {
-		                Toast.makeText(NotificationsActivity.this, "This contact has no phone number(s).", Toast.LENGTH_SHORT).show();
-		            }
-		            phoneCur.close();
-				}
-			}
-			// For testing purposes - to make sure these are changing appropriately
-			//Log.d("Phone number is now: ", selectedText);
-			//Log.d("Email is now: ", selectedEmail);
-			//Log.d("Alarm tone is now: ", selectedTone);
-        }
-    }
+		if (resultCode == Activity.RESULT_OK && requestCode == 0) {
+             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+             int pos = intent.getExtras().getInt("position");
+             System.out.println("pos " + pos);
+             if (uri != null) {
+                 selectedTone = uri.toString();
+                 methodsToSelected.put(alarm, selectedTone);
+                 /*System.out.println("item 0: " + taskList.getItemAtPosition(pos));
+                 RelativeLayout item = (RelativeLayout) taskList
+                 Button button = (Button) item.getChildAt(1);
+                 button.setText(selectedTone);*/
+                 //adapter.notifyDataSetChanged();
+                 //TODO Emily display new alarm text on button
+             } //else nothing
+         }   //TODO Emily, Armando: add if-else cases for email, text  
+			//logic: listview "item" aka relativelayout, and button, both are clickable. 
+			//if item clicked: it goes from highlighted -> non or non -> highlighted (and selection intent triggered)
+			//if button clicked: selection intent triggered and item selected (always)
+			
+        
+     }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -468,20 +383,19 @@ public class NotificationsActivity extends Activity {
 	
 	@Override
     protected void onResume(){
-		super.onResume();		
-       // Restore preferences	   
+		super.onResume();
+		
+       // Restore preferences
        SharedPreferences settings = getSharedPreferences("settings", 0);
+       tasksToSelected = new HashMap<String, Boolean>();
        tasksToSelected.put(alarm, settings.getBoolean(alarm, true));
 	   tasksToSelected.put(email, settings.getBoolean(email, false));
 	   tasksToSelected.put(text,settings.getBoolean(text, false));
-	   SharedPreferences texts = getSharedPreferences("texts", 0); 
-	   //System.out.println("resume alarm " + texts.getString(alarm, "poop"));
+	   methodsToSelected = new HashMap<String, String>();
+	   SharedPreferences texts = getSharedPreferences("texts", 0);
 	   methodsToSelected.put(alarm, texts.getString(alarm, selectedTone));
 	   methodsToSelected.put(email, texts.getString(email, selectedEmail));
 	   methodsToSelected.put(text, texts.getString(text, selectedText));
-
-	   //System.out.println("methodsToSelected is " + methodsToSelected);
-	   adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -495,26 +409,14 @@ public class NotificationsActivity extends Activity {
       editor.putBoolean(alarm, tasksToSelected.get(alarm));
       editor.putBoolean(email, tasksToSelected.get(email));
       editor.putBoolean(text, tasksToSelected.get(text));
-      editor.commit();
-      
       SharedPreferences texts = getSharedPreferences("texts", 0);
       editor = texts.edit();
-      if (rTone.getTitle(getApplicationContext()).equals(RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(getApplicationContext()))) {
-       	 methodsToSelected.put(alarm, deftone);
-      }
       editor.putString(alarm, methodsToSelected.get(alarm));
       editor.putString(email, methodsToSelected.get(email));
       editor.putString(text, methodsToSelected.get(text));
+
+      // Commit the edits!
       editor.commit();
-      
-    }
-    
-    static String getEmail() {
-    	return selectedEmail;
-    }
-    
-    static String getNumber() {
-    	return selectedText;
     }
 
 }
