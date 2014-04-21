@@ -296,7 +296,7 @@ public class MainActivity extends Activity {
 			String[] toArr = {email}; // You can add more emails here if necessary
 			Log.d("EMAIL IS NOW:", toArr[0]);
 			sendMail.setTo(toArr); // load array to setTo function
-			sendMail.setFrom("CookEase Alerts"); // who is sending the email 
+			sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
 			sendMail.setSubject("Your water is boiling!"); 
 			sendMail.setBody("Your water is boiling.");
 			Runnable r = new Runnable() {
