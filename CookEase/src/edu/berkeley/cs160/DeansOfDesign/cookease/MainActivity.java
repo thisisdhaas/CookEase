@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,7 +26,7 @@ import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnBoilingEventListener {
 	
 /*	Implement Prototype
 	- Implement home page (DONE)
@@ -62,6 +63,7 @@ public class MainActivity extends Activity {
   
     // For audio processing
     private BoilingWaterDetector boilingWaterDetector;
+    private boolean alerted = false;
     
     // For demo only, a timer:
     //private Timer timer = new Timer(); 
@@ -115,8 +117,9 @@ public class MainActivity extends Activity {
         );
 		
 		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(this);
+		boilingWaterDetector = new BoilingWaterDetector(this, 0.05);
 		boilingWaterDetector.startDetection(); // TODO: only start when task is selected.
+		boilingWaterDetector.setOnBoilingEventListener(this);
 		
 		taskList = (ListView) findViewById(R.id.listView1);
 		String tasks[] ={water, microDone, microExplo, other};
@@ -397,5 +400,17 @@ public class MainActivity extends Activity {
     	// Stop listening for things!
     	boilingWaterDetector.stopDetection();
     }
+
+	@Override
+	public void processBoilingEvent() {
+		if (!alerted) {
+			alerted = true;
+			runOnUiThread(new Runnable() {
+				public void run() {
+					alert(); 
+				}
+			});
+		}
+	}
     
 }

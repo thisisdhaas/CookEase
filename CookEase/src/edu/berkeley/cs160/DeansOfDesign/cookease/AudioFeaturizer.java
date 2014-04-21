@@ -1,16 +1,18 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
+import weka.core.Instances;
 import android.util.Log;
 import be.hogent.tarsos.dsp.AudioEvent;
 import be.hogent.tarsos.dsp.mfcc.MFCC;
 
 public class AudioFeaturizer {
 	private static final String TAG = "AudioFeaturizer";
-	
-	// TODO: get correct names for these.
 	private static enum Feature {
 			RMS0,
 			BEAT0,
@@ -28,9 +30,46 @@ public class AudioFeaturizer {
 			MFCC11,
 			MFCC12,
 	};
+	private static final HashMap<Feature,String> FeatureNames;
+	static
+	{
+		FeatureNames = new HashMap<Feature, String>();
+		FeatureNames.put(Feature.RMS0, "Root Mean Square0");
+		FeatureNames.put(Feature.BEAT0, "Strength Of Strongest Beat0");
+		FeatureNames.put(Feature.MFCC0, "MFCC0");
+		FeatureNames.put(Feature.MFCC1, "MFCC1");
+		FeatureNames.put(Feature.MFCC2, "MFCC2");
+		FeatureNames.put(Feature.MFCC3, "MFCC3");
+		FeatureNames.put(Feature.MFCC4, "MFCC4");
+		FeatureNames.put(Feature.MFCC5, "MFCC5");
+		FeatureNames.put(Feature.MFCC6, "MFCC6");
+		FeatureNames.put(Feature.MFCC7, "MFCC7");
+		FeatureNames.put(Feature.MFCC8, "MFCC8");
+		FeatureNames.put(Feature.MFCC9, "MFCC9");
+		FeatureNames.put(Feature.MFCC10, "MFCC10");
+		FeatureNames.put(Feature.MFCC11, "MFCC11");
+		FeatureNames.put(Feature.MFCC12, "MFCC12");
+	}
 	private static final Feature[] mFeatures = Feature.values(); 
+	private static final Attribute ClassFeature;
+	static
+	{
+		ArrayList<String> attrValues = new ArrayList<String>();
+		attrValues.add("-1");
+		attrValues.add("1");
+		ClassFeature = new Attribute("Is Boiling Sound", attrValues);
+	}
+	private Instances dataset;
 	
 	public AudioFeaturizer() {
+		// set up the data headers/attributes
+		ArrayList<Attribute> attInfo = new ArrayList<Attribute>(mFeatures.length);
+		for (Feature feature : mFeatures) {
+			attInfo.add(new Attribute(FeatureNames.get(feature)));
+		}
+		attInfo.add(ClassFeature);
+		dataset = new Instances("TestInstances", attInfo, 0);
+		dataset.setClassIndex(ClassFeature.index());
 	}
 	
 	public Instance run(AudioEvent ae) {
@@ -98,6 +137,8 @@ public class AudioFeaturizer {
 				featureVals.setValue(i, featureVal);
 			}
 		}
+		Instances data = new Instances(dataset);
+		featureVals.setDataset(data);
 		return featureVals;
 	}
 	
