@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -282,7 +283,7 @@ public class MainActivity extends Activity {
 		// sends a test email to the currently selected email address
 		sendMessage(1);
 		// sends a test text to the currently selected phone number
-		//sendMessage(2); 
+		sendMessage(2); 
 		
 	}
 	
@@ -312,11 +313,32 @@ public class MainActivity extends Activity {
 			Thread t = new Thread(r);
 			t.start();
 		} else {
-			String textnum = texts.getString(NotificationsActivity.text, NotificationsActivity.selectedText);
-			//TODO - Emily: implement text message send function.  The phone number is stored in textnum variable.
+			//TODO Comment out the entire block below if it crashes
+			final String textnum = texts.getString(NotificationsActivity.text, NotificationsActivity.selectedText);
+			//Text message send function.  The phone number is stored in textnum variable.
+			Runnable r = new Runnable() {
+			    @Override
+			    public void run() {
+			    	try {
+			    		//sendSMS(textnum, "Your water is boiling!");
+			    		sendSMS("5556", "Your water is boiling!");
+			    	} catch(Exception e) {
+			    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
+			    		// Eventually handling this exception would be nice
+			    	}
+			    }
+			};
+			Thread t = new Thread(r);
+			t.start();
 			
 		}
 	}
+	
+	private void sendSMS(String phoneNumber, String message)
+	   {
+	       SmsManager sms = SmsManager.getDefault();
+	       sms.sendTextMessage(phoneNumber, null, message, null, null);
+	    }
 	
 
 	@Override
