@@ -117,9 +117,11 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
         );
 		
 		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(this, 0.04);
-		boilingWaterDetector.startDetection(); // TODO: only start when task is selected.
+		boilingWaterDetector = new BoilingWaterDetector(this, 0.1);
 		boilingWaterDetector.setOnBoilingEventListener(this);
+		if (tasksToSelected.get(water)) {
+			boilingWaterDetector.startDetection();
+		}
 		
 		taskList = (ListView) findViewById(R.id.listView1);
 		String tasks[] ={water, microDone, microExplo, other};
@@ -148,11 +150,18 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    			item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(false);
 	    			tasksToSelected.put(itemText, false);
+	    			if (itemText == water) {
+	    				boilingWaterDetector.stopDetection();
+	    			}
 	    		} else { //not selected yet
 	    			item.setBackgroundColor(Color.parseColor(purpleBg));
 	    			item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(true);
 	    			tasksToSelected.put(itemText, true);
+	    			if (itemText == water) {
+	    				alerted = false;
+	    				boilingWaterDetector.startDetection();
+	    			}
 	    		}
 	    		/*//For demo only, run 5 second timer and pop up alert
 	        	timer.schedule(new MyTimerTask(), 5000);
@@ -361,9 +370,6 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	@Override
     protected void onResume(){
 		super.onResume();
-		
-		// Start listening for things!
-		boilingWaterDetector.startDetection();
 		
        // Restore preferences
        SharedPreferences settings = getSharedPreferences("settings", 0);

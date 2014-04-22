@@ -46,6 +46,7 @@ public class BoilingWaterDetector implements OnAudioEventListener {
 
 	public void stopDetection() {
 		if (mAudioProc.isRecording()) {
+			mDetectionHistory.clear();
 			mAudioProc.stop();
 		}
 	}
@@ -104,7 +105,8 @@ public class BoilingWaterDetector implements OnAudioEventListener {
 		// call back if we heard boiling water
 		if (thresholdExceded && mOnBoilingEventListener != null) {
 			Log.d(TAG, "Threshold exceded--HEARD BOILING!");
-			mOnBoilingEventListener.processBoilingEvent();	
+			mOnBoilingEventListener.processBoilingEvent();
+			stopDetection();
 		}
 	}
 
