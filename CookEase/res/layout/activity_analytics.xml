@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="27dp"
             android:orientation="horizontal" >
 
             <TextView
@@ -53,7 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#990066"
+   
                 android:gravity="center"
                 android:text="@string/home"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -64,7 +64,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#990066"
+                
                 android:gravity="center"
                 android:text="@string/notifications"
                 android:textAppearance="?android:attr/textAppearanceMedium"
@@ -76,20 +76,11 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:background="#990066"
                 android:text="@string/analytics"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/textView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/imageView1"
-            android:layout_toRightOf="@+id/button1"
-            android:text="@string/analytics_format"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#ffffff" />
 
         <TextView
             android:id="@+id/textView6"
@@ -101,12 +92,31 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ffffff" />
 
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/imageView1"
+            android:layout_marginLeft="14dp"
+            android:layout_toRightOf="@+id/textView8"
+            android:text="@string/analytics_format"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView9"
+            android:layout_alignParentBottom="true"
+            android:text="Test Microwave" />
+
         <ImageView
             android:id="@+id/imageView1"
             android:layout_width="500dp"
             android:layout_height="200dp"
-            android:layout_alignBottom="@+id/textView9"
-            android:layout_marginBottom="23dp"
+            android:layout_above="@+id/button1"
+            android:layout_alignParentLeft="true"
             android:gravity="center"
             android:src="@drawable/ex_analytics" />
 
@@ -114,18 +124,9 @@
             android:id="@+id/button1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignRight="@+id/textView6"
-            android:layout_below="@+id/imageView1"
-            android:layout_marginRight="22dp"
             android:text="Test Water" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
-            android:layout_toRightOf="@+id/textView9"
-            android:text="Test Microwave" />
 
     </RelativeLayout>
 

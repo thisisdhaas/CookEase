@@ -18,6 +18,6 @@
     <string name="analytics_slogan">Cooking analytics</string>
     <string name="notify_instruction">Notify via:</string>
     <string name="analytics_instruction">Currently viewing:</string>
-    <string name="analytics_format">Graph by Avg.</string>
+    <string name="analytics_format">Graph by Average</string>
 
 </resources>
