@@ -2,19 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_blur"
+    android:background="#009933"
     tools:context=".NotificationsActivity" >
     
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
         android:alpha="0.4"
-        android:background="#474747"
-	 />
+        android:background="@dimen/activity_horizontal_margin" />
 
    <TextView
         android:id="@+id/textView1"
@@ -39,7 +38,7 @@
         android:textColor="#FFFFFF"
         android:text="@string/notify_slogan"
         android:textSize="21sp"
-        android:textStyle="italic"
+        
         android:textAppearance="?android:attr/textAppearanceMedium" />
     
   <LinearLayout
@@ -67,6 +66,7 @@
         android:textColor="#FFFFFF"
         android:text="@string/notifications"
         android:gravity="center"
+        android:background="#990066"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
@@ -87,8 +87,7 @@
         android:layout_above="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
-        android:background= "#a684a1"
-        android:alpha="0.9"
+        android:background="#990066"
         android:textColor="#ffffff" >
     </ListView>
     	
