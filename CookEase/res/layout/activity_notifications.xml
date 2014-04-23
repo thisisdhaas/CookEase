@@ -22,7 +22,7 @@
             android:gravity="center"
             android:text="@string/home"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000" />
 
         <TextView
             android:id="@+id/textView4"
@@ -33,7 +33,7 @@
             android:gravity="center"
             android:text="@string/notifications"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000"/>
 
         <TextView
             android:id="@+id/textView5"
@@ -43,7 +43,7 @@
             android:gravity="center"
             android:text="@string/analytics"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#FFFFFF" />
+            android:textColor="#000000"/>
     </LinearLayout>
 
     <TextView
@@ -56,7 +56,7 @@
         android:fontFamily="sans-serif"
         android:text="@string/notifications"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="50sp" />
 
     <TextView
@@ -78,7 +78,7 @@
         android:layout_centerVertical="true"
         android:text="@string/notify_instruction"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#ffffff" />
+        android:textColor="#000000" />
 
     <ListView
         android:id="@+id/listView2"
@@ -88,7 +88,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:background="#990066"
-        android:textColor="#ffffff" >
+        android:textColor="#000000" >
     </ListView>
 
 </RelativeLayout>

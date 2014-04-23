@@ -17,18 +17,8 @@
             android:fontFamily="sans-serif"
             android:text="@string/cookease"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:textSize="60sp" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="@string/instruction"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#ffffff" />
 
         <TextView
             android:id="@+id/textView2"
@@ -51,7 +41,7 @@
             android:layout_marginBottom="32dp"
             android:alpha="0.9"
             android:background="#990066"
-            android:textColor="#ffffff" >
+            android:textColor="#000000" >
         </ListView>
 
         <LinearLayout
@@ -72,7 +62,7 @@
                 android:gravity="center"
                 android:text="@string/home"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="20sp" />
 
             <TextView
@@ -83,7 +73,7 @@
                 android:gravity="center"
                 android:text="@string/notifications"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="18sp" />
 
             <TextView
@@ -94,8 +84,18 @@
                 android:gravity="center"
                 android:text="@string/analytics"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textSize="20sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/listView1"
+            android:layout_centerHorizontal="true"
+            android:text="@string/instruction"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#000000" />
 
 </RelativeLayout>
