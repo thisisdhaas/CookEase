@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#009933"
+    android:background="@drawable/clock_y"
     tools:context=".NotificationsActivity" >
 
     <LinearLayout
@@ -29,10 +29,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#990066"
             android:gravity="center"
             android:text="@string/notifications"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background = "#FFFFCC"
+			android:alpha="0.7"
             android:textColor="#000000"/>
 
         <TextView
@@ -52,12 +53,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="58dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="sans-serif"
         android:text="@string/notifications"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
-        android:textSize="50sp" />
+        android:textSize="55sp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -67,7 +68,7 @@
         android:layout_centerHorizontal="true"
         android:text="@string/notify_slogan"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="21sp" />
 
     <TextView
@@ -87,7 +88,8 @@
         android:layout_below="@+id/textView6"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:background="#990066"
+        android:layout_marginLeft="20dp"
+        android:background="@android:color/transparent"
         android:textColor="#000000" >
     </ListView>
 

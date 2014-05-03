@@ -49,9 +49,9 @@ public class NotificationsActivity extends Activity {
     public HashMap<String, String> methodsToSelected = new HashMap<String, String>();
     public ListView taskList;
     CustomListAdapter adapter = null;
-    static String alarm = "Alarm";
-    static String email = "Email";
-    static String text = "Text";
+    static String alarm = "Alarm:";
+    static String email = "Email:";
+    static String text = "Text:";
     static String deftone = "Default Tone";
     static String selectedTone = deftone;
     static String selectedEmail = "Enter email";
@@ -80,7 +80,7 @@ public class NotificationsActivity extends Activity {
 	    methodsToSelected.put(email, texts.getString(email, selectedEmail));
 	    methodsToSelected.put(text, texts.getString(text, selectedText));
 	    
-		// Set up notifications button
+		// Set up home button
 		homeText = (TextView) findViewById(R.id.textView3);
 		homeText.setOnClickListener(
             new View.OnClickListener() {
@@ -113,11 +113,6 @@ public class NotificationsActivity extends Activity {
 		
 		taskList = (ListView) findViewById(R.id.listView2);
         taskList.setClickable(true);
-
-        /*final List<CustomList> listOfPhonebook = new ArrayList<CustomList>();
-        listOfPhonebook.add(new CustomList(alarm, "Happy Tone"));
-        listOfPhonebook.add(new CustomList(email, "joe@berkeley.edu"));
-        listOfPhonebook.add(new CustomList(text, "Armando Mota"));*/
         
         String tasks[] ={alarm, email, text};
 		final ArrayList<String> list = new ArrayList<String>();
@@ -152,11 +147,11 @@ public class NotificationsActivity extends Activity {
             	}
             	
     	        if (tasksToSelected.get(itemText)) { //selected already
-    	        	item.setBackgroundColor(Color.parseColor(greyBg));
+    	        	//item.setBackgroundColor(Color.parseColor(greyBg));
     	            check.setChecked(false);
     	        	tasksToSelected.put(itemText, false);
     	        } else { //not selected yet
-    	        	item.setBackgroundColor(Color.parseColor(purpleBg));
+    	        	//item.setBackgroundColor(Color.parseColor(purpleBg));
     	            check.setChecked(true);
     	            tasksToSelected.put(itemText, true);
     	            // Even though the whole bar has been clicked, we still want to show the contact list
@@ -194,9 +189,9 @@ public class NotificationsActivity extends Activity {
         startActivity(intent);
 	}
 	
-	// User clicked on the Analytics button
+	// User clicked on the Home button
 	protected void doHome(View view) {
-		// Launch Analytics page
+		// Launch Home page
     	Intent intent = new Intent(this, MainActivity.class);
 //    	String img = "sample1";
 //    	intent.putExtra(EXTRA_MESSAGE, img);
@@ -252,9 +247,9 @@ public class NotificationsActivity extends Activity {
 	    private Context context;
 
 	    private List<String> list;
-	    String alarm = "Alarm";
-	    String email = "Email";
-	    String text = "Text";
+	    String alarm = "Alarm:";
+	    String email = "Email:";
+	    String text = "Text:";
 
 	    public CustomListAdapter(Context context, List<String> list) {
 	        this.context = context;
@@ -303,10 +298,10 @@ public class NotificationsActivity extends Activity {
 	   	 	if ((position == 0 && tasksToSelected.get(alarm)) ||
 	   			(position == 1 && tasksToSelected.get(email)) ||
 	   			(position == 2 && tasksToSelected.get(text))) {
-	   				view.setBackgroundColor(Color.parseColor(purpleBg));
+	   				//view.setBackgroundColor(Color.parseColor(purpleBg));
 	   				cb.setChecked(true);
 	   	 	} else {
-	   	 		view.setBackgroundColor(Color.parseColor(greyBg));
+	   	 		//view.setBackgroundColor(Color.parseColor(greyBg));
 	   	 		cb.setChecked(false);
 	   	 	}
 	   	 	

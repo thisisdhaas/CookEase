@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -25,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.TextView;
+import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
 public class MainActivity extends Activity implements OnBoilingEventListener {
 	
@@ -130,8 +129,6 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	      list.add(tasks[i]); 
 	    }
 
-	   //adapter = new StableArrayAdapter(this,
-       // android.R.layout.simple_list_item_1, list);
 
         adapter = new StableArrayAdapter(this,
         		android.R.layout.simple_list_item_multiple_choice, list);
@@ -146,16 +143,16 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    		CheckedTextView item = (CheckedTextView) view;
 	    		String itemText = (String) parent.getItemAtPosition(position);
 	    		if (tasksToSelected.get(itemText)) { //selected already
-	    			item.setBackgroundColor(Color.parseColor(greyBg));
-	    			item.setTextColor(Color.parseColor(white));
+	    			//item.setBackgroundColor(Color.parseColor(greyBg));
+	    			//item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(false);
 	    			tasksToSelected.put(itemText, false);
 	    			if (itemText == water) {
 	    				boilingWaterDetector.stopDetection();
 	    			}
 	    		} else { //not selected yet
-	    			item.setBackgroundColor(Color.parseColor(purpleBg));
-	    			item.setTextColor(Color.parseColor(white));
+	    			//item.setBackgroundColor(Color.parseColor(purpleBg));
+	    			//item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(true);
 	    			tasksToSelected.put(itemText, true);
 	    			if (itemText == water) {
@@ -211,7 +208,6 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	// Demo end
  	*/
 	private class StableArrayAdapter extends ArrayAdapter<String> {
-		
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 	    Context c;
 	    
@@ -242,6 +238,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    	        //We must create a View:
 	    		 	LayoutInflater inflater=getLayoutInflater();
 	    	        view = inflater.inflate(R.layout.custom_row, parent, false);
+	    		 	
 	    	 }
 	    	 CheckedTextView temp = (CheckedTextView) view.findViewById(R.id.text1);
 	    	 if (position == 0) {
@@ -254,14 +251,14 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    		 temp.setText(other);
 	    	 }
 	    	
-	    	if ((position == 0 && tasksToSelected.get(water)) ||
+	    	/*if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
 	    			(position == 2 && tasksToSelected.get(microExplo)) ||
 	    			(position == 3 && tasksToSelected.get(other))) {
 	    				view.setBackgroundColor(Color.parseColor(purpleBg));
 	    	} else {
 	    		view.setBackgroundColor(Color.parseColor(greyBg));
-	    	}
+	    	}*/
 	    	adapter.notifyDataSetChanged();
 	    	return view;
 	    }

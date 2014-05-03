@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#009933"
+    android:background="@drawable/analytics_y_low2"
     tools:context=".AnalyticsActivity" >
 
     <TextView
@@ -14,7 +14,7 @@
         android:layout_marginTop="2dp"
         android:text="@string/analytics_slogan"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="21sp" />
 
     <RelativeLayout
@@ -76,7 +76,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:background="#990066"
+                android:background = "#FFFFCC"
+				android:alpha="0.7"
                 android:text="@string/analytics"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#000000" />
@@ -141,6 +142,6 @@
         android:text="@string/analytics"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
-        android:textSize="60sp" />
+        android:textSize="55sp" />
 
 </RelativeLayout>
