@@ -27,15 +27,6 @@ import android.widget.TextView;
 import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
 public class MainActivity extends Fragment implements OnBoilingEventListener {
-	
-/*	Implement Prototype
-	- Implement home page (DONE)
-	- Implement alert/notification popup (DONE)
-	- Implement friend selection (DONE-ish)
-	- Implement Analytics page (Namkyu)
-	- Implement demo functionality (DONE)*/
-	
-	
 
     public final static String EXTRA_MESSAGE = "edu.berkeley.cs160.DeansOfDesign.MESSAGE";
     private static TextView analyticsText = null;
@@ -60,13 +51,9 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     StableArrayAdapter adapter = null;
     Activity act;
     
-  
     // For audio processing
     private BoilingWaterDetector boilingWaterDetector;
     private boolean alerted = false;
-    
-    // For demo only, a timer:
-    //private Timer timer = new Timer(); 
     
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,18 +68,19 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		
 		// Restore preferences
 	    SharedPreferences settings = act.getSharedPreferences("settings", 0);
-	    tasksToSelected.put(water, settings.getBoolean(water, true));
-	    tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
-	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
-	    tasksToSelected.put(other,settings.getBoolean(other, true));
+	    tasksToSelected.put(water, settings.getBoolean(water, false));
+	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
+	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
+	    tasksToSelected.put(other,settings.getBoolean(other, false));
 
 		// Demo, click the instructions for alert!
 		instructionText = (TextView) act.findViewById(R.id.textView6);
 		instructionText.setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
-		                	alert();
+                	alert(microDone); //hardcoded microDone for testing
                 }
+                
             }
         );
 		
@@ -141,18 +129,6 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    				boilingWaterDetector.startDetection();
 	    			}
 	    		}
-	    		/*//For demo only, run 5 second timer and pop up alert
-	        	timer.schedule(new MyTimerTask(), 5000);
-		    	// End demo stuff here
-	        	view.animate().setDuration(2000).alpha(0).withEndAction(new Runnable() {
-	              	@Override
-	              	public void run() {
-	                	list.remove(item);
-	                	adapter.notifyDataSetChanged();
-	                	view.setAlpha(1);
-	              	}
-	            	});
-	        	} */
 	    	}
 	    });   
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -174,22 +150,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    
 	   return inflater.inflate(R.layout.activity_main, container, false);
 	}
-	/*
-	// For demo only
-	private class MyTimerTask extends TimerTask{
 
-        @Override
-        public void run() {        
-            runOnUiThread(new Runnable() {              
-                @Override
-                public void run() {
-                    alert();
-                }
-            });
-        }       
-    }
-	// Demo end
- 	*/
 	private class StableArrayAdapter extends ArrayAdapter<String> {
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 	    Context c;
@@ -249,26 +210,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	  }
 
 	
-	/*// User clicked on the Analytics button
-	protected void doAnalytics(View view) {
-		// Launch Analytics page
-    	Intent intent = new Intent(act, AnalyticsActivity.class);
-//    	String img = "sample1";
-//    	intent.putExtra(EXTRA_MESSAGE, img);
-        startActivity(intent);
-	}
-	
-	// User clicked on the Notifications button
-	protected void doNotifications(View view) {
-		// Launch Notifications page
-    	Intent intent = new Intent(act, NotificationsActivity.class);
-//    	String img = "sample1";
-//    	intent.putExtra(EXTRA_MESSAGE, img);
-        startActivity(intent);
-	}*/
-	
 	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
-	public void alert() {
+	public void alert(String task) {
 		new AlertDialog.Builder(act)
 	    .setTitle(alert_title)
 	    .setMessage(alert_message)
@@ -282,6 +225,19 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		sendMessage(1);
 		// sends a test text to the currently selected phone number
 		sendMessage(2); 
+		if (task == water) {
+			tasksToSelected.put(water, false);
+			taskList.setItemChecked(0, tasksToSelected.get(water));
+		} else if (task == microDone) {
+			tasksToSelected.put(microDone, false);
+			taskList.setItemChecked(1, tasksToSelected.get(microDone));
+		} else if (task == microExplo) { 
+			tasksToSelected.put(microExplo, false);
+			taskList.setItemChecked(2, tasksToSelected.get(microExplo));
+		} else if (task == other) {
+			tasksToSelected.put(other, false);
+			taskList.setItemChecked(3, tasksToSelected.get(other));
+		}
 		
 	}
 	
@@ -354,10 +310,10 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
        // Restore preferences
        SharedPreferences settings = act.getSharedPreferences("settings", 0);
        tasksToSelected = new HashMap<String, Boolean>();
-       tasksToSelected.put(water, settings.getBoolean(water, true));
-	   tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
-	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
-	   tasksToSelected.put(other,settings.getBoolean(other, true));
+       tasksToSelected.put(water, settings.getBoolean(water, false));
+	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
+	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
+	   tasksToSelected.put(other,settings.getBoolean(other, false));
     }
 
     @Override
@@ -392,7 +348,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 			alerted = true;
 			act.runOnUiThread(new Runnable() {
 				public void run() {
-					alert(); 
+					alert(water); 
 				}
 			});
 		}
