@@ -13,16 +13,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class AnalyticsActivity extends Activity {
+public class AnalyticsActivity extends Fragment {
 
 	private static TextView homeText;
 	private static TextView notificatonsText;
@@ -36,37 +39,17 @@ public class AnalyticsActivity extends Activity {
 	
 	private long waterTime = 0;
 	private long microwaveTime = 0;
+	Activity act;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_analytics);
-		
-		// Set up home button
-		homeText = (TextView) findViewById(R.id.textView3);
-		homeText.setOnClickListener(
-
-            new View.OnClickListener() {
-
-                public void onClick(View v) {
-                	doHome(v);               	
-                }
-            }
-        );
-		
-		// Set up analytics button
-		notificatonsText = (TextView) findViewById(R.id.textView4);
-		notificatonsText.setOnClickListener(
-            new View.OnClickListener() {
-                public void onClick(View v) {
-//                	alert();
-                	doNotifications(v);  
-                }
-            }
-        );
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
+		act = this.getActivity();
+		act.setContentView(R.layout.activity_analytics);
 		
 		// Set up test water button
-		waterButton = (Button) findViewById(R.id.button1);
+		waterButton = (Button) act.findViewById(R.id.button1);
 		waterButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
@@ -82,7 +65,7 @@ public class AnalyticsActivity extends Activity {
 		);
 		
 		// Set up test microwave button
-		microwaveButton = (Button) findViewById(R.id.button2);
+		microwaveButton = (Button) act.findViewById(R.id.button2);
 		microwaveButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
@@ -97,26 +80,26 @@ public class AnalyticsActivity extends Activity {
 				}
 		);
 		displayStats();
+		return inflater.inflate(R.layout.activity_main, container, false);
 	}
 	
-	public void doHome(View view) {
-    	Intent intent = new Intent(this, MainActivity.class);
+	/*public void doHome(View view) {
+    	Intent intent = new Intent(act, TabActivity.class);
         startActivity(intent);
 	}
 	
 	// User clicked on the Notifcations button
 	protected void doNotifications(View view) {
 		// Launch Analytics page
-    	Intent intent = new Intent(this, NotificationsActivity.class);
+    	Intent intent = new Intent(act, NotificationsActivity.class);
 //    	String img = "sample1";
 //    	intent.putExtra(EXTRA_MESSAGE, img);
         startActivity(intent);
-	}
+	}*/
 
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.analytics, menu);
+		act.getMenuInflater().inflate(R.menu.analytics, menu);
 		return true;
 	}
 
@@ -164,7 +147,7 @@ public class AnalyticsActivity extends Activity {
         		fis = new FileInputStream(fileName);
         	} else {
             // File not found?
-            	FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            	FileOutputStream fos = act.openFileOutput(fileName, Context.MODE_PRIVATE);
             	fos.write("".getBytes());
             	fos.close();
                 fis = new FileInputStream(fileName);
@@ -211,8 +194,8 @@ public class AnalyticsActivity extends Activity {
 	}
 	
 	public void displayStats() {
-		TextView waterText = (TextView) findViewById(R.id.textView8);
-		TextView microwaveText = (TextView) findViewById(R.id.textView9);
+		TextView waterText = (TextView) act.findViewById(R.id.textView8);
+		TextView microwaveText = (TextView) act.findViewById(R.id.textView9);
 		String waterFile = "waterAnalyticsRecord";
 		String microwaveFile = "microwaveAnalyticsRecord";
 		

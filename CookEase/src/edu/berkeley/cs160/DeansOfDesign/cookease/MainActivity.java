@@ -7,6 +7,7 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
-public class MainActivity extends Activity implements OnBoilingEventListener {
+public class MainActivity extends Fragment implements OnBoilingEventListener {
 	
 /*	Implement Prototype
 	- Implement home page (DONE)
@@ -57,7 +58,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
     StableArrayAdapter adapter = null;
-    
+    Activity act;
     
   
     // For audio processing
@@ -68,45 +69,25 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
     //private Timer timer = new Timer(); 
     
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState) {
+		super.onCreateView(inflater, container, savedInstanceState);
 		
+		act = this.getActivity();
+		act.setContentView(R.layout.activity_main);
 		// Make a mail object to send email with
 		//make a Mail object to email with
 	    sendMail = new Mail("cookease.app@gmail.com", "deansofdesign");
 		
 		// Restore preferences
-	    SharedPreferences settings = getSharedPreferences("settings", 0);
+	    SharedPreferences settings = act.getSharedPreferences("settings", 0);
 	    tasksToSelected.put(water, settings.getBoolean(water, true));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, true));
 	    tasksToSelected.put(other,settings.getBoolean(other, true));
-	    
-	    
-	    
-		
-		// Set up notifications button
-		settingsText = (TextView) findViewById(R.id.textView4);
-		settingsText.setOnClickListener(
-            new View.OnClickListener() {
-                public void onClick(View v) {
-                	doNotifications(v);
-                }
-            }
-        );
-		// Set up analytics button
-		analyticsText = (TextView) findViewById(R.id.textView5);
-		analyticsText.setOnClickListener(
-            new View.OnClickListener() {
-                public void onClick(View v) {
-//                	alert();
-                	doAnalytics(v);  
-                }
-            }
-        );
+
 		// Demo, click the instructions for alert!
-		instructionText = (TextView) findViewById(R.id.textView6);
+		instructionText = (TextView) act.findViewById(R.id.textView6);
 		instructionText.setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
@@ -116,13 +97,13 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
         );
 		
 		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(this, 0.1);
+		boilingWaterDetector = new BoilingWaterDetector(act, 0.1);
 		boilingWaterDetector.setOnBoilingEventListener(this);
 		if (tasksToSelected.get(water)) {
 			boilingWaterDetector.startDetection();
 		}
 		
-		taskList = (ListView) findViewById(R.id.listView1);
+		taskList = (ListView) act.findViewById(R.id.listView1);
 		String tasks[] ={water, microDone, microExplo, other};
 		final ArrayList<String> list = new ArrayList<String>();
 	    for (int i = 0; i < tasks.length; ++i) {
@@ -130,7 +111,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    }
 
 
-        adapter = new StableArrayAdapter(this,
+        adapter = new StableArrayAdapter(act,
         		android.R.layout.simple_list_item_multiple_choice, list);
 	    
 	    taskList.setAdapter(adapter);
@@ -189,7 +170,9 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	      return;
 	    }
 	    // Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
-	    View wantedView = listView.getChildAt(wantedChild);*/  
+	    View wantedView = listView.getChildAt(wantedChild);*/ 
+	    
+	   return inflater.inflate(R.layout.activity_main, container, false);
 	}
 	/*
 	// For demo only
@@ -236,7 +219,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    	View view = convertView;
 	    	 if( view == null ){
 	    	        //We must create a View:
-	    		 	LayoutInflater inflater=getLayoutInflater();
+	    		 	LayoutInflater inflater=act.getLayoutInflater();
 	    	        view = inflater.inflate(R.layout.custom_row, parent, false);
 	    		 	
 	    	 }
@@ -266,10 +249,10 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	  }
 
 	
-	// User clicked on the Analytics button
+	/*// User clicked on the Analytics button
 	protected void doAnalytics(View view) {
 		// Launch Analytics page
-    	Intent intent = new Intent(this, AnalyticsActivity.class);
+    	Intent intent = new Intent(act, AnalyticsActivity.class);
 //    	String img = "sample1";
 //    	intent.putExtra(EXTRA_MESSAGE, img);
         startActivity(intent);
@@ -278,15 +261,15 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	// User clicked on the Notifications button
 	protected void doNotifications(View view) {
 		// Launch Notifications page
-    	Intent intent = new Intent(this, NotificationsActivity.class);
+    	Intent intent = new Intent(act, NotificationsActivity.class);
 //    	String img = "sample1";
 //    	intent.putExtra(EXTRA_MESSAGE, img);
         startActivity(intent);
-	}
+	}*/
 	
 	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
 	public void alert() {
-		new AlertDialog.Builder(this)
+		new AlertDialog.Builder(act)
 	    .setTitle(alert_title)
 	    .setMessage(alert_message)
 	    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -304,7 +287,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	
 	// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
 	public void sendMessage(int mtype) {
-		SharedPreferences texts = getSharedPreferences("texts", 0);
+		SharedPreferences texts = act.getSharedPreferences("texts", 0);
 		if (mtype == 1) {
 		    String email = texts.getString(NotificationsActivity.email, NotificationsActivity.selectedEmail);
 			Log.d("EMAIL SENT TO:", email);
@@ -355,21 +338,21 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	    }
 	
 
-	@Override
+	/*@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		act.getMenuInflater().inflate(R.menu.main, menu);
 		return true;
-	}
+	}*/
 	
 
 	
 	@Override
-    protected void onResume(){
+	public void onResume(){
 		super.onResume();
 		
        // Restore preferences
-       SharedPreferences settings = getSharedPreferences("settings", 0);
+       SharedPreferences settings = act.getSharedPreferences("settings", 0);
        tasksToSelected = new HashMap<String, Boolean>();
        tasksToSelected.put(water, settings.getBoolean(water, true));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, true));
@@ -378,12 +361,12 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
     }
 
     @Override
-    protected void onPause(){
+	public void onPause(){
        super.onPause();
 
       // We need an Editor object to make preference changes.
       // All objects are from android.context.Context
-      SharedPreferences settings = getSharedPreferences("settings", 0);
+      SharedPreferences settings = act.getSharedPreferences("settings", 0);
       SharedPreferences.Editor editor = settings.edit();
       editor.putBoolean(water, tasksToSelected.get(water));
       editor.putBoolean(microDone, tasksToSelected.get(microDone));
@@ -396,7 +379,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
     
 
     @Override
-    protected void onDestroy(){
+	public void onDestroy(){
     	super.onDestroy();
 
     	// Stop listening for things!
@@ -407,7 +390,7 @@ public class MainActivity extends Activity implements OnBoilingEventListener {
 	public void processBoilingEvent() {
 		if (!alerted) {
 			alerted = true;
-			runOnUiThread(new Runnable() {
+			act.runOnUiThread(new Runnable() {
 				public void run() {
 					alert(); 
 				}

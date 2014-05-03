@@ -19,5 +19,6 @@
     <string name="notify_instruction">Notify via:</string>
     <string name="analytics_instruction">Currently viewing:</string>
     <string name="analytics_format">Graph by Average</string>
+    <string name="title_activity_tab">TabActivity</string>
 
 </resources>

@@ -1,0 +1,16 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+    <item
+        android:id="@+id/item1"
+        android:title="Home">
+    </item><item
+        android:id="@+id/item2"
+        android:title="Notifications">
+    </item>
+    <item
+        android:id="@+id/item3"
+        android:title="Analytics">
+    </item>
+</menu>
