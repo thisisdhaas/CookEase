@@ -54,8 +54,10 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     public String friends_title = "Who do you want to alert?";
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
-    StableArrayAdapter adapter = null;
-    Activity act;
+    private StableArrayAdapter adapter = null;
+    private Activity act;
+    private boolean inForeground;
+    
     
     // For audio processing
     private BoilingWaterDetector boilingWaterDetector;
@@ -79,6 +81,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	    tasksToSelected.put(other,settings.getBoolean(other, false));
+	    inForeground = true;
 
 		// Testing: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
@@ -280,40 +283,44 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 			contentText = "Other kitchen tasks are done"; //temporary
 		}
 		
-		NotificationCompat.Builder mBuilder =
-		        new NotificationCompat.Builder(act)
-		        .setSmallIcon(R.drawable.ic_launcher) //temp icon
-		        .setContentTitle("CookEase Notification")
-		        .setContentText(contentText);
-		// Creates an explicit intent for an Activity in your app
-		Intent resultIntent = new Intent(act, TabActivity.class);
-
-		// The stack builder object will contain an artificial back stack for the
-		// started Activity.
-		// This ensures that navigating backward from the Activity leads out of
-		// your application to the Home screen.
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(act);
-		// Adds the back stack for the Intent (but not the Intent itself)
-		stackBuilder.addParentStack(TabActivity.class);
-		// Adds the Intent that starts the Activity to the top of the stack
-		stackBuilder.addNextIntent(resultIntent);
-		PendingIntent resultPendingIntent =
-		        stackBuilder.getPendingIntent(
-		            0,
-		            PendingIntent.FLAG_UPDATE_CURRENT
-		        );
-		mBuilder.setContentIntent(resultPendingIntent);
-		NotificationManager mNotificationManager =
-		    (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
-		// mId allows you to update the notification later on.
-		mNotificationManager.notify(0, mBuilder.build());
-
-		//TODO uncomment when water boiling working
-		//check if we have to keep listening for other tasks
-		//if (!tasksSelected()) {
-			// Stop listening for things!
-	    //	boilingWaterDetector.stopDetection();
-		//}
+		//Notifications if app in background
+		if (!inForeground) {
+			NotificationCompat.Builder mBuilder =
+			        new NotificationCompat.Builder(act)
+			        .setSmallIcon(R.drawable.ic_launcher) //temp icon
+			        .setContentTitle("CookEase Notification")
+			        .setContentText(contentText);
+			
+			// Creates an explicit intent for an Activity in your app
+			Intent resultIntent = new Intent(act, TabActivity.class);
+	
+			// The stack builder object will contain an artificial back stack for the
+			// started Activity.
+			// This ensures that navigating backward from the Activity leads out of
+			// your application to the Home screen.
+			TaskStackBuilder stackBuilder = TaskStackBuilder.create(act);
+			// Adds the back stack for the Intent (but not the Intent itself)
+			stackBuilder.addParentStack(TabActivity.class);
+			// Adds the Intent that starts the Activity to the top of the stack
+			stackBuilder.addNextIntent(resultIntent);
+			PendingIntent resultPendingIntent =
+			        stackBuilder.getPendingIntent(
+			            0,
+			            PendingIntent.FLAG_UPDATE_CURRENT
+			        );
+			mBuilder.setContentIntent(resultPendingIntent);
+			NotificationManager mNotificationManager =
+			    (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
+			// mId allows you to update the notification later on.
+			mNotificationManager.notify(0, mBuilder.build());
+	
+			//TODO uncomment when water boiling working
+			//check if we have to keep listening for other tasks
+			//if (!tasksSelected()) {
+				// Stop listening for things!
+		    //	boilingWaterDetector.stopDetection();
+			//}
+		}
 		
 	}
 	
@@ -390,6 +397,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	   tasksToSelected.put(other,settings.getBoolean(other, false));
+	   inForeground = true;
     }
 
     @Override
@@ -404,6 +412,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
       editor.putBoolean(microDone, tasksToSelected.get(microDone));
       editor.putBoolean(microExplo, tasksToSelected.get(microExplo));
       editor.putBoolean(other, tasksToSelected.get(other));
+      inForeground = false;
 
       // Commit the edits!
       editor.commit();
@@ -413,6 +422,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     @Override
 	public void onDestroy(){
     	super.onDestroy();
+    	inForeground = false;
 
     	// Stop listening for things!
     	boilingWaterDetector.stopDetection();
