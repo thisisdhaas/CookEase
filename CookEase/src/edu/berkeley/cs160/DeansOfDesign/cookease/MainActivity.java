@@ -2,17 +2,23 @@ package edu.berkeley.cs160.DeansOfDesign.cookease;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,7 +59,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     
     // For audio processing
     private BoilingWaterDetector boilingWaterDetector;
-    private boolean alerted = false;
+    private boolean waterAlerted = false;
+    private boolean isListening;
     
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,7 +80,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	    tasksToSelected.put(other,settings.getBoolean(other, false));
 
-		// Demo, click the instructions for alert!
+		// Testing: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
 		instructionText.setOnClickListener(
             new View.OnClickListener() {
@@ -87,6 +94,11 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		// Setup audio processing
 		boilingWaterDetector = new BoilingWaterDetector(act, 0.1);
 		boilingWaterDetector.setOnBoilingEventListener(this);
+		//TODO: change if-statement to general case below once
+		//everything's working
+		//if (tasksSelected()) {
+		//	boilingWaterDetector.startDetection();
+		//}
 		if (tasksToSelected.get(water)) {
 			boilingWaterDetector.startDetection();
 		}
@@ -116,6 +128,11 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(false);
 	    			tasksToSelected.put(itemText, false);
+	    			//TODO: change if-statement to general case below once
+	    			//everything's working
+	    			//if (tasksSelected()) {
+	    			//	boilingWaterDetector.stopDetection();
+	    			//}
 	    			if (itemText == water) {
 	    				boilingWaterDetector.stopDetection();
 	    			}
@@ -124,8 +141,13 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//item.setTextColor(Color.parseColor(white));
 	    			item.setChecked(true);
 	    			tasksToSelected.put(itemText, true);
+	    			//TODO: change if-statement to general case below once
+	    			//everything's working
+	    			//if (tasksSelected()) {
+	    			//	boilingWaterDetector.startDetection();
+	    			//}
 	    			if (itemText == water) {
-	    				alerted = false;
+	    				waterAlerted = false;
 	    				boilingWaterDetector.startDetection();
 	    			}
 	    		}
@@ -209,6 +231,20 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 
 	  }
 
+	public boolean tasksSelected() {
+		Set<String> temp = tasksToSelected.keySet();
+		Iterator<String> iter = temp.iterator();
+		while (iter.hasNext()) {
+			if (tasksToSelected.get(iter.next())) {
+				isListening = true;
+				break;
+			} else {
+				isListening = false;
+			}
+		}
+		return isListening;
+	}
+	
 	
 	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
 	public void alert(String task) {
@@ -225,19 +261,59 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		sendMessage(1);
 		// sends a test text to the currently selected phone number
 		sendMessage(2); 
+		String contentText="";
 		if (task == water) {
 			tasksToSelected.put(water, false);
 			taskList.setItemChecked(0, tasksToSelected.get(water));
+			contentText = "Your water has boiled";
 		} else if (task == microDone) {
 			tasksToSelected.put(microDone, false);
 			taskList.setItemChecked(1, tasksToSelected.get(microDone));
+			contentText = "The microwave is done";
 		} else if (task == microExplo) { 
 			tasksToSelected.put(microExplo, false);
 			taskList.setItemChecked(2, tasksToSelected.get(microExplo));
+			contentText = "Food is exploding in the microwave";
 		} else if (task == other) {
 			tasksToSelected.put(other, false);
 			taskList.setItemChecked(3, tasksToSelected.get(other));
+			contentText = "Other kitchen tasks are done"; //temporary
 		}
+		
+		NotificationCompat.Builder mBuilder =
+		        new NotificationCompat.Builder(act)
+		        .setSmallIcon(R.drawable.ic_launcher) //temp icon
+		        .setContentTitle("CookEase Notification")
+		        .setContentText(contentText);
+		// Creates an explicit intent for an Activity in your app
+		Intent resultIntent = new Intent(act, TabActivity.class);
+
+		// The stack builder object will contain an artificial back stack for the
+		// started Activity.
+		// This ensures that navigating backward from the Activity leads out of
+		// your application to the Home screen.
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(act);
+		// Adds the back stack for the Intent (but not the Intent itself)
+		stackBuilder.addParentStack(TabActivity.class);
+		// Adds the Intent that starts the Activity to the top of the stack
+		stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent =
+		        stackBuilder.getPendingIntent(
+		            0,
+		            PendingIntent.FLAG_UPDATE_CURRENT
+		        );
+		mBuilder.setContentIntent(resultPendingIntent);
+		NotificationManager mNotificationManager =
+		    (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
+		// mId allows you to update the notification later on.
+		mNotificationManager.notify(0, mBuilder.build());
+
+		//TODO uncomment when water boiling working
+		//check if we have to keep listening for other tasks
+		//if (!tasksSelected()) {
+			// Stop listening for things!
+	    //	boilingWaterDetector.stopDetection();
+		//}
 		
 	}
 	
@@ -344,8 +420,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 
 	@Override
 	public void processBoilingEvent() {
-		if (!alerted) {
-			alerted = true;
+		if (!waterAlerted) {
+			waterAlerted = true;
 			act.runOnUiThread(new Runnable() {
 				public void run() {
 					alert(water); 
