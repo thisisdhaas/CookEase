@@ -1,5 +1,6 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -9,12 +10,18 @@ import android.app.FragmentTransaction;
 import android.view.Menu;
 import android.view.Window;
 
-public class TabActivity extends Activity {
+public class TabActivity extends Activity implements OnBoilingEventListener {
 	
+	// For handling tabs
 	ActionBar.Tab tab1, tab2, tab3;
 	Fragment fragmentTab1 = new MainActivity();
 	Fragment fragmentTab2 = new NotificationsActivity();
 	Fragment fragmentTab3 = new AnalyticsActivity();
+    
+    // For audio processing
+    protected BoilingWaterDetector boilingWaterDetector;
+    protected boolean waterAlerted = false;
+    protected boolean isListening;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,10 @@ public class TabActivity extends Activity {
         actionBar.addTab(tab1);
         actionBar.addTab(tab2);
         actionBar.addTab(tab3);
+        
+        // Set up audio processing.
+		boilingWaterDetector = new BoilingWaterDetector(this, 0.1);
+		boilingWaterDetector.setOnBoilingEventListener(this);
 
 	}
 
@@ -75,4 +86,25 @@ public class TabActivity extends Activity {
 		return true;
 	}
 
+	// Stop listening for things!
+    @Override
+	public void onDestroy(){
+    	super.onDestroy();
+    	boilingWaterDetector.stopDetection();
+    }
+    
+	@Override
+	public void processBoilingEvent() {
+		if (!waterAlerted) {
+			waterAlerted = true;
+			runOnUiThread(new Runnable() {
+				public void run() {
+					// TODO(dhaas): What if main tab isn't selected? How do we handle alerts?
+					MainActivity mainTab = (MainActivity) fragmentTab1;
+					mainTab.alert(mainTab.water); 
+				}
+			});
+		}
+	}
+	
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.NotificationManager;
@@ -33,13 +32,10 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.TextView;
-import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
-public class MainActivity extends Fragment implements OnBoilingEventListener {
+public class MainActivity extends Fragment {
 
     public final static String EXTRA_MESSAGE = "edu.berkeley.cs160.DeansOfDesign.MESSAGE";
-    private static TextView analyticsText = null;
-    private static TextView settingsText = null;
     private static TextView instructionText = null;
     
     public String alert_message = "Your water is boiling!\nYour microwave is done!";
@@ -60,21 +56,15 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
     private StableArrayAdapter adapter = null;
-    private Activity act;
+    private TabActivity act;
     private boolean inForeground;
-    
-    
-    // For audio processing
-    private BoilingWaterDetector boilingWaterDetector;
-    private boolean waterAlerted = false;
-    private boolean isListening;
     
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
-		act = this.getActivity();
+		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_main);
 		// Make a mail object to send email with
 		//make a Mail object to email with
@@ -99,16 +89,13 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
             }
         );
 		
-		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(act, 0.1);
-		boilingWaterDetector.setOnBoilingEventListener(this);
 		//TODO: change if-statement to general case below once
 		//everything's working
 		//if (tasksSelected()) {
 		//	boilingWaterDetector.startDetection();
 		//}
 		if (tasksToSelected.get(water)) {
-			boilingWaterDetector.startDetection();
+			act.boilingWaterDetector.startDetection();
 		}
 		
 		taskList = (ListView) act.findViewById(R.id.listView1);
@@ -141,7 +128,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//	boilingWaterDetector.stopDetection();
 	    			//}
 	    			if (itemText == water) {
-	    				boilingWaterDetector.stopDetection();
+	    				act.boilingWaterDetector.stopDetection();
 	    			}
 	    		} else { //not selected yet
 	    			item.setBackgroundColor(Color.parseColor(green));
@@ -153,8 +140,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//	boilingWaterDetector.startDetection();
 	    			//}
 	    			if (itemText == water) {
-	    				waterAlerted = false;
-	    				boilingWaterDetector.startDetection();
+	    				act.waterAlerted = false;
+	    				act.boilingWaterDetector.startDetection();
 	    			}
 	    		}
 	    	}
@@ -252,17 +239,18 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 
 
 	public boolean tasksSelected() {
+		// TODO (dhaas): this logic needs work.
 		Set<String> temp = tasksToSelected.keySet();
 		Iterator<String> iter = temp.iterator();
 		while (iter.hasNext()) {
 			if (tasksToSelected.get(iter.next())) {
-				isListening = true;
+				act.isListening = true;
 				break;
 			} else {
-				isListening = false;
+				act.isListening = false;
 			}
 		}
-		return isListening;
+		return act.isListening;
 	}
 	
 	
@@ -432,21 +420,6 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	public void onDestroy(){
     	super.onDestroy();
     	inForeground = false;
-
-    	// Stop listening for things!
-    	boilingWaterDetector.stopDetection();
     }
-
-	@Override
-	public void processBoilingEvent() {
-		if (!waterAlerted) {
-			waterAlerted = true;
-			act.runOnUiThread(new Runnable() {
-				public void run() {
-					alert(water); 
-				}
-			});
-		}
-	}
     
 }
