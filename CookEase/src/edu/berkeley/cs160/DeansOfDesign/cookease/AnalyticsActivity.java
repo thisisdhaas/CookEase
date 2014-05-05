@@ -1,44 +1,37 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
 public class AnalyticsActivity extends Fragment {
 
-	private static TextView homeText;
-	private static TextView notificatonsText;
+	private static TextView textViewWater;
+	private static TextView textViewMicrowave;
 	
 	// For analytics testing
 	private static Button waterButton;
 	private static Button microwaveButton;
+	private static Button dbTest;
 	
 	private Boolean waterListening = false;
 	private Boolean microwaveListening = false;
 	
 	private long waterTime = 0;
 	private long microwaveTime = 0;
+	
+	DatabaseHandler db;
 	Activity act;
 	
 	@Override
@@ -55,10 +48,10 @@ public class AnalyticsActivity extends Fragment {
 					public void onClick(View v) {
 						if (waterListening) {
 							waterListening = false;
-							finishTime("water");
+							finishTime(AnalyticsData.WATER);
 						} else {
 							waterListening = true;
-							startTime("water");
+							startTime(AnalyticsData.WATER);
 						}
 					}
 				}
@@ -71,15 +64,26 @@ public class AnalyticsActivity extends Fragment {
 					public void onClick(View v) {
 						if (microwaveListening) {
 							microwaveListening = false;
-							finishTime("microwave");
+							finishTime(AnalyticsData.MICROWAVE);
 						} else {
 							microwaveListening = true;
-							startTime("microwave");
+							startTime(AnalyticsData.MICROWAVE);
 						}
 					}
 				}
 		);
-		displayStats();
+		// Test DB
+		dbTest = (Button) act.findViewById(R.id.dbTest);
+		dbTest.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						displayStats();
+					}
+				}
+		);
+		textViewWater = (TextView) act.findViewById(R.id.textViewWater);
+//		displayStats();
+        db = new DatabaseHandler(act);
 		return inflater.inflate(R.layout.activity_main, container, false);
 	}
 	
@@ -103,146 +107,99 @@ public class AnalyticsActivity extends Fragment {
 		return true;
 	}
 
-	public void startTime(String type) {
+	public void startTime(int dataType) {
 		// Record start time
-		if (type == "water") {
+		if (dataType == AnalyticsData.WATER) {
 			waterTime = System.currentTimeMillis();
-		} else if (type == "microwave") {
+		} else if (dataType == AnalyticsData.MICROWAVE) {
 			microwaveTime = System.currentTimeMillis();
 		}
 	}
 	
-	public void finishTime(String type) {
+	public void finishTime(int dataType) {
 		// Record finish time, then subtract from start time to get total duration
-		long time = System.currentTimeMillis();
-		String fileName = null;
-		if (type == "water") {
-			time -= waterTime;
-			fileName = "waterAnalyticsRecord";
-		} else if (type == "microwave") {
-			time -= microwaveTime;
-			fileName = "microwaveAnalyticsRecord";
+		long duration = System.currentTimeMillis();
+		if (dataType == AnalyticsData.WATER) {
+			duration -= waterTime;
+		} else if (dataType == AnalyticsData.MICROWAVE) {
+			duration -= microwaveTime;
 		}
-		// Record this in either microwave or water file 
-		// E.g. 2014-01: 100.42 213.76
-		Calendar cal = Calendar.getInstance();  
-	    int year = cal.get(cal.YEAR);  
-	    int month = cal.get(cal.MONTH)+1; //zero-based
-	    String curDate;
-	    if (month < 10) {
-		    curDate = year+"-"+"0"+month;
-	    } else {
-		    curDate = year+"-"+month;
-	    }
-	    
-	  //reading file line by line in Java using BufferedReader       
-        FileInputStream fis = null;
-        BufferedReader reader = null;
-        Boolean dateFound = false;
-      
-        try {
-        	// Open file and inputstream and stuff like that 
-        	File myFile = new File(fileName);
-        	if (myFile.exists()) {
-        		fis = new FileInputStream(fileName);
-        	} else {
-            // File not found?
-            	FileOutputStream fos = act.openFileOutput(fileName, Context.MODE_PRIVATE);
-            	fos.write("".getBytes());
-            	fos.close();
-                fis = new FileInputStream(fileName);
-            }
-            reader = new BufferedReader(new InputStreamReader(fis));
-          
-            System.out.println("Reading File line by line using BufferedReader");
-            
-            // Look for our "year-month" in first 7 bytes, maybe just skip to last line and check?
-            String line = reader.readLine();
-            String date = line.substring(0, 7);
-            while(line != null){
-            	if (date == curDate) {
-            		dateFound = true;
-            	}
-                line = reader.readLine();
-            }                     
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(AnalyticsActivity.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AnalyticsActivity.class.getName()).log(Level.SEVERE, null, ex);
-          
-        } finally {
-            try {
-                FileWriter fw = new FileWriter(fileName, true); //the true will append the new data
-            	if (dateFound) {
-            		// Append time to end of string
-            		fw.write(" "+time); //appends the string to the file   
-            	} else {
-            		// Create new line in the file with time
-            		fw.write("\n"+curDate+" "+time); //appends the string to the file   
-            	}
-            	fw.close();
-                reader.close();
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(AnalyticsActivity.class.getName()).log(Level.SEVERE, null, ex);
-            } 
-        }		
-		
-/*		FileOutputStream fos = openFileOutput(file, Context.MODE_PRIVATE);
-		fos.write(string.getBytes());
-		fos.close();*/
+		// Put this in database
+		Date date = new Date();
+        Log.d("Insert: ", "Inserting .."); 
+        db.addAnalyticsData(new AnalyticsData(date.toString(), String.valueOf(duration), String.valueOf(dataType)));
+        Log.d("Done inserting: ", "Inserted: " +date+" duration: " +duration+" dataType:"+dataType); 
 	}
 	
 	public void displayStats() {
-		TextView waterText = (TextView) act.findViewById(R.id.textView8);
-		TextView microwaveText = (TextView) act.findViewById(R.id.textView9);
-		String waterFile = "waterAnalyticsRecord";
-		String microwaveFile = "microwaveAnalyticsRecord";
+//		TextView waterText = (TextView) act.findViewById(R.id.textView8);
+//		TextView microwaveText = (TextView) act.findViewById(R.id.textView9);
 		
-		int i = 0;
-		while (i < 2) {
-			String fileName = null;
-			TextView curText = null;
-			if (i == 0) {
-				fileName = waterFile;
-				curText = waterText;
-			} else {
-				fileName = microwaveFile;
-				curText = microwaveText;
-			}
-	        FileInputStream fis = null;
-	        BufferedReader reader = null;
-			try {
-				// Open file and inputstream and stuff like that 
-		    	File myFile = new File(fileName);
-		    	if (myFile.exists()) {
-		    		fis = new FileInputStream(fileName);
-		    	} else {
-		    		// File not found?
-		        	return;
-		        }
-	            reader = new BufferedReader(new InputStreamReader(fis));
-	            // Print these lines
-	            String line = reader.readLine();
-	            while(line != null){
-	            	curText.append(line);
-	                line = reader.readLine();
-	            } 
-			}  catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-				try {
-					if (reader == null || fis == null) {
-						return;
-					}
-					reader.close();
-					fis.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
+		// Reading last stat
+        Log.d("Reading: ", "Reading all stats..");
+        String stats = "";
+        List<AnalyticsData> dataList = db.getAllAnalyticsData();       
+         
+        for (AnalyticsData d : dataList) {
+          stats += "Date: "+d.getDate()+" ,Duration: " + d.getDuration() + " ,dataType: " + d.getDataType()+"\n";
+        }
+        System.out.println("stats is: " + stats);
+        System.out.println("textViewWater is: "+textViewWater);
+        textViewWater.append(stats);
+//            String log = "Id: "+d.getDate()+" ,Name: " + d.getDuration() + " ,Phone: " + d.getDataType();
+                // Writing Contacts to log
+//        Log.d("Name: ", log);
+        	
+        
+        
+        
+//		String waterFile = "waterAnalyticsRecord";
+//		String microwaveFile = "microwaveAnalyticsRecord";
+		
+//		int i = 0;
+//		while (i < 2) {
+//			String fileName = null;
+//			TextView curText = null;
+//			if (i == 0) {
+//				fileName = waterFile;
+//				curText = waterText;
+//			} else {
+//				fileName = microwaveFile;
+//				curText = microwaveText;
+//			}
+//	        FileInputStream fis = null;
+//	        BufferedReader reader = null;
+//			try {
+//				// Open file and inputstream and stuff like that 
+//		    	File myFile = new File(fileName);
+//		    	if (myFile.exists()) {
+//		    		fis = new FileInputStream(fileName);
+//		    	} else {
+//		    		// File not found?
+//		        	return;
+//		        }
+//	            reader = new BufferedReader(new InputStreamReader(fis));
+//	            // Print these lines
+//	            String line = reader.readLine();
+//	            while(line != null){
+//	            	curText.append(line);
+//	                line = reader.readLine();
+//	            } 
+//			}  catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} finally {
+//				try {
+//					if (reader == null || fis == null) {
+//						return;
+//					}
+//					reader.close();
+//					fis.close();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		}
 	}
 }
