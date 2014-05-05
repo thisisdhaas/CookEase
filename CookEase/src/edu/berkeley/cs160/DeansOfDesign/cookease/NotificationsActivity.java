@@ -57,6 +57,14 @@ public class NotificationsActivity extends Fragment {
         adapter = new CustomListAdapter(act, contactsSelected);
         addedList.setItemsCanFocus(true);
         addedList.setAdapter(adapter);
+        
+        Button addbutton = (Button) act.findViewById(R.id.add_contact_button);
+        addbutton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+            	startActivityForResult(intent, 1);
+            }
+        });
         return inflater.inflate(R.layout.activity_main, container, false);
     }
 
@@ -216,10 +224,7 @@ public class NotificationsActivity extends Fragment {
     }
 
 	
-	public void openMessageContacts(View v) {
-		Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-    	startActivityForResult(intent, 1);
-	}
+	
 	
 	public void openAlarms(View v) {
 		Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);

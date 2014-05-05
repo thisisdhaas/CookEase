@@ -87,8 +87,7 @@
    	    android:text="Add a contact"
    	    android:layout_centerHorizontal="true"
    	    android:layout_centerVertical="true"
-   	    android:drawableLeft="@drawable/add"
-   	    android:onClick="openMessageContacts" />
+   	    android:drawableLeft="@drawable/add" />
 
     <ListView
         android:id="@+id/listView2"
