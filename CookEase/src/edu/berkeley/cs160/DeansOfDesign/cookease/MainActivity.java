@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -47,6 +48,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     public String other = "Other Kitchen Tasks";
     String greyBg = "#84a689";
     String purpleBg = "#a684a1";
+    String green ="#7BF49B";
+    String gray = "#F1D66A";
     String white = "#ffffff";
     private Mail sendMail;
     String sendOkay = "";
@@ -115,7 +118,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 
 
         adapter = new StableArrayAdapter(act,
-        		android.R.layout.simple_list_item_multiple_choice, list);
+        		R.layout.custom_row, list);
 	    
 	    taskList.setAdapter(adapter);
 	    taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -127,8 +130,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    		CheckedTextView item = (CheckedTextView) view;
 	    		String itemText = (String) parent.getItemAtPosition(position);
 	    		if (tasksToSelected.get(itemText)) { //selected already
-	    			//item.setBackgroundColor(Color.parseColor(greyBg));
-	    			//item.setTextColor(Color.parseColor(white));
+	    			item.setBackgroundColor(Color.parseColor(gray));
 	    			item.setChecked(false);
 	    			tasksToSelected.put(itemText, false);
 	    			//TODO: change if-statement to general case below once
@@ -140,8 +142,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    				boilingWaterDetector.stopDetection();
 	    			}
 	    		} else { //not selected yet
-	    			//item.setBackgroundColor(Color.parseColor(purpleBg));
-	    			//item.setTextColor(Color.parseColor(white));
+	    			item.setBackgroundColor(Color.parseColor(green));
 	    			item.setChecked(true);
 	    			tasksToSelected.put(itemText, true);
 	    			//TODO: change if-statement to general case below once
@@ -161,7 +162,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    taskList.setItemChecked(1, tasksToSelected.get(microDone));
 	    taskList.setItemChecked(2, tasksToSelected.get(microExplo));
 	    taskList.setItemChecked(3, tasksToSelected.get(other));
-	    
+	   
 /*	    int wantedPosition = 10; // Whatever position you're looking for  
 	    int wantedChild = wantedPosition - firstPosition;
 	    // Say, first visible position is 8, you want position 10, wantedChild will now be 2
@@ -212,22 +213,26 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    	 CheckedTextView temp = (CheckedTextView) view.findViewById(R.id.text1);
 	    	 if (position == 0) {
 	    		 temp.setText(water);
+	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.cookeaseiconsmall, 0);
 	    	 } else if (position == 1) {
 	    		 temp.setText(microDone);
+	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.microdone, 0);
 	    	 } else if (position == 2) {
 	    		 temp.setText(microExplo);
+	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.microexplo, 0);
 	    	 } else if (position == 3) {
 	    		 temp.setText(other);
+	    		 //temp.setCompoundDrawablesWithIntrinsicBounds( R.drawable.other, 0, 0, 0);
 	    	 }
 	    	
-	    	/*if ((position == 0 && tasksToSelected.get(water)) ||
+	    	if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
 	    			(position == 2 && tasksToSelected.get(microExplo)) ||
 	    			(position == 3 && tasksToSelected.get(other))) {
-	    				view.setBackgroundColor(Color.parseColor(purpleBg));
+	    				view.setBackgroundColor(Color.parseColor(green));
 	    	} else {
-	    		view.setBackgroundColor(Color.parseColor(greyBg));
-	    	}*/
+	    		view.setBackgroundColor(Color.parseColor(gray));
+	    	}
 	    	adapter.notifyDataSetChanged();
 	    	return view;
 	    }
