@@ -16,7 +16,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -211,19 +214,29 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    		 	
 	    	 }
 	    	 CheckedTextView temp = (CheckedTextView) view.findViewById(R.id.text1);
+	    	 Drawable dr = null;
+	    	 Bitmap bitmap = null;
+	    	 Drawable d = null;
 	    	 if (position == 0) {
 	    		 temp.setText(water);
-	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.cookeaseiconsmall, 0);
+	    		 dr = getResources().getDrawable(R.drawable.potboil);
+	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
+	    		 // Scale it to 50 x 50
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 100, 100, true));
 	    	 } else if (position == 1) {
 	    		 temp.setText(microDone);
-	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.microdone, 0);
+	    		 dr = getResources().getDrawable(R.drawable.microdone);
+	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
+	    		 // Scale it to 50 x 50
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 150, 100, true));
 	    	 } else if (position == 2) {
 	    		 temp.setText(microExplo);
-	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.microexplo, 0);
-	    	 } //else if (position == 3) {
-	    		 //temp.setText(other);
-	    		 //temp.setCompoundDrawablesWithIntrinsicBounds( R.drawable.other, 0, 0, 0);
-	    	 //}
+	    		 dr = getResources().getDrawable(R.drawable.microexplo);
+	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
+	    		 // Scale it to 50 x 50
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,150, 100, true));
+	    	 }
+    		 temp.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
 	    	
 	    	if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
