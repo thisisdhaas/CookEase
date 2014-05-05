@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="match_parent"
+   	android:layout_height="20dp"
+   	android:clickable="false"
+	android:descendantFocusability="blocksDescendants"
+	android:focusable="false"
+	android:focusableInTouchMode="false" >
+	
+	<TextView 
+	    android:id="@+id/contact_text"
+	    android:layout_width="wrap_content"
+	   	android:layout_height="wrap_content"
+	   	android:textSize="18dp"
+	   	android:layout_centerVertical="true"
+	   	android:paddingLeft="15dp"
+	   	android:textAlignment="center"
+	   	android:paddingStart="10dp"
+	   	android:textColor="#000000"
+	   	android:clickable="false"
+		android:focusable="false"
+		android:focusableInTouchMode="false" />
+
+   	<Button
+   	    android:id="@+id/emailbutton"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="match_parent"
+   	    android:layout_toLeftOf="@+id/textbutton"
+   	    android:layout_marginRight="15dp"  
+   	    android:layout_centerVertical="true"
+   	    android:clickable="true"
+   	    android:focusable="true"
+   	    android:focusableInTouchMode="false"
+   	    android:background="@android:color/transparent"
+   	    android:text="Email"
+   	    android:drawableTop="@drawable/email" />
+   	
+   	<Button
+   	    android:id="@+id/textbutton"
+   	    android:layout_width="wrap_content"
+   	    android:layout_height="match_parent"
+   	    android:layout_alignParentRight="true"
+   	    android:layout_centerVertical="true"
+   	    android:padding="3dp"
+   	    android:clickable="true"
+   	    android:focusable="true"
+   	    android:focusableInTouchMode="false"
+   	    android:background="@android:color/transparent"
+   	    android:text="Text"
+   	    android:drawableTop="@drawable/text" />
+   	    
+ </RelativeLayout>
+   	
+
+

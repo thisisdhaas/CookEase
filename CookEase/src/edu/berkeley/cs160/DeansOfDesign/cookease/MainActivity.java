@@ -26,7 +26,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -237,7 +236,6 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,150, 100, true));
 	    	 }
     		 temp.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
-	    	
 	    	if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
 	    			(position == 2 && tasksToSelected.get(microExplo))) {// ||
@@ -251,6 +249,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    }
 
 	  }
+
 
 	public boolean tasksSelected() {
 		Set<String> temp = tasksToSelected.keySet();
@@ -346,9 +345,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	public void sendMessage(int mtype) {
 		SharedPreferences texts = act.getSharedPreferences("texts", 0);
 		if (mtype == 1) {
-		    String email = texts.getString(NotificationsActivity.email, NotificationsActivity.selectedEmail);
-			Log.d("EMAIL SENT TO:", email);
-			String[] toArr = {email}; // You can add more emails here if necessary
+			String[] emails = NotificationsActivity.emails.values().toArray(new String[NotificationsActivity.emails.size()]);
+			String[] toArr = emails; // You can add more emails here if necessary
 			Log.d("EMAIL IS NOW:", toArr[0]);
 			sendMail.setTo(toArr); // load array to setTo function
 			sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
@@ -368,7 +366,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 			Thread t = new Thread(r);
 			t.start();
 		} else {
-			final String textnum = texts.getString(NotificationsActivity.text, NotificationsActivity.selectedText);
+			final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
 			//Text message send function.  The phone number is stored in textnum variable.
 			Runnable r = new Runnable() {
 			    @Override
@@ -388,21 +386,14 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		}
 	}
 	
-	private void sendSMS(String phoneNumber, String message)
-	   {
-	       SmsManager sms = SmsManager.getDefault();
-	       sms.sendTextMessage(phoneNumber, null, message, null, null);
-	    }
-	
-
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		act.getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}*/
-	
-
+	private void sendSMS(String[] numbers, String message) {
+       SmsManager sms = SmsManager.getDefault();
+       int i = 0;
+       while (i < numbers.length) {
+    	   sms.sendTextMessage(numbers[i], null, message, null, null);
+    	   i += 1;
+       }
+    }
 	
 	@Override
 	public void onResume(){
