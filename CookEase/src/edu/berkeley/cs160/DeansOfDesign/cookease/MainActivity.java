@@ -83,7 +83,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    tasksToSelected.put(water, settings.getBoolean(water, false));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	    tasksToSelected.put(other,settings.getBoolean(other, false));
+	   // tasksToSelected.put(other,settings.getBoolean(other, false));
 	    inForeground = true;
 
 		// Testing: click the instructions for alert
@@ -110,7 +110,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		}
 		
 		taskList = (ListView) act.findViewById(R.id.listView1);
-		String tasks[] ={water, microDone, microExplo, other};
+		String tasks[] ={water, microDone, microExplo};//, other};
 		final ArrayList<String> list = new ArrayList<String>();
 	    for (int i = 0; i < tasks.length; ++i) {
 	      list.add(tasks[i]); 
@@ -161,7 +161,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    taskList.setItemChecked(0, tasksToSelected.get(water));
 	    taskList.setItemChecked(1, tasksToSelected.get(microDone));
 	    taskList.setItemChecked(2, tasksToSelected.get(microExplo));
-	    taskList.setItemChecked(3, tasksToSelected.get(other));
+	    //taskList.setItemChecked(3, tasksToSelected.get(other));
 	   
 /*	    int wantedPosition = 10; // Whatever position you're looking for  
 	    int wantedChild = wantedPosition - firstPosition;
@@ -220,15 +220,15 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    	 } else if (position == 2) {
 	    		 temp.setText(microExplo);
 	    		 temp.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.microexplo, 0);
-	    	 } else if (position == 3) {
-	    		 temp.setText(other);
+	    	 } //else if (position == 3) {
+	    		 //temp.setText(other);
 	    		 //temp.setCompoundDrawablesWithIntrinsicBounds( R.drawable.other, 0, 0, 0);
-	    	 }
+	    	 //}
 	    	
 	    	if ((position == 0 && tasksToSelected.get(water)) ||
 	    			(position == 1 && tasksToSelected.get(microDone)) ||
-	    			(position == 2 && tasksToSelected.get(microExplo)) ||
-	    			(position == 3 && tasksToSelected.get(other))) {
+	    			(position == 2 && tasksToSelected.get(microExplo))) {// ||
+	    			//(position == 3 && tasksToSelected.get(other))) {
 	    				view.setBackgroundColor(Color.parseColor(green));
 	    	} else {
 	    		view.setBackgroundColor(Color.parseColor(gray));
@@ -282,11 +282,11 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 			tasksToSelected.put(microExplo, false);
 			taskList.setItemChecked(2, tasksToSelected.get(microExplo));
 			contentText = "Food is exploding in the microwave";
-		} else if (task == other) {
-			tasksToSelected.put(other, false);
-			taskList.setItemChecked(3, tasksToSelected.get(other));
-			contentText = "Other kitchen tasks are done"; //temporary
-		}
+		} //else if (task == other) {
+			//tasksToSelected.put(other, false);
+			//taskList.setItemChecked(3, tasksToSelected.get(other));
+			//contentText = "Other kitchen tasks are done"; //temporary
+		//}
 		
 		//Notifications if app in background
 		if (!inForeground) {
@@ -401,7 +401,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
        tasksToSelected.put(water, settings.getBoolean(water, false));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	   tasksToSelected.put(other,settings.getBoolean(other, false));
+	  // tasksToSelected.put(other,settings.getBoolean(other, false));
 	   inForeground = true;
     }
 
@@ -416,7 +416,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
       editor.putBoolean(water, tasksToSelected.get(water));
       editor.putBoolean(microDone, tasksToSelected.get(microDone));
       editor.putBoolean(microExplo, tasksToSelected.get(microExplo));
-      editor.putBoolean(other, tasksToSelected.get(other));
+      //editor.putBoolean(other, tasksToSelected.get(other));
       inForeground = false;
 
       // Commit the edits!
