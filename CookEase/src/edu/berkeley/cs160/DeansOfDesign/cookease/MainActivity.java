@@ -221,19 +221,19 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    		 dr = getResources().getDrawable(R.drawable.potboil);
 	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
 	    		 // Scale it to 50 x 50
-	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 100, 100, true));
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 67, 67, true));
 	    	 } else if (position == 1) {
 	    		 temp.setText(microDone);
 	    		 dr = getResources().getDrawable(R.drawable.microdone);
 	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
 	    		 // Scale it to 50 x 50
-	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 150, 100, true));
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 100, 67, true));
 	    	 } else if (position == 2) {
 	    		 temp.setText(microExplo);
 	    		 dr = getResources().getDrawable(R.drawable.microexplo);
 	    		 bitmap = ((BitmapDrawable) dr).getBitmap();
 	    		 // Scale it to 50 x 50
-	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,150, 100, true));
+	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,100, 67, true));
 	    	 }
     		 temp.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
 	    	if ((position == 0 && tasksToSelected.get(water)) ||
