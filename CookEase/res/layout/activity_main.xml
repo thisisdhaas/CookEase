@@ -36,7 +36,7 @@
 	<RelativeLayout
 	    android:id="@+id/tasktext"
 	    android:layout_width="match_parent"
-	    android:layout_height="200dp"
+	    android:layout_height="225dp"
 	    android:layout_marginLeft="7dp"
 	    android:layout_marginRight="7dp"
 	    android:layout_below="@id/titletext"
@@ -56,10 +56,10 @@
 	    <ListView
 	        android:id="@+id/listView1"
 	        android:layout_width="450dp"
-	        android:layout_height="175dp"
+	        android:layout_height="200dp"
 	        android:layout_centerHorizontal="true"
 	        android:layout_marginLeft="20dp"
-	        android:layout_marginTop="10dp"
+	        android:layout_marginTop="15dp"
 	        android:layout_marginBottom="10dp"
 	        android:layout_below="@id/textView6"
 	        android:textColor="#000000" >

@@ -83,7 +83,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 		
 		// Restore preferences
 	    SharedPreferences settings = act.getSharedPreferences("settings", 0);
-	    tasksToSelected.put(water, settings.getBoolean(water, false));
+	    tasksToSelected.put(water, false);
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	   // tasksToSelected.put(other,settings.getBoolean(other, false));
