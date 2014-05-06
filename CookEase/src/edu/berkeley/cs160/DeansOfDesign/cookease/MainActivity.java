@@ -31,7 +31,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
@@ -175,6 +177,31 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    }
 	    // Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
 	    View wantedView = listView.getChildAt(wantedChild);*/ 
+	    
+	    //Disable/Enable task list based on whether app is listening
+	    final ImageView mic = (ImageView) act.findViewById(R.id.img1);
+	    mic.setOnClickListener(new View.OnClickListener() {
+	    	   //@Override
+	    	   public void onClick(View v) {
+	    		   RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
+	    	      //if listening, change mic to gray + gray out listview
+	    		   if (isListening) {
+	    			   isListening = false;
+	    			   int color = 0xFFFFFFFF;
+	    			   int transparent = Color.argb(0, Color.red(color), Color.green(color), Color.blue(color));
+	    			   mic.setColorFilter(transparent);
+	    			   //taskLayout.setBackgroundColor();
+	    			   //set instructiontextview unclickable
+	    			   //set listview unclickable
+	    		   } else {//else change mic color to red, ungray out listview
+	    			   isListening = true;
+	    			   //taskLaayout.setBackgroundColor();
+	    			   //set instructiontextview clickable
+	    			   //set listview clickable
+	    		   }
+	    		  
+	    	   }        
+	    	});
 	    
 	   return inflater.inflate(R.layout.activity_main, container, false);
 	}
@@ -448,5 +475,6 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 			});
 		}
 	}
+	
     
 }
