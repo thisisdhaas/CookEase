@@ -297,6 +297,12 @@ public class MainActivity extends Fragment {
 		} else {
 			setMic(act.areTasksSelected());
 		}
+	   TextView instrView = (TextView) act.findViewById(R.id.textView6);
+	   if (act.areTasksSelected()) {
+		   instrView.setText("Currently Listening for:");
+	   } else {
+		   instrView.setText("Tap to listen for events:");
+	   }
 	   
     }
 

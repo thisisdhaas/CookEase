@@ -12,7 +12,7 @@
     <string name="title_activity_analytics">AnalyticsActivity</string>
     <string name="ok">OK</string>
     <string name="notifications">Notifications</string>
-    <string name="instruction">Tap to listen for an event:</string>
+    <string name="instruction">Tap to listen for events:</string>
     <string name="title_activity_notifications">NotificationsActivity</string>
     <string name="notify_slogan">How should we notify you?</string>
     <string name="analytics_slogan">Cooking analytics</string>

@@ -258,7 +258,9 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 		}
 		if (!toReturn) {
 			TextView instrView = (TextView) findViewById(R.id.textView6);
-			instrView.setText("Tap to listen for an event:");
+			if (instrView != null) {
+				instrView.setText("Tap to listen for events:");
+			}
 		}
 		return toReturn;
 	}
