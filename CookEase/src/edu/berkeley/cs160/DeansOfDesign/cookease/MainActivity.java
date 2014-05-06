@@ -124,6 +124,8 @@ public class MainActivity extends Fragment {
 	    			item.setChecked(true);
 	    			TabActivity.tasksToSelected.put(itemText, true);
 	    			act.kitchenEventDetector.startDetection(eventClassName);
+	    			TextView instrView = (TextView) act.findViewById(R.id.textView6);
+	    			instrView.setText("Currently Listening for:");
 	    		}
 	    		//setMic(act.kitchenEventDetector.isDetecting());
 	    		setMic(act.areTasksSelected());
@@ -155,27 +157,40 @@ public class MainActivity extends Fragment {
 
 	public void setMic(boolean greyIfFalse) {
 		final ImageView mic = (ImageView) act.findViewById(R.id.img1);
-		 RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
 		if (!greyIfFalse) {
 			Log.d("setmic", "gray!");
 			   mic.setColorFilter(transparent);
 			   //grey out area
-			   taskLayout.setBackgroundColor(Color.parseColor("#ADADAD"));
-			   taskLayout.setAlpha(0.9f);
+			   //taskLayout.setBackgroundColor(Color.parseColor("#ADADAD"));
+			   //taskLayout.setAlpha(0.9f);
+			   RelativeLayout greyOut = (RelativeLayout) act.findViewById(R.id.greyout);
+			   greyOut.setBackgroundColor(Color.parseColor("#292929"));
+			   greyOut.setAlpha(0.5f);
+			   TextView notlistening = (TextView) act.findViewById(R.id.notlistening);
+			   notlistening.setText("Not Listening");
 			   //set instructiontextview unclickable
 			   TextView tv = (TextView) act.findViewById(R.id.textView6);
 			   tv.setClickable(false);
-			   tv.setAlpha(0.5f);
+			   tv.setAlpha(0.2f);
 			   //set listview unclickable
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
 			   lv.setEnabled(false);
-			   lv.setAlpha(0.5f);
+			   lv.setAlpha(0.2f);
+			   //set listening text
+			   TextView listening = (TextView) act.findViewById(R.id.listening);
+			   listening.setText("Tap To Listen");
 			   act.kitchenEventDetector.disable();
+			   
 		   } else {//else change mic color to red, ungray out listview
 			   Log.d("setmic","red!");
 			   mic.setColorFilter(Color.parseColor("#E02200"));
-			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
-			   taskLayout.setAlpha(0.7f);
+//			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
+//			   taskLayout.setAlpha(0.7f);
+			   RelativeLayout greyOut = (RelativeLayout) act.findViewById(R.id.greyout);
+			   greyOut.setBackgroundColor(transparent);
+			   greyOut.setAlpha(1);
+			   TextView notlistening = (TextView) act.findViewById(R.id.notlistening);
+			   notlistening.setText("");
 			   //set instructiontextview clickable
 			   TextView tv = (TextView) act.findViewById(R.id.textView6);
 			   tv.setClickable(true);
@@ -184,6 +199,9 @@ public class MainActivity extends Fragment {
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
 			   lv.setEnabled(true);
 			   lv.setAlpha(1);
+			   //set listening text
+			   TextView listening = (TextView) act.findViewById(R.id.listening);
+			   listening.setText("Listening...");
 			   act.kitchenEventDetector.enable();
 		   }
 	}
