@@ -63,7 +63,7 @@
     	    android:orientation="horizontal" >
 
 	    	<TextView
-	    	    android:id="@+id/alarm_text"
+	    	    android:id="@+id/alarm_selector"
 	    	    android:layout_width="wrap_content"
 	    	    android:layout_height="match_parent"
 	    	    android:gravity="center|left"
@@ -111,7 +111,8 @@
    	    android:text="Add a contact"
    	    android:layout_centerHorizontal="true"
    	    android:layout_centerVertical="true"
-   	    android:drawableLeft="@drawable/add" />
+   	    android:drawableLeft="@drawable/add"
+   	    android:drawablePadding="5dp" />
     
     <FrameLayout
         android:id="@+id/contact_frame"
