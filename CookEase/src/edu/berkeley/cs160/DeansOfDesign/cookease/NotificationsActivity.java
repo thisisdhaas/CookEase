@@ -62,28 +62,17 @@ public class NotificationsActivity extends Fragment {
         adapter = new CustomListAdapter(act, contactsSelected);
         addedList.setItemsCanFocus(true);
         addedList.setAdapter(adapter);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         // Set up alarm type text listener to pull up alarm menu
-        TextView alarmSelectButton = (TextView) act.findViewById(R.id.alarm_text);
+        TextView alarmSelectButton = (TextView) act.findViewById(R.id.alarm_selector);
         alarmSelectButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+            	Log.d("BUTTONPRESS", "Choose alarm sound");
             	Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
         		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
         		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
         		intent.putExtra("position", 0);
-        		Log.d("BUTTONPRESS", "Choose alarm sound");
         		startActivityForResult(intent, 0);
             }
         });
@@ -100,7 +89,6 @@ public class NotificationsActivity extends Fragment {
             		alarmOn = true;
             		alarmOnButton.setBackground(getResources().getDrawable(R.drawable.clock));
             	}
-            	view.invalidate();
             }
         });
         
@@ -121,7 +109,6 @@ public class NotificationsActivity extends Fragment {
 		
 	    private Context context;
 	    private List<String> list;
-	    private String name = null;
 	    private Boolean tOn;
 	    private Boolean eOn;
 
@@ -147,7 +134,6 @@ public class NotificationsActivity extends Fragment {
 	    	View view = convertView;
 	    	if (view == null) {
 	    		LayoutInflater inf = act.getLayoutInflater();
-	        	//view = View.inflate(context, R.layout.added_contact_row, null);
 	        	view = inf.inflate(R.layout.added_contact_row, viewGroup, false);
 	        }
 	    	view.setClickable(true);
@@ -156,8 +142,9 @@ public class NotificationsActivity extends Fragment {
 	    	final Button ebutton = (Button) view.findViewById(R.id.emailbutton);
 	        final Button tbutton = (Button) view.findViewById(R.id.textbutton);
 	        if (contactsSelected != null) {
-		        name = contactsSelected.get(pos);
-		        textview.setText(name);
+		        final String name = contactsSelected.get(pos);
+		        
+		        textview.setText(contactsSelected.get(pos));
 		        
 		        Drawable emaildraw = getResources().getDrawable(R.drawable.email);
 		        Drawable edarkdraw = getResources().getDrawable(R.drawable.email_dark);
@@ -173,39 +160,38 @@ public class NotificationsActivity extends Fragment {
 		        	tbutton.setBackground(getResources().getDrawable(R.drawable.sms));
 	        	} else {
 	        		tbutton.setBackground(getResources().getDrawable(R.drawable.sms_dark));
-		        }
+		        } 
+		        ebutton.setOnClickListener(new View.OnClickListener() {
+		        	public void onClick(View view) {
+		        		if (emails.containsKey(name)) {
+		        			if (emailOn.get(name)) {
+		        				emailOn.put(name, false);
+		        			} else {
+		        				emailOn.put(name, true);
+		        			}
+		        			notifyDataSetChanged();
+		        		} else {
+		        			Toast.makeText(act, "This contact has no email.", Toast.LENGTH_SHORT).show();
+		        		}
+		        	}
+		        });
+		        tbutton.setOnClickListener(new View.OnClickListener() {
+		        	public void onClick(View view) {
+		        		if (numbers.containsKey(name)) {
+		        			if (textOn.get(name)) {
+		        				textOn.put(name, false);
+		        			} else {
+		        				textOn.put(name, true);
+		        			}
+		        			notifyDataSetChanged();
+		        		} else {
+		        			Toast.makeText(act, "This contact has no phone number.", Toast.LENGTH_SHORT).show();
+		        		}
+		        	}
+		        });
 	        } else {
 	        	// There are no contacts, do nothing
-	        }          
-	        ebutton.setOnClickListener(new View.OnClickListener() {
-	            public void onClick(View view) {
-	            	if (emails.containsKey(name)) {
-	            		if (emailOn.get(name)) {
-	            			emailOn.put(name, false);
-	            		} else {
-	            			emailOn.put(name, true);
-	            		}
-	            		notifyDataSetChanged();
-	        		} else {
-	        			Toast.makeText(act, "This contact has no email.", Toast.LENGTH_SHORT).show();
-	        		}
-	            }
-	        });
-	        tbutton.setOnClickListener(new View.OnClickListener() {
-	            public void onClick(View view) {
-	            	if (numbers.containsKey(name)) {
-	            		if (textOn.get(name)) {
-	            			textOn.put(name, false);
-	            		} else {
-	            			textOn.put(name, true);
-	            		}
-	            		notifyDataSetChanged();
-	        		} else {
-	        			Toast.makeText(act, "This contact has no phone number.", Toast.LENGTH_SHORT).show();
-	        		}
-	            }
-	        });
-	        notifyDataSetChanged();
+	        }
 	        return view;
 	    }
 	    
@@ -322,17 +308,5 @@ public class NotificationsActivity extends Fragment {
 		super.onResume();
 		adapter.notifyDataSetChanged();
     }
-	
-    
-    // Having this implemented seems to erase the info when we don't want it to be erased, but it doesn't seem to be consistent.  I'm leaving it out
-	// for now
-    //@Override
-    //public void onDestroy(){
-    	//contactsSelected = null;
-    	//emails = null;
-    	//numbers = null;
-    	//emailOn = null;
-    	//textOn = null;
-    	//super.onDestroy();
-    //}
+
 }
