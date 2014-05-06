@@ -76,7 +76,7 @@ public class MainActivity extends Fragment {
 	    tasksToSelected.put(water, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	    setMic(tasksSelected());
+	    setMic(act.isListening);
 	    
 		// FOR TESTING ONLY, REMOVE LATER: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
@@ -306,7 +306,7 @@ public class MainActivity extends Fragment {
        tasksToSelected.put(water, settings.getBoolean(water, false));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	   setMic(tasksSelected());
+	   setMic(act.isListening);
 	   
     }
 
