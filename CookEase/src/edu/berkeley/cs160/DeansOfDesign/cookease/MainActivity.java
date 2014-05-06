@@ -2,28 +2,17 @@ package edu.berkeley.cs160.DeansOfDesign.cookease;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +45,7 @@ public class MainActivity extends Fragment {
 	final int transparent = Color.argb(0, Color.red(color), Color.green(color), Color.blue(color));
 
     public String friends_title = "Who do you want to alert?";
-    public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
+  
     public ListView taskList;
     private StableArrayAdapter adapter = null;
     private TabActivity act;
@@ -73,11 +62,16 @@ public class MainActivity extends Fragment {
 	    //sendMail = new Mail("cookease.app@gmail.com", "deansofdesign");
 		
 		// Restore preferences
-	    SharedPreferences settings = act.getSharedPreferences("settings", 0);
+	   /* SharedPreferences settings = act.getSharedPreferences("settings", 0);
 	    tasksToSelected.put(water, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
-	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	    setMic(!act.kitchenEventDetector.isDisabled());
+	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));*/
+	    //setMic(!act.kitchenEventDetector.isDisabled());
+		if (act.userGreyedOut) {
+			setMic(false);
+		} else {
+			setMic(act.areTasksSelected());
+		}
 	    
 		// FOR TESTING ONLY, REMOVE LATER: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
@@ -91,12 +85,12 @@ public class MainActivity extends Fragment {
             }
         );
 		
-		// Listen for selected tasks
-		for (Map.Entry<String, Boolean> entry : tasksToSelected.entrySet()) {
+		/*// Listen for selected tasks
+		for (Map.Entry<String, Boolean> entry : TabActivity.tasksToSelected.entrySet()) {
 			if (entry.getValue()) {
 				act.kitchenEventDetector.startDetection(TabActivity.eventAppStringsToClassNames.get(entry.getKey()));
 			}
-		}
+		}*/
 		
 		taskList = (ListView) act.findViewById(R.id.listView1);
 		String tasks[] ={water, microDone, microExplo};
@@ -119,25 +113,26 @@ public class MainActivity extends Fragment {
 	    		CheckedTextView item = (CheckedTextView) view;
 	    		String itemText = (String) parent.getItemAtPosition(position);
 	    		String eventClassName = TabActivity.eventAppStringsToClassNames.get(itemText);
-	    		if (tasksToSelected.get(itemText)) { //selected already
+	    		if (TabActivity.tasksToSelected.get(itemText)) { //selected already
 	    			item.setBackgroundColor(Color.parseColor(gray));
 	    			item.setChecked(false);
-	    			tasksToSelected.put(itemText, false);
+	    			TabActivity.tasksToSelected.put(itemText, false);
 	    			act.kitchenEventDetector.stopDetection(eventClassName);
 	    			act.alertedMap.put(eventClassName, false); // reset alerts so the event can get alerted again.
 	    		} else { //not selected yet
 	    			item.setBackgroundColor(Color.parseColor(green));
 	    			item.setChecked(true);
-	    			tasksToSelected.put(itemText, true);
+	    			TabActivity.tasksToSelected.put(itemText, true);
 	    			act.kitchenEventDetector.startDetection(eventClassName);
 	    		}
-	    		setMic(act.kitchenEventDetector.isDetecting());
+	    		//setMic(act.kitchenEventDetector.isDetecting());
+	    		setMic(act.areTasksSelected());
 	    	}
 	    });   
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-	    taskList.setItemChecked(0, tasksToSelected.get(water));
-	    taskList.setItemChecked(1, tasksToSelected.get(microDone));
-	    taskList.setItemChecked(2, tasksToSelected.get(microExplo));
+	    taskList.setItemChecked(0, TabActivity.tasksToSelected.get(water));
+	    taskList.setItemChecked(1, TabActivity.tasksToSelected.get(microDone));
+	    taskList.setItemChecked(2, TabActivity.tasksToSelected.get(microExplo));
 	    
 	    //Disable/Enable task list based on whether app is listening
 	    final ImageView mic = (ImageView) act.findViewById(R.id.img1);
@@ -145,8 +140,10 @@ public class MainActivity extends Fragment {
 	    	   //@Override
 	    	   public void onClick(View v) {
 	    		   if (act.kitchenEventDetector.isDisabled()) {
+	    			   act.userGreyedOut = false;
 	    			   act.kitchenEventDetector.enable();
 	    		   } else {
+	    			   act.userGreyedOut = true;
 	    			   act.kitchenEventDetector.disable();
 	    		   }
 	    		  setMic(!act.kitchenEventDetector.isDisabled());
@@ -160,6 +157,7 @@ public class MainActivity extends Fragment {
 		final ImageView mic = (ImageView) act.findViewById(R.id.img1);
 		 RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
 		if (!greyIfFalse) {
+			Log.d("setmic", "gray!");
 			   mic.setColorFilter(transparent);
 			   //grey out area
 			   taskLayout.setBackgroundColor(Color.parseColor("#ADADAD"));
@@ -174,6 +172,7 @@ public class MainActivity extends Fragment {
 			   lv.setAlpha(0.5f);
 			   act.kitchenEventDetector.disable();
 		   } else {//else change mic color to red, ungray out listview
+			   Log.d("setmic","red!");
 			   mic.setColorFilter(Color.parseColor("#E02200"));
 			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
 			   taskLayout.setAlpha(0.7f);
@@ -191,12 +190,12 @@ public class MainActivity extends Fragment {
 	
 	private class StableArrayAdapter extends ArrayAdapter<String> {
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
-	    Context c;
+	   // Context c;
 	    
 	    public StableArrayAdapter(Context context, int textViewResourceId,
 	        List<String> objects) {
 	      super(context, textViewResourceId, objects);
-	      this.c = context;
+	      //this.c = context;
 	      for (int i = 0; i < objects.size(); ++i) {
 	        mIdMap.put(objects.get(i), i);
 	      }
@@ -246,9 +245,9 @@ public class MainActivity extends Fragment {
 	    		 d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap,100, 67, true));
 	    	 }
     		 temp.setCompoundDrawablesWithIntrinsicBounds(null, null, d, null);
-	    	if ((position == 0 && tasksToSelected.get(water)) ||
-	    			(position == 1 && tasksToSelected.get(microDone)) ||
-	    			(position == 2 && tasksToSelected.get(microExplo))) {
+	    	if ((position == 0 && TabActivity.tasksToSelected.get(water)) ||
+	    			(position == 1 && TabActivity.tasksToSelected.get(microDone)) ||
+	    			(position == 2 && TabActivity.tasksToSelected.get(microExplo))) {
 	    				view.setBackgroundColor(Color.parseColor(green));
 	    	} else {
 	    		view.setBackgroundColor(Color.parseColor(gray));
@@ -269,29 +268,37 @@ public class MainActivity extends Fragment {
 		super.onResume();
 		
        // Restore preferences
-       SharedPreferences settings = act.getSharedPreferences("settings", 0);
+       /*SharedPreferences settings = act.getSharedPreferences("settings", 0);
        tasksToSelected = new HashMap<String, Boolean>();
        tasksToSelected.put(water, settings.getBoolean(water, false));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
-	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	   setMic(act.kitchenEventDetector.isDetecting());
+	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));*/
+	   //setMic(act.kitchenEventDetector.isDetecting());
+	   if (act.userGreyedOut) {
+			setMic(false);
+		} else {
+			setMic(act.areTasksSelected());
+		}
 	   
     }
 
     @Override
 	public void onPause(){
        super.onPause();
-
+       //user left mic on but not listening to anything -- turn it off
+       if (!act.userGreyedOut && !act.areTasksSelected()) {
+    	   act.kitchenEventDetector.disable();
+		} 
       // We need an Editor object to make preference changes.
       // All objects are from android.context.Context
-      SharedPreferences settings = act.getSharedPreferences("settings", 0);
+     /* SharedPreferences settings = act.getSharedPreferences("settings", 0);
       SharedPreferences.Editor editor = settings.edit();
       editor.putBoolean(water, tasksToSelected.get(water));
       editor.putBoolean(microDone, tasksToSelected.get(microDone));
-      editor.putBoolean(microExplo, tasksToSelected.get(microExplo));
+      editor.putBoolean(microExplo, tasksToSelected.get(microExplo));*/
 
       // Commit the edits!
-      editor.commit();
+      //editor.commit();
     }
     
 

@@ -93,7 +93,6 @@
           android:layout_marginBottom="10dp"
           android:clickable="true"
           android:scaleType="fitCenter"
-          android:tint="#E02200"
           android:src="@android:drawable/ic_btn_speak_now" />
         </RelativeLayout>
 </RelativeLayout>

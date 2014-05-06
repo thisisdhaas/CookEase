@@ -128,7 +128,7 @@ public class KitchenEventDetector implements OnAudioEventListener {
 				className = feature_vector.classAttribute().value(predictedClassIndex);
 				//Log.v(TAG, "predicted the audio class: " + className);
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 				className = AudioFeatures.NO_EVENT;
 			}
 
@@ -170,8 +170,8 @@ public class KitchenEventDetector implements OnAudioEventListener {
 		}
 		catch (RuntimeException e) {
 			// Don't crash the app if something went wrong processing the sample
-			Log.v(TAG, "Error processing audio sample, discarding...");
-			e.printStackTrace();
+			//Log.v(TAG, "Error processing audio sample, discarding...");
+			//e.printStackTrace();
 		}
 	}
 

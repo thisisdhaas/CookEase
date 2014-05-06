@@ -19,10 +19,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsManager;
@@ -32,20 +28,28 @@ import android.view.Window;
 
 public class TabActivity extends Activity implements OnKitchenEventListener {
 	
-	public String alert_message = "";
-    public String alert_title = "CookEase Alert";
-    public String water = "Water boiling";
-    public String microDone = "Microwave Done";
-    public String microExplo = "Microwave Explosion";
-    public String waterMessage = "Your water has boiled!";
-    public String microDoneMessage = "The microwave is done.";
-    public String microExploMessage = "Food is exploding in the microwave!";
+	public static String alert_message = "";
+    public static final String alert_title = "CookEase Alert";
+    public static final String water = "Water boiling";
+    public static final String microDone = "Microwave Done";
+    public static final String microExplo = "Microwave Explosion";
+    public static final String waterMessage = "Your water has boiled!";
+    public static final String microDoneMessage = "The microwave is done.";
+    public static final String microExploMessage = "Food is exploding in the microwave!";
     public boolean inForeground;
     public Mail sendMail;
     public NotificationCompat.Builder mBuilder;
     AlertDialog.Builder alt;
     final int DIALOG_ALERT = 10;
     AlertDialog ad;
+    boolean userGreyedOut;
+    protected static final Map<String, Boolean> tasksToSelected;
+    static {
+    	tasksToSelected = new HashMap<String, Boolean>();
+    	tasksToSelected.put(water, false);
+	    tasksToSelected.put(microDone, false);
+	    tasksToSelected.put(microExplo, false);
+    }
 	
 	// For handling tabs
 	ActionBar.Tab tab1, tab2, tab3;
@@ -153,7 +157,6 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 			alertedMap.put(eventType, true);
 			runOnUiThread(new Runnable() {
 				public void run() {
-					//emily: new alert logic for bg vs fg
 					alert(eventClassNamesToAppStrings.get(eventTypeForThread));
 				}
 			});
@@ -166,18 +169,18 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 		int uniqueID = 0;
 		MainActivity tab1 = ((MainActivity) fragmentTab1);
 		if (task == water) {
-			tab1.tasksToSelected.put(water, false);
-			tab1.taskList.setItemChecked(0, tab1.tasksToSelected.get(water));
+			tasksToSelected.put(water, false);
+			tab1.taskList.setItemChecked(0, tasksToSelected.get(water));
 			contentText = waterMessage;
 			uniqueID = 0;
 		} else if (task == microDone) {
-			tab1.tasksToSelected.put(microDone, false);
-			tab1.taskList.setItemChecked(1, tab1.tasksToSelected.get(microDone));
+			tasksToSelected.put(microDone, false);
+			tab1.taskList.setItemChecked(1, tasksToSelected.get(microDone));
 			contentText = microDoneMessage;
 			uniqueID = 1;
 		} else if (task == microExplo) { 
-			tab1.tasksToSelected.put(microExplo, false);
-			tab1.taskList.setItemChecked(2, tab1.tasksToSelected.get(microExplo));
+			tasksToSelected.put(microExplo, false);
+			tab1.taskList.setItemChecked(2, tasksToSelected.get(microExplo));
 			contentText = microExploMessage;
 			uniqueID = 2;
 		}
@@ -229,15 +232,26 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 			NotificationManager mNotificationManager =
 					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 			mNotificationManager.notify(uniqueID, mBuilder.build());
-
-			//TODO uncomment when water boiling working
-			//check if we have to keep listening for other tasks
-			//if (!tasksSelected()) {
-			// Stop listening for things!
-			//	boilingWaterDetector.stopDetection();
-			//}
+			
 		}
-
+		//emily:added
+		((MainActivity) fragmentTab1).setMic(areTasksSelected());
+	}
+	
+	public boolean areTasksSelected() { //check if there are still tasks selected
+		Log.d("tasks", tasksToSelected.toString());
+		boolean toReturn = false;
+		Set<String> temp = tasksToSelected.keySet();
+		Iterator<String> iter = temp.iterator();
+		while (iter.hasNext()) {
+			if (tasksToSelected.get(iter.next())) {
+				toReturn = true;
+				break;
+			} else {
+				toReturn = false;
+			}
+		}
+		return toReturn;
 	}
 
 	@Override
@@ -252,13 +266,12 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 			builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) { 
 					// reset alert_message
-					MainActivity mainFrag = (MainActivity) fragmentTab1;
 					alert_message = "";
-					Set<String> temp = mainFrag.tasksToSelected.keySet();
+					Set<String> temp = tasksToSelected.keySet();
 					Iterator<String> iter = temp.iterator();
 					while (iter.hasNext()) {
 						String next = iter.next();
-						if (mainFrag.tasksToSelected.get(next)) {
+						if (tasksToSelected.get(next)) {
 							String nextMessage = "";
 							if (next == water) {
 								nextMessage = waterMessage;
