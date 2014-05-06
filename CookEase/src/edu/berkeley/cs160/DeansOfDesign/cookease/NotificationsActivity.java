@@ -144,16 +144,9 @@ public class NotificationsActivity extends Fragment {
 	        final Button removebutton = (Button) view.findViewById(R.id.removebutton);
 	        if (contactsSelected != null) {
 		        final String name = contactsSelected.get(pos);
-		        
-		        textview.setText(contactsSelected.get(pos));
-		        
-		        Drawable emaildraw = getResources().getDrawable(R.drawable.email);
-		        Drawable edarkdraw = getResources().getDrawable(R.drawable.email_dark);
-	       	 	Bitmap emailbit = ((BitmapDrawable) emaildraw).getBitmap();
-	       	 	Bitmap edarkbit = ((BitmapDrawable) edarkdraw).getBitmap();
-		        
+		        textview.setText(contactsSelected.get(pos));		        
 		        if (emails.containsKey(name) && emailOn.get(name)) {
-		       	 	ebutton.setBackground(new BitmapDrawable(getResources(),Bitmap.createScaledBitmap(emailbit, 100,100, true)));
+		       	 	ebutton.setBackground(getResources().getDrawable(R.drawable.email));
 	        	} else {
 	        		ebutton.setBackground(getResources().getDrawable(R.drawable.email_dark));
 		        }
@@ -227,11 +220,10 @@ public class NotificationsActivity extends Fragment {
 	             if (uri != null) {
 	                 selectedTone = uri.toString();
 	                 rTone = RingtoneManager.getRingtone(act.getBaseContext(), uri);
-	                 String name;
 	                 if (rTone.getTitle(act.getApplicationContext()).equals(RingtoneManager.getRingtone(act.getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(act.getApplicationContext()))) {
-	                	 name = deftone;
+	                	 selectedTone = deftone;
 	                 } else {
-	                	 name = rTone.getTitle(act.getBaseContext());
+	                	 selectedTone = rTone.getTitle(act.getBaseContext());
 	                 }
 	             }
 	        // Add email/text number
@@ -321,6 +313,8 @@ public class NotificationsActivity extends Fragment {
 	@Override
     public void onResume(){
 		super.onResume();
+		TextView alarmSelectButton = (TextView) act.findViewById(R.id.alarm_selector);
+		alarmSelectButton.setText(selectedTone);
 		adapter.notifyDataSetChanged();
     }
 
