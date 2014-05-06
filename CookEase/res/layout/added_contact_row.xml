@@ -39,14 +39,26 @@
    	    android:id="@+id/textbutton"
    	    android:layout_width="40dp"
    	    android:layout_height="30dp"
-   	    android:layout_alignParentRight="true"
+   	    android:layout_toLeftOf="@+id/removebutton"
    	    android:layout_centerVertical="true"
    	    android:padding="5dp"
    	    android:clickable="true"
    	    android:focusable="true"
    	    android:focusableInTouchMode="false"
    	    android:background="@drawable/sms"
-   	    android:layout_marginRight="5dp" />
+   	    android:layout_marginRight="8dp" />
+   	
+   	<Button
+   	    android:id="@+id/removebutton"
+   	    android:layout_width="11dp"
+   	    android:layout_height="11dp"
+   	    android:layout_alignParentRight="true"
+   	    android:layout_alignParentTop="true"
+   	    android:layout_margin="3dp"
+   	    android:clickable="true"
+   	    android:focusable="true"
+   	    android:focusableInTouchMode="false"
+   	    android:background="@drawable/cancel" />
    	    
  </RelativeLayout>
    	

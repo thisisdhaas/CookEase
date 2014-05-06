@@ -141,6 +141,7 @@ public class NotificationsActivity extends Fragment {
 	    	TextView textview = (TextView) view.findViewById(R.id.contact_text);
 	    	final Button ebutton = (Button) view.findViewById(R.id.emailbutton);
 	        final Button tbutton = (Button) view.findViewById(R.id.textbutton);
+	        final Button removebutton = (Button) view.findViewById(R.id.removebutton);
 	        if (contactsSelected != null) {
 		        final String name = contactsSelected.get(pos);
 		        
@@ -188,6 +189,20 @@ public class NotificationsActivity extends Fragment {
 		        			Toast.makeText(act, "This contact has no phone number.", Toast.LENGTH_SHORT).show();
 		        		}
 		        	}
+		        });
+		        removebutton.setOnClickListener(new View.OnClickListener() {
+		            public void onClick(View view) {
+		            	contactsSelected.remove(name);
+		            	if (emails.containsKey(name)) {
+		            		emails.remove(name);
+		            		emailOn.remove(name);
+		            	}
+		            	if (numbers.containsKey(name)) {
+		            		numbers.remove(name);
+		            		textOn.remove(name);
+		            	}
+		            	notifyDataSetChanged();
+		            }
 		        });
 	        } else {
 	        	// There are no contacts, do nothing
