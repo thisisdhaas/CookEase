@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -147,7 +146,9 @@ public class NotificationsActivity extends Fragment {
 	    	final int pos = position;
 	    	View view = convertView;
 	    	if (view == null) {
-	        	view = View.inflate(context, R.layout.added_contact_row, null);
+	    		LayoutInflater inf = act.getLayoutInflater();
+	        	//view = View.inflate(context, R.layout.added_contact_row, null);
+	        	view = inf.inflate(R.layout.added_contact_row, viewGroup, false);
 	        }
 	    	view.setClickable(true);
 	        view.setFocusable(true);
@@ -157,8 +158,14 @@ public class NotificationsActivity extends Fragment {
 	        if (contactsSelected != null) {
 		        name = contactsSelected.get(pos);
 		        textview.setText(name);
+		        
+		        Drawable emaildraw = getResources().getDrawable(R.drawable.email);
+		        Drawable edarkdraw = getResources().getDrawable(R.drawable.email_dark);
+	       	 	Bitmap emailbit = ((BitmapDrawable) emaildraw).getBitmap();
+	       	 	Bitmap edarkbit = ((BitmapDrawable) edarkdraw).getBitmap();
+		        
 		        if (emails.containsKey(name) && emailOn.get(name)) {
-		        	ebutton.setBackground(getResources().getDrawable(R.drawable.email));
+		       	 	ebutton.setBackground(new BitmapDrawable(getResources(),Bitmap.createScaledBitmap(emailbit, 100,100, true)));
 	        	} else {
 	        		ebutton.setBackground(getResources().getDrawable(R.drawable.email_dark));
 		        }
