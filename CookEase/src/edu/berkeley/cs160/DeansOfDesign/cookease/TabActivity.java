@@ -16,6 +16,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.telephony.SmsManager;
@@ -32,6 +35,7 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
     public String microExplo = "Microwave Explosion";
     public boolean inForeground;
     public Mail sendMail;
+    public NotificationCompat.Builder mBuilder;
 	
 	// For handling tabs
 	ActionBar.Tab tab1, tab2, tab3;
@@ -135,19 +139,23 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
 		public void alert(String task) {
 			String contentText="";
+			int uniqueID = 0;
 			MainActivity tab1 = ((MainActivity) fragmentTab1);
 			if (task == water) {
 				tab1.tasksToSelected.put(water, false);
 				tab1.taskList.setItemChecked(0, tab1.tasksToSelected.get(water));
 				contentText = "Your water has boiled";
+				uniqueID = 0;
 			} else if (task == microDone) {
 				tab1.tasksToSelected.put(microDone, false);
 				tab1.taskList.setItemChecked(1, tab1.tasksToSelected.get(microDone));
 				contentText = "The microwave is done";
+				uniqueID = 1;
 			} else if (task == microExplo) { 
 				tab1.tasksToSelected.put(microExplo, false);
 				tab1.taskList.setItemChecked(2, tab1.tasksToSelected.get(microExplo));
 				contentText = "Food is exploding in the microwave";
+				uniqueID = 2;
 			}
 			AlertDialog.Builder alt = new AlertDialog.Builder(this)
 		    .setTitle(alert_title)
@@ -164,13 +172,15 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 			sendMessage(2); 
 			
 			//Standard Android Notif if app not in foreground
-			//if (!inForeground) {
-				NotificationCompat.Builder mBuilder =
-				        new NotificationCompat.Builder(this)
-				        .setSmallIcon(R.drawable.ic_launcher) //temp icon
-				        .setContentTitle("CookEase Notification")
-				        .setContentText(contentText);
-				
+			if (!inForeground) {
+				if (mBuilder == null) {
+					mBuilder = new NotificationCompat.Builder(this)
+					        .setSmallIcon(R.drawable.cookeaseiconsmall)
+					        .setContentTitle("CookEase Notification")
+					        .setAutoCancel(true);
+				} 
+				mBuilder.setContentText(contentText);
+
 				// Creates an explicit intent for an Activity in your app
 				Intent resultIntent = new Intent(this, TabActivity.class);
 		
@@ -191,8 +201,7 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 				mBuilder.setContentIntent(resultPendingIntent);
 				NotificationManager mNotificationManager =
 				    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				// mId allows you to update the notification later on.
-				mNotificationManager.notify(0, mBuilder.build());
+				mNotificationManager.notify(uniqueID, mBuilder.build());
 		
 				//TODO uncomment when water boiling working
 				//check if we have to keep listening for other tasks
@@ -200,7 +209,7 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 					// Stop listening for things!
 			    //	boilingWaterDetector.stopDetection();
 				//}
-			//}
+			}
 			
 		}
 		

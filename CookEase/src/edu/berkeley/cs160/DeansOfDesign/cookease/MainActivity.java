@@ -84,6 +84,7 @@ public class MainActivity extends Fragment {
             new View.OnClickListener() {
                 public void onClick(View v) {
                 	act.alert(microDone); //hardcoded microDone for testing
+                	act.alert(microExplo);
                 }
                 
             }
