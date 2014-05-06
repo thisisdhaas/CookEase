@@ -1,6 +1,8 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
@@ -28,14 +31,20 @@ import android.view.Window;
 
 public class TabActivity extends Activity implements OnBoilingEventListener {
 	
-	public String alert_message = "Your water is boiling!\nYour microwave is done!";
+	public String alert_message = "";
     public String alert_title = "CookEase Alert";
     public String water = "Water boiling";
     public String microDone = "Microwave Done";
     public String microExplo = "Microwave Explosion";
+    public String waterMessage = "Your water has boiled!";
+    public String microDoneMessage = "The microwave is done.";
+    public String microExploMessage = "Food is exploding in the microwave!";
     public boolean inForeground;
     public Mail sendMail;
     public NotificationCompat.Builder mBuilder;
+    AlertDialog.Builder alt;
+    final int DIALOG_ALERT = 10;
+    AlertDialog ad;
 	
 	// For handling tabs
 	ActionBar.Tab tab1, tab2, tab3;
@@ -144,20 +153,21 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 			if (task == water) {
 				tab1.tasksToSelected.put(water, false);
 				tab1.taskList.setItemChecked(0, tab1.tasksToSelected.get(water));
-				contentText = "Your water has boiled";
+				contentText = waterMessage;
 				uniqueID = 0;
 			} else if (task == microDone) {
 				tab1.tasksToSelected.put(microDone, false);
 				tab1.taskList.setItemChecked(1, tab1.tasksToSelected.get(microDone));
-				contentText = "The microwave is done";
+				contentText = microDoneMessage;
 				uniqueID = 1;
 			} else if (task == microExplo) { 
 				tab1.tasksToSelected.put(microExplo, false);
 				tab1.taskList.setItemChecked(2, tab1.tasksToSelected.get(microExplo));
-				contentText = "Food is exploding in the microwave";
+				contentText = microExploMessage;
 				uniqueID = 2;
 			}
-			AlertDialog.Builder alt = new AlertDialog.Builder(this)
+			alert_message += "Alert: " + contentText + "\n";
+			/*alt = new AlertDialog.Builder(this)
 		    .setTitle(alert_title)
 		    .setMessage(contentText)
 		    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -165,7 +175,9 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 		            // continue
 		        }
 		     });
-		     alt.show();
+		     alt.show();*/
+			 showDialog(DIALOG_ALERT);
+		     
 			// sends a test email to the currently selected email address
 			sendMessage(1);
 			// sends a test text to the currently selected phone number
@@ -212,6 +224,45 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 			}
 			
 		}
+		
+		@Override
+		protected Dialog onCreateDialog(int id) {
+		  switch (id) {
+		    case DIALOG_ALERT:
+		    	if (ad != null) { //Stack all messages in just one alert
+		    		ad.dismiss();
+		    	}
+			    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			    builder.setMessage(alert_message);
+			    builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			            // reset alert_message
+			        	MainActivity mainFrag = (MainActivity) fragmentTab1;
+			        	alert_message = "";
+		        		Set<String> temp = mainFrag.tasksToSelected.keySet();
+		        		Iterator<String> iter = temp.iterator();
+		        		while (iter.hasNext()) {
+		        			String next = iter.next();
+		        			if (mainFrag.tasksToSelected.get(next)) {
+		        				String nextMessage = "";
+		        				if (next == water) {
+		        					nextMessage = waterMessage;
+		        				} else if (next == microExplo) {
+		        					nextMessage = microExploMessage;
+		        				} else if (next == microDone) {
+		        					nextMessage = microDoneMessage;
+		        				}
+		        				alert_message += "Alert: " + nextMessage + "\n";
+		        			} 
+			        	}
+			        }
+			     });
+			    ad = builder.create();
+			    ad.show();
+		  }
+		  return super.onCreateDialog(id);
+		}
+
 		
 		// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
 		public void sendMessage(int mtype) {
