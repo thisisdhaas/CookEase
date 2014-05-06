@@ -14,6 +14,7 @@ import java.util.Random;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import edu.berkeley.cs160.DeansOfDesign.wekamodeltrainer.AudioFeaturizer;
+import edu.berkeley.cs160.DeansOfDesign.wekamodeltrainer.AudioFeatures;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.RandomForest;
@@ -24,25 +25,33 @@ import be.hogent.tarsos.dsp.AudioEvent;
 import be.hogent.tarsos.dsp.AudioProcessor;
 
 public class WekaModelTrainer {
-	private static final Map<String, Boolean> wavToClass;
+	private static final Map<String, String> wavToClass;
 	static
 	{
-		wavToClass = new HashMap<String, Boolean>();
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05 (1)/BoilingSounds1.wav", 
-				true);
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05 (1)/BoilingSounds2.wav", 
-				true);
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05/Voice 003 Boiling.wav", 
-				true);
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05 (1)/BackgroundKitchenSounds1.wav", 
-				false);
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05 (1)/BackgroundKitchenSounds2.wav", 
-				false);
-		wavToClass.put("/Users/dhaas/Downloads/documents-export-2014-04-05/Voice 003 No Boiling.wav", 
-				false);
+		wavToClass = new HashMap<String, String>();
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/boiling.wav", 
+				AudioFeatures.BOILING);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/boiling2.wav", 
+				AudioFeatures.BOILING);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/BoilingWater.wav", 
+				AudioFeatures.BOILING);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/microdone.wav", 
+				AudioFeatures.MICRO_DONE);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/microdone2.wav", 
+				AudioFeatures.MICRO_DONE);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/microdone3.wav", 
+				AudioFeatures.MICRO_DONE);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/microdone4.wav", 
+				AudioFeatures.MICRO_DONE);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/MicrowaveAlarm.wav", 
+				AudioFeatures.MICRO_DONE);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/noevent.wav", 
+				AudioFeatures.NO_EVENT);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/noevent2.wav", 
+				AudioFeatures.NO_EVENT);
 	}
 	private static final String arffPath = "/Users/dhaas/Desktop/trainset.arff";
-	private static final String modelPath = "/Users/dhaas/Desktop/boiling_water_clf.model";
+	private static final String modelPath = "/Users/dhaas/Desktop/event_clf.model";
 	private static Instances trainingData;
 	private static boolean doneFeaturizing = false;
 	
@@ -55,9 +64,9 @@ public class WekaModelTrainer {
 		System.out.println("Featurizing training data...");
 		final AudioFeaturizer audioFeaturizer = new AudioFeaturizer();
 		trainingData = new Instances(audioFeaturizer.getDataset());
-		for (final Map.Entry<String, Boolean> entry : wavToClass.entrySet()) {
+		for (final Map.Entry<String, String> entry : wavToClass.entrySet()) {
 			final String wavFile = entry.getKey();
-			final Boolean wavClass = entry.getValue();
+			final String wavClass = entry.getValue();
 			System.out.println("Loading and featurizing " + wavFile + "...");
 			try {
 				doneFeaturizing = false;
@@ -118,7 +127,7 @@ public class WekaModelTrainer {
 		// train and evaluate the model, with 10-fold stratified cross-validation
 		System.out.println("Training the model...");
 		Classifier model = (Classifier) new RandomForest();
-		String options[] = { "-D"};
+		String options[] = {"-I", "100", "-K", "0"};
 		try {
 			((RandomForest) model).setOptions(options);
 		} catch (Exception e1) {

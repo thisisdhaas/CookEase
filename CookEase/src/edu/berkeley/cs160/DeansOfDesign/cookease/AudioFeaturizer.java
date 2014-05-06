@@ -1,7 +1,9 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -13,79 +15,30 @@ import be.hogent.tarsos.dsp.mfcc.MFCC;
 
 public class AudioFeaturizer {
 	private static final String TAG = "AudioFeaturizer";
-	private static enum Feature {
-			RMS0,
-			BEAT0,
-			MFCC0,
-			MFCC1,
-			MFCC2,
-			MFCC3,
-			MFCC4,
-			MFCC5,
-			MFCC6,
-			MFCC7,
-			MFCC8,
-			MFCC9,
-			MFCC10,
-			MFCC11,
-			MFCC12,
-	};
-	private static final HashMap<Feature,String> FeatureNames;
-	static
-	{
-		FeatureNames = new HashMap<Feature, String>();
-		FeatureNames.put(Feature.RMS0, "Root Mean Square0");
-		FeatureNames.put(Feature.BEAT0, "Strength Of Strongest Beat0");
-		FeatureNames.put(Feature.MFCC0, "MFCC0");
-		FeatureNames.put(Feature.MFCC1, "MFCC1");
-		FeatureNames.put(Feature.MFCC2, "MFCC2");
-		FeatureNames.put(Feature.MFCC3, "MFCC3");
-		FeatureNames.put(Feature.MFCC4, "MFCC4");
-		FeatureNames.put(Feature.MFCC5, "MFCC5");
-		FeatureNames.put(Feature.MFCC6, "MFCC6");
-		FeatureNames.put(Feature.MFCC7, "MFCC7");
-		FeatureNames.put(Feature.MFCC8, "MFCC8");
-		FeatureNames.put(Feature.MFCC9, "MFCC9");
-		FeatureNames.put(Feature.MFCC10, "MFCC10");
-		FeatureNames.put(Feature.MFCC11, "MFCC11");
-		FeatureNames.put(Feature.MFCC12, "MFCC12");
-	}
-	private static final Feature[] mFeatures = Feature.values(); 
-	private static final Attribute ClassFeature;
-	static
-	{
-		ArrayList<String> attrValues = new ArrayList<String>();
-		attrValues.add("-1");
-		attrValues.add("1");
-		ClassFeature = new Attribute("Is Boiling Sound", attrValues);
-	}
 	private Instances dataset;
 	
 	public AudioFeaturizer() {
 		// set up the data headers/attributes
-		ArrayList<Attribute> attInfo = new ArrayList<Attribute>(mFeatures.length);
-		for (Feature feature : mFeatures) {
-			attInfo.add(new Attribute(FeatureNames.get(feature)));
+		ArrayList<Attribute> attInfo = new ArrayList<Attribute>(AudioFeatures.Features.length);
+		for (AudioFeatures.Feature feature : AudioFeatures.Features) {
+			attInfo.add(new Attribute(AudioFeatures.FeatureNames.get(feature)));
 		}
-		attInfo.add(ClassFeature);
+		attInfo.add(AudioFeatures.ClassFeature);
 		dataset = new Instances("TestInstances", attInfo, 0);
-		dataset.setClassIndex(ClassFeature.index());
+		dataset.setClassIndex(AudioFeatures.ClassFeature.index());
 	}
 	
 	public Instance run(AudioEvent ae) {
-		Instance featureVals = new DenseInstance(mFeatures.length);
+		Instance featureVals = new DenseInstance(AudioFeatures.Features.length+1);
+		Instances data = new Instances(dataset);
+		featureVals.setDataset(data);
 		double mfcc[] = computeMFCC(ae);
-		for (int i = 0; i < mFeatures.length; i++) {
+		for (int i = 0; i < AudioFeatures.Features.length; i++) {
 			double featureVal = Math.random();
 			boolean setFeatureVal = true;
-			switch (mFeatures[i]) {
+			switch (AudioFeatures.Features[i]) {
 			case RMS0:
 				featureVal = getRMSFeature(ae);
-				break;
-			case BEAT0:
-				// jAudio wasn't using this... so let's leave it blank for now
-				//featureVal = getBeatSalienceFeature(ae);
-				setFeatureVal = false;
 				break;
 			case MFCC0:
 				featureVal = mfcc[0];
@@ -126,6 +79,57 @@ public class AudioFeaturizer {
 			case MFCC12:
 				featureVal = mfcc[12];
 				break;
+			case MFCC13:
+				featureVal = mfcc[13];
+				break;
+			case MFCC14:
+				featureVal = mfcc[14];
+				break;
+			case MFCC15:
+				featureVal = mfcc[15];
+				break;
+			case MFCC16:
+				featureVal = mfcc[16];
+				break;
+			case MFCC17:
+				featureVal = mfcc[17];
+				break;
+			case MFCC18:
+				featureVal = mfcc[18];
+				break;
+			case MFCC19:
+				featureVal = mfcc[19];
+				break;
+			case MFCC20:
+				featureVal = mfcc[20];
+				break;
+			case MFCC21:
+				featureVal = mfcc[21];
+				break;
+			case MFCC22:
+				featureVal = mfcc[22];
+				break;
+			case MFCC23:
+				featureVal = mfcc[23];
+				break;
+			case MFCC24:
+				featureVal = mfcc[24];
+				break;
+			case MFCC25:
+				featureVal = mfcc[25];
+				break;
+			case MFCC26:
+				featureVal = mfcc[26];
+				break;
+			case MFCC27:
+				featureVal = mfcc[27];
+				break;
+			case MFCC28:
+				featureVal = mfcc[28];
+				break;
+			case MFCC29:
+				featureVal = mfcc[29];
+				break;
 			default:
 				featureVal = Math.random(); // unimplemented feature--just make it random.
 				break;
@@ -134,21 +138,16 @@ public class AudioFeaturizer {
 				featureVals.setValue(i, featureVal);
 			}
 		}
-		Instances data = new Instances(dataset);
-		featureVals.setDataset(data);
 		return featureVals;
 	}
 	
 	private double getRMSFeature(AudioEvent ae) {
 		return ae.getRMS();
 	}
-
-	private double getBeatSalienceFeature(AudioEvent ae) {
-		// TODO
-		return 0.0;
-	}
 	
-	private synchronized double[] computeMFCC(AudioEvent ae) {
+	private double[] computeMFCC(AudioEvent ae) {
+		PrintStream out = System.out;
+		System.setOut(new PrintStream(new NullOutputStream()));
 		final MFCC mfcc = new MFCC(512, (int)ae.getSampleRate());
 		mfcc.process(ae);
 		float mfccs[] = mfcc.getMFCC();
@@ -156,6 +155,14 @@ public class AudioFeaturizer {
 		for (int i = 0; i < mfccs.length; i++) {
 			mfccDoubles[i] = (double) mfccs[i];
 		}
+		System.setOut(out);
 		return mfccDoubles;
+	}
+	
+	/**Writes to nowhere*/
+	public class NullOutputStream extends OutputStream {
+	  @Override
+	  public void write(int b) throws IOException {
+	  }
 	}
 }
