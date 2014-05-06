@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/relativeLayout1"
-    android:layout_width="match_parent"
-   	android:layout_height="20dp"
+    android:layout_width="fill_parent"
+   	android:layout_height="50dp"
    	android:clickable="false"
 	android:descendantFocusability="blocksDescendants"
 	android:focusable="false"
@@ -10,12 +10,11 @@
 	<TextView 
 	    android:id="@+id/contact_text"
 	    android:layout_width="wrap_content"
-	   	android:layout_height="wrap_content"
+	   	android:layout_height="match_parent"
 	   	android:textSize="18dp"
 	   	android:layout_centerVertical="true"
-	   	android:paddingLeft="15dp"
+	   	android:padding="10dp"
 	   	android:textAlignment="center"
-	   	android:paddingStart="10dp"
 	   	android:textColor="#000000"
 	   	android:clickable="false"
 		android:focusable="false"
@@ -23,31 +22,31 @@
 
    	<Button
    	    android:id="@+id/emailbutton"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="match_parent"
-   	    android:layout_toLeftOf="@+id/textbutton"
-   	    android:layout_marginRight="15dp"  
+   	    android:layout_width="40dp"
+   	    android:layout_height="30dp"
+   	    android:layout_toLeftOf="@+id/textbutton" 
    	    android:layout_centerVertical="true"
+   	    android:layout_marginTop="5dp"
+   	    android:layout_marginBottom="5dp"
+   	    android:layout_marginRight="15dp"
+   	    android:layout_marginLeft="15dp" 
    	    android:clickable="true"
    	    android:focusable="true"
    	    android:focusableInTouchMode="false"
-   	    android:background="@android:color/transparent"
-   	    android:text="Email"
-   	    android:drawableTop="@drawable/email" />
+   	    android:background="@drawable/email" />
    	
    	<Button
    	    android:id="@+id/textbutton"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="match_parent"
+   	    android:layout_width="40dp"
+   	    android:layout_height="30dp"
    	    android:layout_alignParentRight="true"
    	    android:layout_centerVertical="true"
-   	    android:padding="3dp"
+   	    android:padding="5dp"
    	    android:clickable="true"
    	    android:focusable="true"
    	    android:focusableInTouchMode="false"
-   	    android:background="@android:color/transparent"
-   	    android:text="Text"
-   	    android:drawableTop="@drawable/text" />
+   	    android:background="@drawable/sms"
+   	    android:layout_marginRight="5dp" />
    	    
  </RelativeLayout>
    	

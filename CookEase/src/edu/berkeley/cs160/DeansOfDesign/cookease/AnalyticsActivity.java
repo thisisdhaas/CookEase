@@ -1,5 +1,7 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -141,11 +143,25 @@ public class AnalyticsActivity extends Fragment {
         List<AnalyticsData> dataList = db.getAllAnalyticsData();       
          
         for (AnalyticsData d : dataList) {
-          stats += "Date: "+d.getDate()+" ,Duration: " + d.getDuration() + " ,dataType: " + d.getDataType()+"\n";
+        	// Format date for printing
+          String date = d.getDate();
+          date = date.substring(4,10)+" " + date.substring(24);
+          String myDate = "Date: "+ date;
+          // Format duration for printing
+          long duration = Long.parseLong(d.getDuration()) / 1000;
+          String myDuration = "Duration: "+String.valueOf(duration)+" seconds";
+          // Format datatype for printing
+          int dataType = Integer.getInteger(d.getDataType());
+          System.out.println("dataType is: "+dataType);
+          String myDataType = (dataType == AnalyticsData.WATER ? "Water" : "Microwave");
+          // append to "stats"
+          stats += myDate+myDuration+myDataType+"\n\n";
+//          stats += "Date: "+date+", Duration: " + d.getDuration() + ", dataType: " + d.getDataType()+"\n";
+		
+//          stats += "Date: "+d.getDate()+" ,Duration: " + d.getDuration() + " ,dataType: " + d.getDataType()+"\n";
+
         }
-        System.out.println("stats is: " + stats);
-        System.out.println("textViewWater is: "+textViewWater);
-        textViewWater.append(stats);
+        textViewWater.append("\n"+stats);
 //            String log = "Id: "+d.getDate()+" ,Name: " + d.getDuration() + " ,Phone: " + d.getDataType();
                 // Writing Contacts to log
 //        Log.d("Name: ", log);

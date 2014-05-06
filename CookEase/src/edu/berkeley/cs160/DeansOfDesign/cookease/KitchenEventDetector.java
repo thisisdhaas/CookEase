@@ -31,19 +31,19 @@ public class KitchenEventDetector implements OnAudioEventListener {
 	private Classifier mModel;
 	private boolean mModelLoaded = false;
 	private OnKitchenEventListener mOnKitchenEventListener;
-	private double mSensitivity;
+	private Map<String, Double> mSensitivities;
 	private Map<String, ArrayList<Double>> mDetectionHistory;
 	private static final double HISTORY_SIZE = 100d;
 	private Set<String> mActiveEvents;
 	private boolean mDisabled;
 		
-	public KitchenEventDetector(Context context, double sensitivity, String[] activeEvents) {
+	public KitchenEventDetector(Context context, Map<String, Double> sensitivities, String[] activeEvents) {
 		mUseMic = true;
 		mAudioProc = new AudioProc(SAMPLE_RATE, context);
 		mAudioProc.setOnAudioEventListener(this);
 		mAudioFeaturizer = new AudioFeaturizer();
 		loadModel(context);
-		mSensitivity = sensitivity;
+		mSensitivities = sensitivities;
 		mDetectionHistory = new HashMap<String, ArrayList<Double>>();
 		mDetectionHistory.put(AudioFeatures.BOILING, new ArrayList<Double>());
 		mDetectionHistory.put(AudioFeatures.MICRO_DONE, new ArrayList<Double>());
@@ -54,8 +54,8 @@ public class KitchenEventDetector implements OnAudioEventListener {
 		}
 	}
 
-	public KitchenEventDetector(Context context, double sensitivity) {
-		this(context, sensitivity, new String[]{});
+	public KitchenEventDetector(Context context, Map<String, Double> sensitivities) {
+		this(context, sensitivities, new String[]{});
 	}
 	
 	public void stopDetection() {
@@ -106,7 +106,9 @@ public class KitchenEventDetector implements OnAudioEventListener {
 	}
 	
 	public void enable() {
-		startDetection();
+		if (!mActiveEvents.isEmpty()) {
+			startDetection();
+		}
 		mDisabled = false;
 	}
 	
@@ -131,15 +133,20 @@ public class KitchenEventDetector implements OnAudioEventListener {
 				//e.printStackTrace();
 				className = AudioFeatures.NO_EVENT;
 			}
-
+			boolean detectedActiveEvent = mActiveEvents.contains(className);
+			
 			// Update detection history
 			synchronized(this) {
 				for (Map.Entry<String, ArrayList<Double>> entry : mDetectionHistory.entrySet()) {
 					ArrayList<Double> histArray = entry.getValue();
-					if (className == entry.getKey()) {
+					if (className == entry.getKey() && detectedActiveEvent) {
 						histArray.add(1d);
 						Log.d(TAG, "Classified sample as an event: " + className);
 						
+					}
+					else if (className == entry.getKey()) {
+						histArray.add(0d);
+						Log.d(TAG, "Classified sample as an event: " + className + " but not active!");
 					}
 					else {
 						histArray.add(0d);
@@ -157,11 +164,11 @@ public class KitchenEventDetector implements OnAudioEventListener {
 					num_detections += reading;
 				}
 				double percentDetected = num_detections / HISTORY_SIZE;
-				boolean thresholdExceded = percentDetected > mSensitivity;
+				boolean thresholdExceded = percentDetected > mSensitivities.get(className);
 				Log.v(TAG, "Percent Detected " + className + ": " + new DecimalFormat("0.00").format(percentDetected));
 
 				// call back if we heard an active event
-				if (thresholdExceded && mOnKitchenEventListener != null && mActiveEvents.contains(className)) {
+				if (thresholdExceded && mOnKitchenEventListener != null && detectedActiveEvent) {
 					Log.d(TAG, "Threshold exceded--HEARD EVENT " + className + "!");
 					stopDetection(className);
 					mOnKitchenEventListener.processKitchenEvent(className);
@@ -186,6 +193,7 @@ public class KitchenEventDetector implements OnAudioEventListener {
 	
 	private void loadModel(Context context) {
 		// For complex models serialization overflows the stack, so run in on a different thread with a big stack!
+		Log.d(TAG, "Beginning model load...");
 		final Resources resources = context.getResources();
 		new Thread(null, new Runnable() {
 
@@ -193,6 +201,7 @@ public class KitchenEventDetector implements OnAudioEventListener {
 			public void run() {
 				try {
 					setModel((Classifier) SerializationHelper.read(resources.openRawResource(mModelResourceID)));
+					Log.d(TAG, "Model load complete!");
 				} catch (Exception e) {
 					e.printStackTrace();
 					throw new RuntimeException("Error de-serializing model!");
