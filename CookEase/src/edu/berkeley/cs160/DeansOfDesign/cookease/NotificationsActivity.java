@@ -116,7 +116,7 @@ public class NotificationsActivity extends Fragment {
 		        if (numbers.containsKey(name) && textOn.get(name)) {
 		        	tbutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.text, 0, 0);
 	        	} else {
-	        		tbutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.textdark, 0, 0);
+	        		tbutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.textdark_copy, 0, 0);
 		        }
 	        } else {
 	        	// There are no contacts, do nothing
@@ -268,15 +268,15 @@ public class NotificationsActivity extends Fragment {
     }
 	
     
-    // We can get ride of this overridden method if we want to use the back android button and still have it 
-    // remember the info when we come back.
-    @Override
-    public void onDestroy(){
-    	contactsSelected = null;
-    	emails = null;
-    	numbers = null;
-    	emailOn = null;
-    	textOn = null;
-    	super.onDestroy();
-    }
+    // Having this implemented seems to erase the info when we don't want it to be erased, but it doesn't seem to be consistent.  I'm leaving it out
+	// for now
+    //@Override
+    //public void onDestroy(){
+    	//contactsSelected = null;
+    	//emails = null;
+    	//numbers = null;
+    	//emailOn = null;
+    	//textOn = null;
+    	//super.onDestroy();
+    //}
 }

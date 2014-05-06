@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/clock_y"
+    android:screenOrientation="portrait"
     tools:context=".NotificationsActivity" >
 
     <TextView
@@ -57,7 +58,7 @@
    	    android:gravity="left|center_vertical"
    	    android:paddingLeft="10dp"
 		android:paddingRight="5dp"
-   	    android:drawableRight="@drawable/speaker1"
+   	    android:drawableRight="@drawable/clock"
    	    android:drawablePadding="15dp"
    	    android:textSize="18dp"
    	    android:alpha="0.8" />
@@ -89,18 +90,24 @@
    	    android:layout_centerVertical="true"
    	    android:drawableLeft="@drawable/add" />
 
-    <ListView
-        android:id="@+id/listView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/add_contact_button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="40dp"
-        android:layout_marginBottom="8dp"
-        android:background="#EACE59"
-        android:clickable="true"
-        android:textColor="#000000"
-        android:alpha="0.8" >
-    </ListView>
-
+    <RelativeLayout
+	    android:id="@+id/contact_background"
+	    android:layout_width="match_parent"
+	    android:layout_height="225dp"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@id/add_contact_button"
+	    android:layout_marginTop="15dp"
+	    android:layout_marginBottom="10dp"
+	    android:background="#F1D66A"
+	    android:alpha="0.7" >
+	    <ListView
+	        android:id="@+id/listView2"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:clickable="true"
+	        android:textColor="#000000" >
+	    </ListView>
+	</RelativeLayout>
 </RelativeLayout>
