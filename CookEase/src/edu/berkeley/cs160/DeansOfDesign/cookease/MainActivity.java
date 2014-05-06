@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.NotificationManager;
@@ -35,17 +34,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
 
-public class MainActivity extends Fragment implements OnBoilingEventListener {
+public class MainActivity extends Fragment {
 
     public final static String EXTRA_MESSAGE = "edu.berkeley.cs160.DeansOfDesign.MESSAGE";
-    private static TextView analyticsText = null;
-    private static TextView settingsText = null;
     private static TextView instructionText = null;
     
-    public String alert_message = "Your water is boiling!\nYour microwave is done!";
-    public String alert_title = "CookEase Alert";
     public String water = "Water boiling";
     public String microDone = "Microwave Done";
     public String microExplo = "Microwave Explosion";
@@ -62,21 +56,15 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
     public ListView taskList;
     private StableArrayAdapter adapter = null;
-    private Activity act;
-    private boolean inForeground;
-    
-    
-    // For audio processing
-    private BoilingWaterDetector boilingWaterDetector;
-    private boolean waterAlerted = false;
-    private boolean isListening;
+    private TabActivity act;
+    //public boolean inHomeScreen;
     
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		
-		act = this.getActivity();
+		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_main);
 		// Make a mail object to send email with
 		//make a Mail object to email with
@@ -88,29 +76,26 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	   // tasksToSelected.put(other,settings.getBoolean(other, false));
-	    inForeground = true;
+	   // inForeground = true;
 
 		// Testing: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
 		instructionText.setOnClickListener(
             new View.OnClickListener() {
                 public void onClick(View v) {
-                	alert(microDone); //hardcoded microDone for testing
+                	act.alert(microDone); //hardcoded microDone for testing
                 }
                 
             }
         );
 		
-		// Setup audio processing
-		boilingWaterDetector = new BoilingWaterDetector(act, 0.1);
-		boilingWaterDetector.setOnBoilingEventListener(this);
 		//TODO: change if-statement to general case below once
 		//everything's working
 		//if (tasksSelected()) {
 		//	boilingWaterDetector.startDetection();
 		//}
 		if (tasksToSelected.get(water)) {
-			boilingWaterDetector.startDetection();
+			act.boilingWaterDetector.startDetection();
 		}
 		
 		taskList = (ListView) act.findViewById(R.id.listView1);
@@ -143,7 +128,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//	boilingWaterDetector.stopDetection();
 	    			//}
 	    			if (itemText == water) {
-	    				boilingWaterDetector.stopDetection();
+	    				act.boilingWaterDetector.stopDetection();
 	    			}
 	    		} else { //not selected yet
 	    			item.setBackgroundColor(Color.parseColor(green));
@@ -155,8 +140,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			//	boilingWaterDetector.startDetection();
 	    			//}
 	    			if (itemText == water) {
-	    				waterAlerted = false;
-	    				boilingWaterDetector.startDetection();
+	    				act.waterAlerted = false;
+	    				act.boilingWaterDetector.startDetection();
 	    			}
 	    		}
 	    	}
@@ -185,8 +170,8 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    	   public void onClick(View v) {
 	    		   RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
 	    	      //if listening, change mic to gray + gray out listview
-	    		   if (isListening) {
-	    			   isListening = false;
+	    		   if (act.isListening) {
+	    			   act.isListening = false;
 	    			   int color = 0xFFFFFFFF;
 	    			   int transparent = Color.argb(0, Color.red(color), Color.green(color), Color.blue(color));
 	    			   mic.setColorFilter(transparent);
@@ -194,7 +179,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	    			   //set instructiontextview unclickable
 	    			   //set listview unclickable
 	    		   } else {//else change mic color to red, ungray out listview
-	    			   isListening = true;
+	    			   act.isListening = true;
 	    			   //taskLaayout.setBackgroundColor();
 	    			   //set instructiontextview clickable
 	    			   //set listview clickable
@@ -279,148 +264,20 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 
 
 	public boolean tasksSelected() {
+		// TODO (dhaas): this logic needs work.
 		Set<String> temp = tasksToSelected.keySet();
 		Iterator<String> iter = temp.iterator();
 		while (iter.hasNext()) {
 			if (tasksToSelected.get(iter.next())) {
-				isListening = true;
+				act.isListening = true;
 				break;
 			} else {
-				isListening = false;
+				act.isListening = false;
 			}
 		}
-		return isListening;
+		return act.isListening;
 	}
 	
-	
-	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
-	public void alert(String task) {
-		new AlertDialog.Builder(act)
-	    .setTitle(alert_title)
-	    .setMessage(alert_message)
-	    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int which) { 
-	            // continue
-	        }
-	     })
-	     .show();
-		// sends a test email to the currently selected email address
-		sendMessage(1);
-		// sends a test text to the currently selected phone number
-		sendMessage(2); 
-		String contentText="";
-		if (task == water) {
-			tasksToSelected.put(water, false);
-			taskList.setItemChecked(0, tasksToSelected.get(water));
-			contentText = "Your water has boiled";
-		} else if (task == microDone) {
-			tasksToSelected.put(microDone, false);
-			taskList.setItemChecked(1, tasksToSelected.get(microDone));
-			contentText = "The microwave is done";
-		} else if (task == microExplo) { 
-			tasksToSelected.put(microExplo, false);
-			taskList.setItemChecked(2, tasksToSelected.get(microExplo));
-			contentText = "Food is exploding in the microwave";
-		} //else if (task == other) {
-			//tasksToSelected.put(other, false);
-			//taskList.setItemChecked(3, tasksToSelected.get(other));
-			//contentText = "Other kitchen tasks are done"; //temporary
-		//}
-		
-		//Notifications if app in background
-		if (!inForeground) {
-			NotificationCompat.Builder mBuilder =
-			        new NotificationCompat.Builder(act)
-			        .setSmallIcon(R.drawable.ic_launcher) //temp icon
-			        .setContentTitle("CookEase Notification")
-			        .setContentText(contentText);
-			
-			// Creates an explicit intent for an Activity in your app
-			Intent resultIntent = new Intent(act, TabActivity.class);
-	
-			// The stack builder object will contain an artificial back stack for the
-			// started Activity.
-			// This ensures that navigating backward from the Activity leads out of
-			// your application to the Home screen.
-			TaskStackBuilder stackBuilder = TaskStackBuilder.create(act);
-			// Adds the back stack for the Intent (but not the Intent itself)
-			stackBuilder.addParentStack(TabActivity.class);
-			// Adds the Intent that starts the Activity to the top of the stack
-			stackBuilder.addNextIntent(resultIntent);
-			PendingIntent resultPendingIntent =
-			        stackBuilder.getPendingIntent(
-			            0,
-			            PendingIntent.FLAG_UPDATE_CURRENT
-			        );
-			mBuilder.setContentIntent(resultPendingIntent);
-			NotificationManager mNotificationManager =
-			    (NotificationManager) act.getSystemService(Context.NOTIFICATION_SERVICE);
-			// mId allows you to update the notification later on.
-			mNotificationManager.notify(0, mBuilder.build());
-	
-			//TODO uncomment when water boiling working
-			//check if we have to keep listening for other tasks
-			//if (!tasksSelected()) {
-				// Stop listening for things!
-		    //	boilingWaterDetector.stopDetection();
-			//}
-		}
-		
-	}
-	
-	// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
-	public void sendMessage(int mtype) {
-		SharedPreferences texts = act.getSharedPreferences("texts", 0);
-		if (mtype == 1) {
-			String[] emails = NotificationsActivity.emails.values().toArray(new String[NotificationsActivity.emails.size()]);
-			String[] toArr = emails; // You can add more emails here if necessary
-			Log.d("EMAIL IS NOW:", toArr[0]);
-			sendMail.setTo(toArr); // load array to setTo function
-			sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
-			sendMail.setSubject("Your water is boiling!"); 
-			sendMail.setBody("Your water is boiling.");
-			Runnable r = new Runnable() {
-			    @Override
-			    public void run() {
-			    	try {
-			    		sendMail.send();
-			    	} catch(Exception e) {
-			    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
-			    		// Eventually handling this exception would be nice
-			    	}
-			    }
-			};
-			Thread t = new Thread(r);
-			t.start();
-		} else {
-			final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
-			//Text message send function.  The phone number is stored in textnum variable.
-			Runnable r = new Runnable() {
-			    @Override
-			    public void run() {
-			    	try {
-			    		sendSMS(textnum, "Your water is boiling!");
-			    		//sendSMS("5554", "Your water is boiling!"); //for emulator testing
-			    	} catch(Exception e) {
-			    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
-			    		// Eventually handling this exception would be nice
-			    	}
-			    }
-			};
-			Thread t = new Thread(r);
-			t.start();
-			
-		}
-	}
-	
-	private void sendSMS(String[] numbers, String message) {
-       SmsManager sms = SmsManager.getDefault();
-       int i = 0;
-       while (i < numbers.length) {
-    	   sms.sendTextMessage(numbers[i], null, message, null, null);
-    	   i += 1;
-       }
-    }
 	
 	@Override
 	public void onResume(){
@@ -433,7 +290,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
 	  // tasksToSelected.put(other,settings.getBoolean(other, false));
-	   inForeground = true;
+	   //inForeground = true;
     }
 
     @Override
@@ -448,7 +305,7 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
       editor.putBoolean(microDone, tasksToSelected.get(microDone));
       editor.putBoolean(microExplo, tasksToSelected.get(microExplo));
       //editor.putBoolean(other, tasksToSelected.get(other));
-      inForeground = false;
+      //inForeground = false;
 
       // Commit the edits!
       editor.commit();
@@ -458,23 +315,6 @@ public class MainActivity extends Fragment implements OnBoilingEventListener {
     @Override
 	public void onDestroy(){
     	super.onDestroy();
-    	inForeground = false;
-
-    	// Stop listening for things!
-    	boilingWaterDetector.stopDetection();
+    	//inForeground = false;
     }
-
-	@Override
-	public void processBoilingEvent() {
-		if (!waterAlerted) {
-			waterAlerted = true;
-			act.runOnUiThread(new Runnable() {
-				public void run() {
-					alert(water); 
-				}
-			});
-		}
-	}
-	
-    
 }
