@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.annotation.SuppressLint;
@@ -40,10 +41,10 @@ public class MainActivity extends Fragment {
     public final static String EXTRA_MESSAGE = "edu.berkeley.cs160.DeansOfDesign.MESSAGE";
     private static TextView instructionText = null;
     
-    public String water = "Water boiling";
-    public String microDone = "Microwave Done";
-    public String microExplo = "Microwave Explosion";
-    public String other = "Other Kitchen Tasks";
+    public static String water = "Water boiling";
+    public static String microDone = "Microwave Done";
+    public static String microExplo = "Microwave Explosion";
+    public static String other = "Other Kitchen Tasks";
     String greyBg = "#84a689";
     String purpleBg = "#a684a1";
     String green ="#7BF49B";
@@ -76,7 +77,7 @@ public class MainActivity extends Fragment {
 	    tasksToSelected.put(water, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	    setMic(act.isListening);
+	    setMic(!act.kitchenEventDetector.isDisabled());
 	    
 		// FOR TESTING ONLY, REMOVE LATER: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
@@ -90,13 +91,11 @@ public class MainActivity extends Fragment {
             }
         );
 		
-		//TODO: change if-statement to general case below once
-		//everything's working
-		//if (tasksSelected()) {
-		//	boilingWaterDetector.startDetection();
-		//}
-		if (tasksToSelected.get(water)) {
-			act.boilingWaterDetector.startDetection();
+		// Listen for selected tasks
+		for (Map.Entry<String, Boolean> entry : tasksToSelected.entrySet()) {
+			if (entry.getValue()) {
+				act.kitchenEventDetector.startDetection(TabActivity.eventAppStringsToClassNames.get(entry.getKey()));
+			}
 		}
 		
 		taskList = (ListView) act.findViewById(R.id.listView1);
@@ -119,33 +118,20 @@ public class MainActivity extends Fragment {
 	    			int position, long id) {
 	    		CheckedTextView item = (CheckedTextView) view;
 	    		String itemText = (String) parent.getItemAtPosition(position);
+	    		String eventClassName = TabActivity.eventAppStringsToClassNames.get(itemText);
 	    		if (tasksToSelected.get(itemText)) { //selected already
 	    			item.setBackgroundColor(Color.parseColor(gray));
 	    			item.setChecked(false);
 	    			tasksToSelected.put(itemText, false);
-	    			//TODO: change if-statement to general case below once
-	    			//everything's working
-	    			//if (tasksSelected()) {
-	    			//	boilingWaterDetector.stopDetection();
-	    			//}
-	    			if (itemText == water) {
-	    				act.boilingWaterDetector.stopDetection();
-	    			}
+	    			act.kitchenEventDetector.stopDetection(eventClassName);
+	    			act.alertedMap.put(eventClassName, false); // reset alerts so the event can get alerted again.
 	    		} else { //not selected yet
 	    			item.setBackgroundColor(Color.parseColor(green));
 	    			item.setChecked(true);
 	    			tasksToSelected.put(itemText, true);
-	    			//TODO: change if-statement to general case below once
-	    			//everything's working
-	    			//if (tasksSelected()) {
-	    			//	boilingWaterDetector.startDetection();
-	    			//}
-	    			if (itemText == water) {
-	    				act.waterAlerted = false;
-	    				act.boilingWaterDetector.startDetection();
-	    			}
+	    			act.kitchenEventDetector.startDetection(eventClassName);
 	    		}
-	    		setMic(tasksSelected());
+	    		setMic(act.kitchenEventDetector.isDetecting());
 	    	}
 	    });   
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -158,12 +144,12 @@ public class MainActivity extends Fragment {
 	    mic.setOnClickListener(new View.OnClickListener() {
 	    	   //@Override
 	    	   public void onClick(View v) {
-	    		   if (act.isListening) {
-	    			   act.isListening = false;
+	    		   if (act.kitchenEventDetector.isDisabled()) {
+	    			   act.kitchenEventDetector.enable();
 	    		   } else {
-	    			   act.isListening = true;
+	    			   act.kitchenEventDetector.disable();
 	    		   }
-	    		  setMic(act.isListening);
+	    		  setMic(!act.kitchenEventDetector.isDisabled());
 	    	   }        
 	    	});
 	    
@@ -186,7 +172,7 @@ public class MainActivity extends Fragment {
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
 			   lv.setEnabled(false);
 			   lv.setAlpha(0.5f);
-			   act.isListening = false;
+			   act.kitchenEventDetector.disable();
 		   } else {//else change mic color to red, ungray out listview
 			   mic.setColorFilter(Color.parseColor("#E02200"));
 			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
@@ -199,7 +185,7 @@ public class MainActivity extends Fragment {
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
 			   lv.setEnabled(true);
 			   lv.setAlpha(1);
-			   act.isListening = true;
+			   act.kitchenEventDetector.enable();
 		   }
 	}
 	
@@ -273,28 +259,10 @@ public class MainActivity extends Fragment {
 	    
 	    @Override
 	    public boolean isEnabled(int position) {
-	        return act.isListening;
+	        return !act.kitchenEventDetector.isDisabled();
 	    }
 
 	  }
-
-
-	public boolean tasksSelected() {
-		// TODO (dhaas): this logic needs work.
-		boolean toReturn = false;
-		Set<String> temp = tasksToSelected.keySet();
-		Iterator<String> iter = temp.iterator();
-		while (iter.hasNext()) {
-			if (tasksToSelected.get(iter.next())) {
-				toReturn = true;
-				break;
-			} else {
-				toReturn = false;
-			}
-		}
-		return toReturn;
-	}
-	
 	
 	@Override
 	public void onResume(){
@@ -306,7 +274,7 @@ public class MainActivity extends Fragment {
        tasksToSelected.put(water, settings.getBoolean(water, false));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-	   setMic(act.isListening);
+	   setMic(act.kitchenEventDetector.isDetecting());
 	   
     }
 

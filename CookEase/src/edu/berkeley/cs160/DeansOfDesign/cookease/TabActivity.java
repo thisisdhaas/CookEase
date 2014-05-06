@@ -3,8 +3,9 @@ package edu.berkeley.cs160.DeansOfDesign.cookease;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Map;
 
-import edu.berkeley.cs160.DeansOfDesign.cookease.BoilingWaterDetector.OnBoilingEventListener;
+import edu.berkeley.cs160.DeansOfDesign.cookease.KitchenEventDetector.OnKitchenEventListener;
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -29,7 +30,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.Window;
 
-public class TabActivity extends Activity implements OnBoilingEventListener {
+public class TabActivity extends Activity implements OnKitchenEventListener {
 	
 	public String alert_message = "";
     public String alert_title = "CookEase Alert";
@@ -53,9 +54,22 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 	Fragment fragmentTab3 = new AnalyticsActivity();
     
     // For audio processing
-    protected BoilingWaterDetector boilingWaterDetector;
-    protected boolean waterAlerted = false;
-    protected boolean isListening;
+    protected KitchenEventDetector kitchenEventDetector;
+    protected Map<String, Boolean> alertedMap;
+    protected static final Map<String, String> eventClassNamesToAppStrings;
+    static {
+    	eventClassNamesToAppStrings = new HashMap<String, String>();
+    	eventClassNamesToAppStrings.put(AudioFeatures.BOILING, MainActivity.water);
+    	eventClassNamesToAppStrings.put(AudioFeatures.MICRO_DONE, MainActivity.microDone);
+    	eventClassNamesToAppStrings.put(AudioFeatures.MICRO_EXPL, MainActivity.microExplo);
+    }
+    protected static final Map<String, String> eventAppStringsToClassNames;
+    static {
+    	eventAppStringsToClassNames = new HashMap<String, String>();
+    	eventAppStringsToClassNames.put(MainActivity.water, AudioFeatures.BOILING);
+    	eventAppStringsToClassNames.put(MainActivity.microDone, AudioFeatures.MICRO_DONE);
+    	eventAppStringsToClassNames.put(MainActivity.microExplo, AudioFeatures.MICRO_EXPL);
+    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +125,10 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
         actionBar.addTab(tab3);
         
         // Set up audio processing.
-		boilingWaterDetector = new BoilingWaterDetector(this, 0.1);
-		boilingWaterDetector.setOnBoilingEventListener(this);
-
+		kitchenEventDetector = new KitchenEventDetector(this, 0.1);
+		kitchenEventDetector.setOnKitchenEventListener(this);
+		alertedMap = new HashMap<String, Boolean>();
+		resetAlertedMap();
 	}
 
 	@Override
@@ -127,47 +142,47 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
     @Override
 	public void onDestroy(){
     	super.onDestroy();
-    	boilingWaterDetector.stopDetection();
+    	kitchenEventDetector.stopDetection();
     	inForeground= false;
     }
     
 	@Override
-	public void processBoilingEvent() {
-		if (!waterAlerted) {
-			waterAlerted = true;
+	public void processKitchenEvent(String eventType) {
+		final String eventTypeForThread = eventType;
+		if (!alertedMap.get(eventType)) {
+			alertedMap.put(eventType, true);
 			runOnUiThread(new Runnable() {
 				public void run() {
-					// TODO(dhaas): What if main tab isn't selected? How do we handle alerts?
 					//emily: new alert logic for bg vs fg
-					alert(water); 
+					alert(eventClassNamesToAppStrings.get(eventTypeForThread));
 				}
 			});
 		}
 	}
 	
 	// This now pops up the alerts toast in addition to sending an email/text (we can use this to test messaging capabilities for now)
-		public void alert(String task) {
-			String contentText="";
-			int uniqueID = 0;
-			MainActivity tab1 = ((MainActivity) fragmentTab1);
-			if (task == water) {
-				tab1.tasksToSelected.put(water, false);
-				tab1.taskList.setItemChecked(0, tab1.tasksToSelected.get(water));
-				contentText = waterMessage;
-				uniqueID = 0;
-			} else if (task == microDone) {
-				tab1.tasksToSelected.put(microDone, false);
-				tab1.taskList.setItemChecked(1, tab1.tasksToSelected.get(microDone));
-				contentText = microDoneMessage;
-				uniqueID = 1;
-			} else if (task == microExplo) { 
-				tab1.tasksToSelected.put(microExplo, false);
-				tab1.taskList.setItemChecked(2, tab1.tasksToSelected.get(microExplo));
-				contentText = microExploMessage;
-				uniqueID = 2;
-			}
-			alert_message += "Alert: " + contentText + "\n";
-			/*alt = new AlertDialog.Builder(this)
+	public void alert(String task) {
+		String contentText="";
+		int uniqueID = 0;
+		MainActivity tab1 = ((MainActivity) fragmentTab1);
+		if (task == water) {
+			tab1.tasksToSelected.put(water, false);
+			tab1.taskList.setItemChecked(0, tab1.tasksToSelected.get(water));
+			contentText = waterMessage;
+			uniqueID = 0;
+		} else if (task == microDone) {
+			tab1.tasksToSelected.put(microDone, false);
+			tab1.taskList.setItemChecked(1, tab1.tasksToSelected.get(microDone));
+			contentText = microDoneMessage;
+			uniqueID = 1;
+		} else if (task == microExplo) { 
+			tab1.tasksToSelected.put(microExplo, false);
+			tab1.taskList.setItemChecked(2, tab1.tasksToSelected.get(microExplo));
+			contentText = microExploMessage;
+			uniqueID = 2;
+		}
+		alert_message += "Alert: " + contentText + "\n";
+		/*alt = new AlertDialog.Builder(this)
 		    .setTitle(alert_title)
 		    .setMessage(contentText)
 		    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -176,161 +191,168 @@ public class TabActivity extends Activity implements OnBoilingEventListener {
 		        }
 		     });
 		     alt.show();*/
-			 showDialog(DIALOG_ALERT);
-		     
-			// sends a test email to the currently selected email address
-			sendMessage(1);
-			// sends a test text to the currently selected phone number
-			sendMessage(2); 
-			
-			//Standard Android Notif if app not in foreground
-			if (!inForeground) {
-				if (mBuilder == null) {
-					mBuilder = new NotificationCompat.Builder(this)
-					        .setSmallIcon(R.drawable.cookeaseiconsmall)
-					        .setContentTitle("CookEase Notification")
-					        .setAutoCancel(true);
-				} 
-				mBuilder.setContentText(contentText);
+		showDialog(DIALOG_ALERT);
 
-				// Creates an explicit intent for an Activity in your app
-				Intent resultIntent = new Intent(this, TabActivity.class);
-		
-				// The stack builder object will contain an artificial back stack for the
-				// started Activity.
-				// This ensures that navigating backward from the Activity leads out of
-				// your application to the Home screen.
-				TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-				// Adds the back stack for the Intent (but not the Intent itself)
-				stackBuilder.addParentStack(TabActivity.class);
-				// Adds the Intent that starts the Activity to the top of the stack
-				stackBuilder.addNextIntent(resultIntent);
-				PendingIntent resultPendingIntent =
-				        stackBuilder.getPendingIntent(
-				            0,
-				            PendingIntent.FLAG_UPDATE_CURRENT
-				        );
-				mBuilder.setContentIntent(resultPendingIntent);
-				NotificationManager mNotificationManager =
-				    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				mNotificationManager.notify(uniqueID, mBuilder.build());
-		
-				//TODO uncomment when water boiling working
-				//check if we have to keep listening for other tasks
-				//if (!tasksSelected()) {
-					// Stop listening for things!
-			    //	boilingWaterDetector.stopDetection();
-				//}
+		// sends a test email to the currently selected email address
+		sendMessage(1);
+		// sends a test text to the currently selected phone number
+		sendMessage(2); 
+
+		//Standard Android Notif if app not in foreground
+		if (!inForeground) {
+			if (mBuilder == null) {
+				mBuilder = new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.cookeaseiconsmall)
+				.setContentTitle("CookEase Notification")
+				.setAutoCancel(true);
+			} 
+			mBuilder.setContentText(contentText);
+
+			// Creates an explicit intent for an Activity in your app
+			Intent resultIntent = new Intent(this, TabActivity.class);
+
+			// The stack builder object will contain an artificial back stack for the
+			// started Activity.
+			// This ensures that navigating backward from the Activity leads out of
+			// your application to the Home screen.
+			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+			// Adds the back stack for the Intent (but not the Intent itself)
+			stackBuilder.addParentStack(TabActivity.class);
+			// Adds the Intent that starts the Activity to the top of the stack
+			stackBuilder.addNextIntent(resultIntent);
+			PendingIntent resultPendingIntent =
+					stackBuilder.getPendingIntent(
+							0,
+							PendingIntent.FLAG_UPDATE_CURRENT
+							);
+			mBuilder.setContentIntent(resultPendingIntent);
+			NotificationManager mNotificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			mNotificationManager.notify(uniqueID, mBuilder.build());
+
+			//TODO uncomment when water boiling working
+			//check if we have to keep listening for other tasks
+			//if (!tasksSelected()) {
+			// Stop listening for things!
+			//	boilingWaterDetector.stopDetection();
+			//}
+		}
+
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		switch (id) {
+		case DIALOG_ALERT:
+			if (ad != null) { //Stack all messages in just one alert
+				ad.dismiss();
 			}
-			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(alert_message);
+			builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) { 
+					// reset alert_message
+					MainActivity mainFrag = (MainActivity) fragmentTab1;
+					alert_message = "";
+					Set<String> temp = mainFrag.tasksToSelected.keySet();
+					Iterator<String> iter = temp.iterator();
+					while (iter.hasNext()) {
+						String next = iter.next();
+						if (mainFrag.tasksToSelected.get(next)) {
+							String nextMessage = "";
+							if (next == water) {
+								nextMessage = waterMessage;
+							} else if (next == microExplo) {
+								nextMessage = microExploMessage;
+							} else if (next == microDone) {
+								nextMessage = microDoneMessage;
+							}
+							alert_message += "Alert: " + nextMessage + "\n";
+						} 
+					}
+				}
+			});
+			ad = builder.create();
+			ad.show();
 		}
-		
-		@Override
-		protected Dialog onCreateDialog(int id) {
-		  switch (id) {
-		    case DIALOG_ALERT:
-		    	if (ad != null) { //Stack all messages in just one alert
-		    		ad.dismiss();
-		    	}
-			    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			    builder.setMessage(alert_message);
-			    builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int which) { 
-			            // reset alert_message
-			        	MainActivity mainFrag = (MainActivity) fragmentTab1;
-			        	alert_message = "";
-		        		Set<String> temp = mainFrag.tasksToSelected.keySet();
-		        		Iterator<String> iter = temp.iterator();
-		        		while (iter.hasNext()) {
-		        			String next = iter.next();
-		        			if (mainFrag.tasksToSelected.get(next)) {
-		        				String nextMessage = "";
-		        				if (next == water) {
-		        					nextMessage = waterMessage;
-		        				} else if (next == microExplo) {
-		        					nextMessage = microExploMessage;
-		        				} else if (next == microDone) {
-		        					nextMessage = microDoneMessage;
-		        				}
-		        				alert_message += "Alert: " + nextMessage + "\n";
-		        			} 
-			        	}
-			        }
-			     });
-			    ad = builder.create();
-			    ad.show();
-		  }
-		  return super.onCreateDialog(id);
-		}
+		return super.onCreateDialog(id);
+	}
 
-		
-		// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
-		public void sendMessage(int mtype) {
-			//SharedPreferences texts = getSharedPreferences("texts", 0);
-			if (mtype == 1) {
-				if (NotificationsActivity.emails != null && NotificationsActivity.emails.size() > 0) {
-					String[] emails = NotificationsActivity.emails.values().toArray(new String[NotificationsActivity.emails.size()]);
-					String[] toArr = emails; // You can add more emails here if necessary
-					Log.d("EMAIL IS NOW:", toArr[0]);
-					sendMail.setTo(toArr); // load array to setTo function
-					sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
-					sendMail.setSubject("Your water is boiling!"); 
-					sendMail.setBody("Your water is boiling.");
-					Runnable r = new Runnable() {
-					    @Override
-					    public void run() {
-					    	try {
-					    		sendMail.send();
-					    	} catch(Exception e) {
-					    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
-					    		// Eventually handling this exception would be nice
-					    	}
-					    }
-					};
-					Thread t = new Thread(r);
-					t.start();
-				}
-			} else {
-				if (NotificationsActivity.numbers != null && NotificationsActivity.numbers.size() > 0) {
-					final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
-					//Text message send function.  The phone number is stored in textnum variable.
-					Runnable r = new Runnable() {
-					    @Override
-					    public void run() {
-					    	try {
-					    		sendSMS(textnum, "Your water is boiling!");
-					    		//sendSMS("5554", "Your water is boiling!"); //for emulator testing
-					    	} catch(Exception e) {
-					    		// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
-					    		// Eventually handling this exception would be nice
-					    	}
-					    }
-					};
-					Thread t = new Thread(r);
-					t.start();
-				}
+
+	// Send email or text message, depending on which argument you pass in - 1 is email, 2 is text (phone number)
+	public void sendMessage(int mtype) {
+		//SharedPreferences texts = getSharedPreferences("texts", 0);
+		if (mtype == 1) {
+			if (NotificationsActivity.emails != null && NotificationsActivity.emails.size() > 0) {
+				String[] emails = NotificationsActivity.emails.values().toArray(new String[NotificationsActivity.emails.size()]);
+				String[] toArr = emails; // You can add more emails here if necessary
+				Log.d("EMAIL IS NOW:", toArr[0]);
+				sendMail.setTo(toArr); // load array to setTo function
+				sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
+				sendMail.setSubject("Your water is boiling!"); 
+				sendMail.setBody("Your water is boiling.");
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							sendMail.send();
+						} catch(Exception e) {
+							// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
+							// Eventually handling this exception would be nice
+						}
+					}
+				};
+				Thread t = new Thread(r);
+				t.start();
+			}
+		} else {
+			if (NotificationsActivity.numbers != null && NotificationsActivity.numbers.size() > 0) {
+				final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
+				//Text message send function.  The phone number is stored in textnum variable.
+				Runnable r = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							sendSMS(textnum, "Your water is boiling!");
+							//sendSMS("5554", "Your water is boiling!"); //for emulator testing
+						} catch(Exception e) {
+							// Can't figure out how to alter things while in this thread - every time I try to do something it crashes
+							// Eventually handling this exception would be nice
+						}
+					}
+				};
+				Thread t = new Thread(r);
+				t.start();
 			}
 		}
-		
-		private void sendSMS(String[] numbers, String message) {
-	       SmsManager sms = SmsManager.getDefault();
-	       int i = 0;
-	       while (i < numbers.length) {
-	    	   sms.sendTextMessage(numbers[i], null, message, null, null);
-	    	   i += 1;
-	       }
-	    }
-		
-		@Override
-		public void onResume(){
-			super.onResume();
-		   inForeground = true;
-	    }
+	}
 
-	    @Override
-		public void onPause(){
-	       super.onPause();
-	      inForeground = false;
-	    }
-	
+	private void sendSMS(String[] numbers, String message) {
+		SmsManager sms = SmsManager.getDefault();
+		int i = 0;
+		while (i < numbers.length) {
+			sms.sendTextMessage(numbers[i], null, message, null, null);
+			i += 1;
+		}
+	}
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		inForeground = true;
+	}
+
+	@Override
+	public void onPause(){
+		super.onPause();
+		inForeground = false;
+	}
+
+	protected void resetAlertedMap() {
+		alertedMap.clear();
+		alertedMap.put(AudioFeatures.BOILING, false);
+		alertedMap.put(AudioFeatures.MICRO_DONE, false);
+		alertedMap.put(AudioFeatures.MICRO_EXPL, false);
+	}
+
 }
