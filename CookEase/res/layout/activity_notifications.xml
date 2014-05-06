@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/clock_y"
+    android:background="@drawable/notifications_background"
     android:screenOrientation="portrait"
     tools:context=".NotificationsActivity" >
 
@@ -10,25 +10,23 @@
         android:id="@+id/title_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="25dp"
+        android:paddingTop="15dp"
         android:layout_below="@+id/linearlayout1"
         android:layout_centerHorizontal="true"
         android:text="How should we notify"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
-        android:textSize="25sp" />
+        android:textSize="20sp" />
     
     <TextView
         android:id="@+id/title_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title_1"
-        android:paddingBottom="10dp"
+        android:layout_below="@id/title_1"
         android:layout_centerHorizontal="true"
         android:text="you?"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
-        android:textSize="25sp" />
+        android:textSize="20sp" />
 
     
     <TextView
@@ -36,78 +34,108 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/title_1"
-        android:paddingTop="60dp"
+        android:layout_below="@id/title_1"
+        android:paddingTop="45dp"
         android:paddingBottom="5dp"
         android:paddingLeft="8dp"
         android:text="Alarm:"
-        android:textSize="28dp"
+        android:textSize="25dp"
         android:textColor="#000000" />
 
-  	<Button
-        android:id="@+id/alarm_select"
-        android:layout_height="55dp"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="10dp"
+    <FrameLayout
+        android:id="@+id/alarm_frame"
+        android:layout_below="@id/alarm_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_marginRight="18dp"
         android:layout_marginLeft="18dp"
-        android:layout_marginTop="5dp"
-        android:layout_below="@+id/alarm_text"
-        android:background="#EACE59"
-   	    android:text="Alarmtone1"
-   	    android:gravity="left|center_vertical"
-   	    android:paddingLeft="10dp"
-		android:paddingRight="5dp"
-   	    android:drawableRight="@drawable/clock"
-   	    android:drawablePadding="15dp"
-   	    android:textSize="18dp"
-   	    android:alpha="0.8" />
-    
+        android:layout_marginBottom="10dp" >
+        
+    	<ImageView
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="fill_parent"
+        	android:background="#F1D66A"
+	    	android:alpha="0.7" />
+    	
+    	<LinearLayout
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="45dp"
+    	    android:orientation="horizontal" >
+
+	    	<TextView
+	    	    android:id="@+id/alarm_text"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="match_parent"
+	    	    android:gravity="center|left"
+	    	    android:layout_margin="5dp"
+	    	    android:layout_weight="4"
+	    	    android:clickable="true"
+	    	    android:textSize="18dp"
+	    	    android:text="testtext" />
+	    	
+	    	<Button
+	    	    android:id="@+id/alarm_select"
+	    	    android:layout_width="35dp"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_gravity="center"
+	    	    android:layout_marginBottom="5dp"
+	    	    android:layout_marginRight="5dp"
+	    	    android:layout_marginTop="5dp"
+	    	    android:background="@drawable/clock" />
+	    	
+    	</LinearLayout>
+	</FrameLayout>
+
+
     <TextView 
 	    android:id="@+id/emailtext_text"
 	    android:layout_width="wrap_content"
 	   	android:layout_height="wrap_content"
-	   	android:layout_below="@+id/alarm_select"
+	   	android:layout_below="@id/alarm_frame"
 	   	android:layout_centerVertical="true"
 	   	android:paddingLeft="8dp"
 	   	android:layout_alignParentLeft="true"
 	   	android:textColor="#000000"
 	   	android:text="Email/Text:"
-	   	android:textSize="28dp" />
+	   	android:textSize="25dp" />
     
     <Button
    	    android:id="@+id/add_contact_button"
    	    android:layout_width="wrap_content"
    	    android:layout_height="wrap_content"
-   	    android:layout_below="@+id/emailtext_text"
+   	    android:layout_below="@id/emailtext_text"
    	    android:layout_alignParentLeft="true"
    	    android:clickable="true"
    	    android:background="@android:color/transparent"
-   	    android:paddingTop="5dp"
    	    android:paddingLeft="15dp"
    	    android:text="Add a contact"
    	    android:layout_centerHorizontal="true"
    	    android:layout_centerVertical="true"
    	    android:drawableLeft="@drawable/add" />
-
-    <RelativeLayout
-	    android:id="@+id/contact_background"
-	    android:layout_width="match_parent"
-	    android:layout_height="225dp"
-	    android:layout_marginLeft="7dp"
-	    android:layout_marginRight="7dp"
-	    android:layout_below="@id/add_contact_button"
-	    android:layout_marginTop="15dp"
-	    android:layout_marginBottom="10dp"
-	    android:background="#F1D66A"
-	    android:alpha="0.7" >
-	    <ListView
-	        android:id="@+id/listView2"
+    
+    <FrameLayout
+        android:id="@+id/contact_frame"
+        android:layout_below="@id/add_contact_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="18dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginBottom="10dp" >
+        
+    	<ImageView
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="fill_parent"
+        	android:background="#F1D66A"
+	    	android:alpha="0.7" />
+    	<ListView
+	        android:id="@+id/contact_view"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_centerHorizontal="true"
 	        android:clickable="true"
 	        android:textColor="#000000" >
-	    </ListView>
-	</RelativeLayout>
+	    </ListView>    
+	</FrameLayout>
+
+    
 </RelativeLayout>

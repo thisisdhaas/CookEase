@@ -10,11 +10,15 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -23,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +41,7 @@ public class NotificationsActivity extends Fragment {
     public static HashMap<String, String> numbers;
     public static HashMap<String, Boolean> emailOn;
     public static HashMap<String, Boolean> textOn;
+    public static boolean alarmOn = true;
     public ListView addedList;
     CustomListAdapter adapter = null;
     static String deftone = "Default Tone";
@@ -53,11 +59,53 @@ public class NotificationsActivity extends Fragment {
 		act = this.getActivity();
 		act.setContentView(R.layout.activity_notifications);
 		restorePrefs();
-		addedList = (ListView) act.findViewById(R.id.listView2);
+		addedList = (ListView) act.findViewById(R.id.contact_view);
         adapter = new CustomListAdapter(act, contactsSelected);
         addedList.setItemsCanFocus(true);
         addedList.setAdapter(adapter);
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // Set up alarm type text listener to pull up alarm menu
+        TextView alarmSelectButton = (TextView) act.findViewById(R.id.alarm_text);
+        alarmSelectButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+        		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+        		intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+        		intent.putExtra("position", 0);
+        		Log.d("BUTTONPRESS", "Choose alarm sound");
+        		startActivityForResult(intent, 0);
+            }
+        });
+        
+        // Set up alarm on/off button's listener
+        final Button alarmOnButton = (Button) act.findViewById(R.id.alarm_select);
+        alarmOnButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	Log.d("BUTTONPRESS", "Turn alarm on/off");
+            	if (alarmOn) {
+            		alarmOn = false;
+            		alarmOnButton.setBackground(getResources().getDrawable(R.drawable.clock_dark));
+            	} else {
+            		alarmOn = true;
+            		alarmOnButton.setBackground(getResources().getDrawable(R.drawable.clock));
+            	}
+            	view.invalidate();
+            }
+        });
+        
+        // Set up add contact button's listener
         Button addbutton = (Button) act.findViewById(R.id.add_contact_button);
         addbutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -65,6 +113,7 @@ public class NotificationsActivity extends Fragment {
             	startActivityForResult(intent, 1);
             }
         });
+        
         return inflater.inflate(R.layout.activity_main, container, false);
     }
 
@@ -109,14 +158,14 @@ public class NotificationsActivity extends Fragment {
 		        name = contactsSelected.get(pos);
 		        textview.setText(name);
 		        if (emails.containsKey(name) && emailOn.get(name)) {
-		        	ebutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.email, 0, 0);
+		        	ebutton.setBackground(getResources().getDrawable(R.drawable.email));
 	        	} else {
-	        		ebutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.emaildark, 0, 0);
+	        		ebutton.setBackground(getResources().getDrawable(R.drawable.email_dark));
 		        }
 		        if (numbers.containsKey(name) && textOn.get(name)) {
-		        	tbutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.text, 0, 0);
+		        	tbutton.setBackground(getResources().getDrawable(R.drawable.sms));
 	        	} else {
-	        		tbutton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.textdark_copy, 0, 0);
+	        		tbutton.setBackground(getResources().getDrawable(R.drawable.sms_dark));
 		        }
 	        } else {
 	        	// There are no contacts, do nothing
