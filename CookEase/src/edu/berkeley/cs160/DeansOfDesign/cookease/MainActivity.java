@@ -51,6 +51,8 @@ public class MainActivity extends Fragment {
     String white = "#ffffff";
     //private Mail sendMail;
     String sendOkay = "";
+    final int color = 0xFFFFFFFF;
+	final int transparent = Color.argb(0, Color.red(color), Color.green(color), Color.blue(color));
 
     public String friends_title = "Who do you want to alert?";
     public HashMap<String, Boolean> tasksToSelected = new HashMap<String, Boolean>();
@@ -63,7 +65,7 @@ public class MainActivity extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		
+
 		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_main);
 		// Make a mail object to send email with
@@ -74,6 +76,7 @@ public class MainActivity extends Fragment {
 	    tasksToSelected.put(water, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	    tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
+	    setMic(tasksSelected());
 	    
 		// FOR TESTING ONLY, REMOVE LATER: click the instructions for alert
 		instructionText = (TextView) act.findViewById(R.id.textView6);
@@ -142,6 +145,7 @@ public class MainActivity extends Fragment {
 	    				act.boilingWaterDetector.startDetection();
 	    			}
 	    		}
+	    		setMic(tasksSelected());
 	    	}
 	    });   
 	    taskList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -154,45 +158,51 @@ public class MainActivity extends Fragment {
 	    mic.setOnClickListener(new View.OnClickListener() {
 	    	   //@Override
 	    	   public void onClick(View v) {
-	    		   RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
-	    	      //if listening, change mic to gray + gray out listview
 	    		   if (act.isListening) {
-	    			   int color = 0xFFFFFFFF;
-	    			   int transparent = Color.argb(0, Color.red(color), Color.green(color), Color.blue(color));
-	    			   mic.setColorFilter(transparent);
-	    			   //grey out area
-	    			   taskLayout.setBackgroundColor(Color.parseColor("#85856F"));
-	    			   taskLayout.setAlpha(0.8f);
-	    			   //set instructiontextview unclickable
-	    			   TextView tv = (TextView) act.findViewById(R.id.textView6);
-	    			   tv.setClickable(false);
-	    			   tv.setAlpha(0.25f);
-	    			   //set listview unclickable
-	    			   ListView lv = (ListView) act.findViewById(R.id.listView1);
-	    			   lv.setEnabled(false);
-	    			   lv.setAlpha(0.25f);
 	    			   act.isListening = false;
-	    		   } else {//else change mic color to red, ungray out listview
-	    			   mic.setColorFilter(Color.parseColor("#E02200"));
-	    			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
-	    			   taskLayout.setAlpha(0.7f);
-	    			   //set instructiontextview clickable
-	    			   TextView tv = (TextView) act.findViewById(R.id.textView6);
-	    			   tv.setClickable(true);
-	    			   tv.setAlpha(1);
-	    			   //set listview clickable
-	    			   ListView lv = (ListView) act.findViewById(R.id.listView1);
-	    			   lv.setEnabled(true);
-	    			   lv.setAlpha(1);
+	    		   } else {
 	    			   act.isListening = true;
 	    		   }
-	    		  
+	    		  setMic(act.isListening);
 	    	   }        
 	    	});
 	    
 	   return inflater.inflate(R.layout.activity_main, container, false);
 	}
 
+	public void setMic(boolean greyIfFalse) {
+		final ImageView mic = (ImageView) act.findViewById(R.id.img1);
+		 RelativeLayout taskLayout = (RelativeLayout) act.findViewById(R.id.tasktext);
+		if (!greyIfFalse) {
+			   mic.setColorFilter(transparent);
+			   //grey out area
+			   taskLayout.setBackgroundColor(Color.parseColor("#ADADAD"));
+			   taskLayout.setAlpha(0.9f);
+			   //set instructiontextview unclickable
+			   TextView tv = (TextView) act.findViewById(R.id.textView6);
+			   tv.setClickable(false);
+			   tv.setAlpha(0.5f);
+			   //set listview unclickable
+			   ListView lv = (ListView) act.findViewById(R.id.listView1);
+			   lv.setEnabled(false);
+			   lv.setAlpha(0.5f);
+			   act.isListening = false;
+		   } else {//else change mic color to red, ungray out listview
+			   mic.setColorFilter(Color.parseColor("#E02200"));
+			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
+			   taskLayout.setAlpha(0.7f);
+			   //set instructiontextview clickable
+			   TextView tv = (TextView) act.findViewById(R.id.textView6);
+			   tv.setClickable(true);
+			   tv.setAlpha(1);
+			   //set listview clickable
+			   ListView lv = (ListView) act.findViewById(R.id.listView1);
+			   lv.setEnabled(true);
+			   lv.setAlpha(1);
+			   act.isListening = true;
+		   }
+	}
+	
 	private class StableArrayAdapter extends ArrayAdapter<String> {
 	    HashMap<String, Integer> mIdMap = new HashMap<String, Integer>();
 	    Context c;
@@ -271,17 +281,18 @@ public class MainActivity extends Fragment {
 
 	public boolean tasksSelected() {
 		// TODO (dhaas): this logic needs work.
+		boolean toReturn = false;
 		Set<String> temp = tasksToSelected.keySet();
 		Iterator<String> iter = temp.iterator();
 		while (iter.hasNext()) {
 			if (tasksToSelected.get(iter.next())) {
-				act.isListening = true;
+				toReturn = true;
 				break;
 			} else {
-				act.isListening = false;
+				toReturn = false;
 			}
 		}
-		return act.isListening;
+		return toReturn;
 	}
 	
 	
@@ -295,7 +306,8 @@ public class MainActivity extends Fragment {
        tasksToSelected.put(water, settings.getBoolean(water, false));
 	   tasksToSelected.put(microDone, settings.getBoolean(microDone, false));
 	   tasksToSelected.put(microExplo,settings.getBoolean(microExplo, false));
-
+	   setMic(tasksSelected());
+	   
     }
 
     @Override
