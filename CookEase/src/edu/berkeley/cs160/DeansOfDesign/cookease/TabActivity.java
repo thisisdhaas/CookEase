@@ -125,7 +125,11 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         actionBar.addTab(tab3);
         
         // Set up audio processing.
-		kitchenEventDetector = new KitchenEventDetector(this, 0.1);
+        Map<String, Double> sensitivities = new HashMap<String, Double>();
+        sensitivities.put(AudioFeatures.BOILING, 0.1d);
+        sensitivities.put(AudioFeatures.MICRO_DONE, 0.04d);
+        sensitivities.put(AudioFeatures.MICRO_EXPL, 0.1d);
+		kitchenEventDetector = new KitchenEventDetector(this, sensitivities);
 		kitchenEventDetector.setOnKitchenEventListener(this);
 		alertedMap = new HashMap<String, Boolean>();
 		resetAlertedMap();

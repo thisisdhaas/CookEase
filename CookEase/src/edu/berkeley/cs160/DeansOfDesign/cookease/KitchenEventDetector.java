@@ -31,19 +31,19 @@ public class KitchenEventDetector implements OnAudioEventListener {
 	private Classifier mModel;
 	private boolean mModelLoaded = false;
 	private OnKitchenEventListener mOnKitchenEventListener;
-	private double mSensitivity;
+	private Map<String, Double> mSensitivities;
 	private Map<String, ArrayList<Double>> mDetectionHistory;
 	private static final double HISTORY_SIZE = 100d;
 	private Set<String> mActiveEvents;
 	private boolean mDisabled;
 		
-	public KitchenEventDetector(Context context, double sensitivity, String[] activeEvents) {
+	public KitchenEventDetector(Context context, Map<String, Double> sensitivities, String[] activeEvents) {
 		mUseMic = true;
 		mAudioProc = new AudioProc(SAMPLE_RATE, context);
 		mAudioProc.setOnAudioEventListener(this);
 		mAudioFeaturizer = new AudioFeaturizer();
 		loadModel(context);
-		mSensitivity = sensitivity;
+		mSensitivities = sensitivities;
 		mDetectionHistory = new HashMap<String, ArrayList<Double>>();
 		mDetectionHistory.put(AudioFeatures.BOILING, new ArrayList<Double>());
 		mDetectionHistory.put(AudioFeatures.MICRO_DONE, new ArrayList<Double>());
@@ -54,8 +54,8 @@ public class KitchenEventDetector implements OnAudioEventListener {
 		}
 	}
 
-	public KitchenEventDetector(Context context, double sensitivity) {
-		this(context, sensitivity, new String[]{});
+	public KitchenEventDetector(Context context, Map<String, Double> sensitivities) {
+		this(context, sensitivities, new String[]{});
 	}
 	
 	public void stopDetection() {
@@ -157,7 +157,7 @@ public class KitchenEventDetector implements OnAudioEventListener {
 					num_detections += reading;
 				}
 				double percentDetected = num_detections / HISTORY_SIZE;
-				boolean thresholdExceded = percentDetected > mSensitivity;
+				boolean thresholdExceded = percentDetected > mSensitivities.get(className);
 				Log.v(TAG, "Percent Detected " + className + ": " + new DecimalFormat("0.00").format(percentDetected));
 
 				// call back if we heard an active event
