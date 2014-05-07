@@ -33,6 +33,8 @@ public class WekaModelTrainer {
 				AudioFeatures.BOILING);
 		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/boiling2.wav", 
 				AudioFeatures.BOILING);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/boiling3.wav", 
+				AudioFeatures.BOILING);
 		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/BoilingWater.wav", 
 				AudioFeatures.BOILING);
 		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/microdone.wav", 
