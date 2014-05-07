@@ -40,22 +40,19 @@ public class NotificationsActivity extends Fragment {
     public static HashMap<String, String> numbers;
     public static HashMap<String, Boolean> emailOn;
     public static HashMap<String, Boolean> textOn;
-    public static boolean alarmOn = true;
     public ListView addedList;
     CustomListAdapter adapter = null;
     static String deftone = "Default Tone";
     static String selectedTone = deftone;
     
-    
     Button mButton;
-    Ringtone rTone = null;
-    Activity act;
+    TabActivity act;
     
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	        Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		act = this.getActivity();
+		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_notifications);
 		restorePrefs();
 		addedList = (ListView) act.findViewById(R.id.contact_view);
@@ -82,11 +79,11 @@ public class NotificationsActivity extends Fragment {
         alarmOnButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	Log.d("BUTTONPRESS", "Turn alarm on/off");
-            	if (alarmOn) {
-            		alarmOn = false;
+            	if (act.alarmOn) {
+            		act.alarmOn = false;
             		alarmOnButton.setBackground(getResources().getDrawable(R.drawable.clock_dark));
             	} else {
-            		alarmOn = true;
+            		act.alarmOn = true;
             		alarmOnButton.setBackground(getResources().getDrawable(R.drawable.clock));
             	}
             }
@@ -219,11 +216,11 @@ public class NotificationsActivity extends Fragment {
 	             Uri uri = intent.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 	             if (uri != null) {
 	                 selectedTone = uri.toString();
-	                 rTone = RingtoneManager.getRingtone(act.getBaseContext(), uri);
-	                 if (rTone.getTitle(act.getApplicationContext()).equals(RingtoneManager.getRingtone(act.getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(act.getApplicationContext()))) {
+	                 act.rTone = RingtoneManager.getRingtone(act.getBaseContext(), uri);
+	                 if (act.rTone.getTitle(act.getApplicationContext()).equals(RingtoneManager.getRingtone(act.getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).getTitle(act.getApplicationContext()))) {
 	                	 selectedTone = deftone;
 	                 } else {
-	                	 selectedTone = rTone.getTitle(act.getBaseContext());
+	                	 selectedTone = act.rTone.getTitle(act.getBaseContext());
 	                 }
 	             }
 	        // Add email/text number
@@ -304,8 +301,8 @@ public class NotificationsActivity extends Fragment {
 		if (textOn == null || textOn.isEmpty()) {
 			textOn = new HashMap<String, Boolean>();
 		}
-		if (rTone == null) {
-			rTone = RingtoneManager.getRingtone(act.getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+		if (act.rTone == null) {
+			act.rTone = RingtoneManager.getRingtone(act.getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 		}
 	}
 	

@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.Map;
 
 import edu.berkeley.cs160.DeansOfDesign.cookease.KitchenEventDetector.OnKitchenEventListener;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -58,6 +60,10 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 	Fragment fragmentTab1 = new MainActivity();
 	Fragment fragmentTab2 = new NotificationsActivity();
 	//Fragment fragmentTab3 = new AnalyticsActivity();
+	
+	// For sounding alarms
+	protected Ringtone rTone;
+    protected boolean alarmOn;
     
     // For audio processing
     protected KitchenEventDetector kitchenEventDetector;
@@ -92,7 +98,8 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tab1 = actionBar.newTab().setText("Home");
         tab2 = actionBar.newTab().setText("Notifications");
-      //  tab3 = actionBar.newTab().setText("Analytics");
+        //tab3 = actionBar.newTab().setText("Analytics");
+        
         final class MyTabListener implements ActionBar.TabListener {
         	Fragment fragment;
         	
@@ -128,11 +135,15 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         
         actionBar.addTab(tab1);
         actionBar.addTab(tab2);
-        //actionBar.addTab(tab3);
+        // actionBar.addTab(tab3);
+        
+        // Set up alarm
+        alarmOn = true;
+        rTone = RingtoneManager.getRingtone(getBaseContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
         
         // Set up audio processing.
         Map<String, Double> sensitivities = new HashMap<String, Double>();
-        sensitivities.put(AudioFeatures.BOILING, 0.2d);
+        sensitivities.put(AudioFeatures.BOILING, 0.25d);
         sensitivities.put(AudioFeatures.MICRO_DONE, 0.04d);
         sensitivities.put(AudioFeatures.MICRO_EXPL, 0.1d);
 		kitchenEventDetector = new KitchenEventDetector(this, sensitivities);
@@ -206,6 +217,11 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 		sendMessage(1);
 		// sends a test text to the currently selected phone number
 		sendMessage(2); 
+		
+		// sounds the alarm
+		if (alarmOn) {
+			rTone.play();
+		}
 
 		//Standard Android Notif if app not in foreground
 		if (!inForeground) {
