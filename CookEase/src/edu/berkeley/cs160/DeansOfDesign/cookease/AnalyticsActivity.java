@@ -1,9 +1,12 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class AnalyticsActivity extends Fragment {
@@ -26,6 +30,8 @@ public class AnalyticsActivity extends Fragment {
 	private static Button waterButton;
 	private static Button microwaveButton;
 	private static Button dbTest;
+    private static final int STATS_TEXT = 1;
+    private static final int STATS_GRAPH = 1;
 	
 	private Boolean waterListening = false;
 	private Boolean microwaveListening = false;
@@ -74,18 +80,50 @@ public class AnalyticsActivity extends Fragment {
 					}
 				}
 		);
-		// Test DB
-		dbTest = (Button) act.findViewById(R.id.dbTest);
+		// Show 5 previous sessions
+		dbTest = (Button) act.findViewById(R.id.showText);
 		dbTest.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						displayStats();
+						displayStats(0);
+					}
+				}
+		);
+		// Show graph
+		Button graphButton = (Button) act.findViewById(R.id.button3);
+		graphButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						displayStats(1);
 					}
 				}
 		);
 		textViewWater = (TextView) act.findViewById(R.id.textViewWater);
 //		displayStats();
         db = new DatabaseHandler(act);
+
+        // For demo, fill database with some examples (previous 5 months)
+        Log.d("Insert: ", "Inserting .."); 
+        // Make the data a little different, so last 5 months, and vary duration randomly
+        for (int i = 1; i <= 5; i++) {
+            Date dt = null;
+            Calendar c = Calendar.getInstance(); 
+            c.setTime(dt); 
+            c.add(Calendar.MONTH, -i);
+            dt = c.getTime();
+            // General pattern for generating a random number between MIN and MAX is
+            // Min + (int)(Math.random() * ((Max - Min) + 1))
+            // Ours will be between 1000 and 10 000
+            long length = 1000 + (int)(Math.random()*((10000-1000)+1));
+            String duration = String.valueOf(length);            
+            db.addAnalyticsData(new AnalyticsData(dt.toString(), duration, String.valueOf(AnalyticsData.WATER))); 
+            
+            // Do this for microwave as well
+            long length2 = 1000 + (int)(Math.random()*((10000-1000)+1));
+            String duration2 = String.valueOf(length2);            
+            db.addAnalyticsData(new AnalyticsData(dt.toString(), duration2, String.valueOf(AnalyticsData.MICROWAVE))); 
+        }
+        
 		return inflater.inflate(R.layout.activity_main, container, false);
 	}
 	
@@ -133,89 +171,56 @@ public class AnalyticsActivity extends Fragment {
         Log.d("Done inserting: ", "Inserted: " +date+" duration: " +duration+" dataType:"+dataType); 
 	}
 	
-	public void displayStats() {
+	public void displayStats(int statType) {
 //		TextView waterText = (TextView) act.findViewById(R.id.textView8);
 //		TextView microwaveText = (TextView) act.findViewById(R.id.textView9);
 		
 		// Reading last stat
         Log.d("Reading: ", "Reading all stats..");
         String stats = "";
-        List<AnalyticsData> dataList = db.getAllAnalyticsData();       
+        List<AnalyticsData> dataList = db.getAllAnalyticsData();    
+        int listSize = dataList.size();
          
-        for (AnalyticsData d : dataList) {
-        	// Format date for printing
-          String date = d.getDate();
-          date = date.substring(4,10)+" " + date.substring(24);
-          String myDate = "Date: "+ date;
-          // Format duration for printing
-          long duration = Long.parseLong(d.getDuration()) / 1000;
-          String myDuration = "Duration: "+String.valueOf(duration)+" seconds";
-          // Format datatype for printing
-          int dataType = Integer.getInteger(d.getDataType());
-          System.out.println("dataType is: "+dataType);
-          String myDataType = (dataType == AnalyticsData.WATER ? "Water" : "Microwave");
-          // append to "stats"
-          stats += myDate+myDuration+myDataType+"\n\n";
-//          stats += "Date: "+date+", Duration: " + d.getDuration() + ", dataType: " + d.getDataType()+"\n";
-		
-//          stats += "Date: "+d.getDate()+" ,Duration: " + d.getDuration() + " ,dataType: " + d.getDataType()+"\n";
+        if (statType == STATS_TEXT) {
+	        // Display last 5 sessions
+	        for (int i = listSize - 6; i < listSize; i++) {
+	          AnalyticsData d = dataList.get(i);
+	        	// Format date for printing
+	          String date = d.getDate();
+	          date = date.substring(4,10)+" " + date.substring(24);
+	          String myDate = "Date: "+ date;
+	          // Format duration for printing
+	          long duration = Long.parseLong(d.getDuration()) / 1000;
+	          String myDuration = "Duration: "+String.valueOf(duration)+" seconds";
+	          // Format datatype for printing
+	          int dataType = Integer.getInteger(d.getDataType());
+	          System.out.println("dataType is: "+dataType);
+	          String myDataType = (dataType == AnalyticsData.WATER ? "Water" : "Microwave");
+	          // append to "stats"
+	          stats += myDate+myDuration+myDataType+"\n\n";
+	        }
+	        textViewWater.append("\n"+stats);
+        } else {
+        	// init example series data
+        	GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
+        	    new GraphView.GraphViewData(1, 2.0d)
+        	    , new GraphView.GraphViewData(2, 1.5d)
+        	    , new GraphView.GraphViewData(3, 2.5d)
+        	    , new GraphView.GraphViewData(4, 1.0d)
+        	    , new GraphView.GraphViewData(5, 0.5d)
+        	});
 
-        }
-        textViewWater.append("\n"+stats);
-//            String log = "Id: "+d.getDate()+" ,Name: " + d.getDuration() + " ,Phone: " + d.getDataType();
-                // Writing Contacts to log
-//        Log.d("Name: ", log);
+        	GraphView graphView = new LineGraphView(
+        	    act // context
+        	    , "Average Cooking Duration" // heading
+        	);
         	
-        
-        
-        
-//		String waterFile = "waterAnalyticsRecord";
-//		String microwaveFile = "microwaveAnalyticsRecord";
-		
-//		int i = 0;
-//		while (i < 2) {
-//			String fileName = null;
-//			TextView curText = null;
-//			if (i == 0) {
-//				fileName = waterFile;
-//				curText = waterText;
-//			} else {
-//				fileName = microwaveFile;
-//				curText = microwaveText;
-//			}
-//	        FileInputStream fis = null;
-//	        BufferedReader reader = null;
-//			try {
-//				// Open file and inputstream and stuff like that 
-//		    	File myFile = new File(fileName);
-//		    	if (myFile.exists()) {
-//		    		fis = new FileInputStream(fileName);
-//		    	} else {
-//		    		// File not found?
-//		        	return;
-//		        }
-//	            reader = new BufferedReader(new InputStreamReader(fis));
-//	            // Print these lines
-//	            String line = reader.readLine();
-//	            while(line != null){
-//	            	curText.append(line);
-//	                line = reader.readLine();
-//	            } 
-//			}  catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} finally {
-//				try {
-//					if (reader == null || fis == null) {
-//						return;
-//					}
-//					reader.close();
-//					fis.close();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		}
+        	graphView.addSeries(exampleSeries); // data
+        	graphView.setHorizontalLabels(new String[] {"December 2013", "January 2014", "February 2014", "March 2014", "April 2014", "May 2014"});
+        	graphView.setVerticalLabels(new String[] {"30 mins", "15 mins", "0 mins"});
+
+        	LinearLayout layout = (LinearLayout) act.findViewById(R.id.graph);
+        	layout.addView(graphView);
+        }
 	}
 }
