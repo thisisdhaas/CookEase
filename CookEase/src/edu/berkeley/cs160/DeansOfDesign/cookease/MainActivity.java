@@ -159,50 +159,74 @@ public class MainActivity extends Fragment {
 		final ImageView mic = (ImageView) act.findViewById(R.id.img1);
 		if (!greyIfFalse) {
 			Log.d("setmic", "gray!");
-			   mic.setColorFilter(transparent);
-			   //grey out area
+			if (mic != null) { 
+				mic.setColorFilter(transparent);
+			}
+				//grey out area
 			   //taskLayout.setBackgroundColor(Color.parseColor("#ADADAD"));
 			   //taskLayout.setAlpha(0.9f);
 			   RelativeLayout greyOut = (RelativeLayout) act.findViewById(R.id.greyout);
-			   greyOut.setBackgroundColor(Color.parseColor("#292929"));
-			   greyOut.setAlpha(0.5f);
+			   if (greyOut != null) {
+				   greyOut.setBackgroundColor(Color.parseColor("#292929"));
+				   greyOut.setAlpha(0.5f);
+			   }
 			   TextView notlistening = (TextView) act.findViewById(R.id.notlistening);
-			   notlistening.setText("Not Listening");
+			   if (notlistening != null) {
+				   notlistening.setText("Not Listening");
+			   }
 			   //set instructiontextview unclickable
 			   TextView tv = (TextView) act.findViewById(R.id.textView6);
-			   tv.setClickable(false);
-			   tv.setAlpha(0.2f);
+			   if (tv != null) {
+				   tv.setClickable(false);
+				   tv.setAlpha(0.2f);
+			   }
 			   //set listview unclickable
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
-			   lv.setEnabled(false);
-			   lv.setAlpha(0.2f);
+			   if (lv != null) {
+				   lv.setEnabled(false);
+				   lv.setAlpha(0.2f);
+			   }
 			   //set listening text
 			   TextView listening = (TextView) act.findViewById(R.id.listening);
-			   listening.setText("Tap To Listen");
+			   if (listening != null) {
+				   listening.setText("Tap To Listen");
+			   }
 			   act.kitchenEventDetector.disable();
 			   
 		   } else {//else change mic color to red, ungray out listview
 			   Log.d("setmic","red!");
-			   mic.setColorFilter(Color.parseColor("#E02200"));
-//			   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
+			   if (mic != null) {
+				   mic.setColorFilter(Color.parseColor("#E02200"));
+			   }
+				//   taskLayout.setBackgroundColor(Color.parseColor("#F1D66A"));
 //			   taskLayout.setAlpha(0.7f);
 			   RelativeLayout greyOut = (RelativeLayout) act.findViewById(R.id.greyout);
-			   greyOut.setBackgroundColor(transparent);
-			   greyOut.setAlpha(1);
+			   if (greyOut != null) {
+				   greyOut.setBackgroundColor(transparent);
+				   greyOut.setAlpha(1);
+			   }
 			   TextView notlistening = (TextView) act.findViewById(R.id.notlistening);
-			   notlistening.setText("");
+			   if (notlistening != null) {
+				   notlistening.setText("");
+			   }
 			   //set instructiontextview clickable
 			   TextView tv = (TextView) act.findViewById(R.id.textView6);
-			   tv.setClickable(true);
-			   tv.setAlpha(1);
+			   if (tv != null) {
+				   tv.setClickable(true);
+				   tv.setAlpha(1);
+			   }
 			   //set listview clickable
 			   ListView lv = (ListView) act.findViewById(R.id.listView1);
-			   lv.setEnabled(true);
-			   lv.setAlpha(1);
+			   if (lv != null) {
+				   lv.setEnabled(true);
+				   lv.setAlpha(1);
+			   }
 			   //set listening text
 			   TextView listening = (TextView) act.findViewById(R.id.listening);
-			   listening.setText("Listening...");
-			   act.kitchenEventDetector.enable();
+			   if (listening != null) {
+				   listening.setText("Listening...");
+			   }
+				   act.kitchenEventDetector.enable();
 		   }
 	}
 	

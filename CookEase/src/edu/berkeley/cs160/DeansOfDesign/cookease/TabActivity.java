@@ -1,5 +1,6 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 	ActionBar.Tab tab1, tab2, tab3;
 	Fragment fragmentTab1 = new MainActivity();
 	Fragment fragmentTab2 = new NotificationsActivity();
-	Fragment fragmentTab3 = new AnalyticsActivity();
+	//Fragment fragmentTab3 = new AnalyticsActivity();
     
     // For audio processing
     protected KitchenEventDetector kitchenEventDetector;
@@ -91,7 +92,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tab1 = actionBar.newTab().setText("Home");
         tab2 = actionBar.newTab().setText("Notifications");
-        tab3 = actionBar.newTab().setText("Analytics");
+      //  tab3 = actionBar.newTab().setText("Analytics");
         final class MyTabListener implements ActionBar.TabListener {
         	Fragment fragment;
         	
@@ -123,11 +124,11 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         }
         tab1.setTabListener(new MyTabListener(fragmentTab1));
         tab2.setTabListener(new MyTabListener(fragmentTab2));
-        tab3.setTabListener(new MyTabListener(fragmentTab3));
+        //tab3.setTabListener(new MyTabListener(fragmentTab3));
         
         actionBar.addTab(tab1);
         actionBar.addTab(tab2);
-        actionBar.addTab(tab3);
+        //actionBar.addTab(tab3);
         
         // Set up audio processing.
         Map<String, Double> sensitivities = new HashMap<String, Double>();
@@ -280,7 +281,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 					alert_message = "";
 					Set<String> temp = tasksToSelected.keySet();
 					Iterator<String> iter = temp.iterator();
-					while (iter.hasNext()) {
+					/*while (iter.hasNext()) {
 						String next = iter.next();
 						if (tasksToSelected.get(next)) {
 							String nextMessage = "";
@@ -293,7 +294,8 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 							}
 							alert_message += "Alert: " + nextMessage + "\n";
 						} 
-					}
+					}*/
+					Log.d("alert", alert_message);
 				}
 			});
 			ad = builder.create();
@@ -308,9 +310,31 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 		//SharedPreferences texts = getSharedPreferences("texts", 0);
 		if (mtype == 1) {
 			if (NotificationsActivity.emails != null && NotificationsActivity.emails.size() > 0) {
-				String[] emails = NotificationsActivity.emails.values().toArray(new String[NotificationsActivity.emails.size()]);
-				String[] toArr = emails; // You can add more emails here if necessary
-				Log.d("EMAIL IS NOW:", toArr[0]);
+				Set<String> emailNames = NotificationsActivity.emails.keySet();
+				Iterator iter = emailNames.iterator();
+				ArrayList<String> emails = new ArrayList<String>();
+				Boolean emailSet;
+				String next;
+				int size = 0;
+				while (iter.hasNext()) {
+					next = (String) iter.next();
+					emailSet = NotificationsActivity.emailOn.get(next);
+					if (emailSet != null && emailSet == true) {
+						emails.add(NotificationsActivity.emails.get(next));
+						size++;
+					}
+				}
+			
+				int counter = 0;
+				String[] toArr = new String[size];// You can add more emails here if necessary
+				for (String name: emails) {
+					if (name != null) {
+						toArr[counter] = name;
+						counter++;
+					}
+				}
+		
+				Log.d("EMAIL IS NOW:", toArr.toString());
 				sendMail.setTo(toArr); // load array to setTo function
 				sendMail.setFrom("cookease.app@gmail.com"); // who is sending the email 
 				sendMail.setSubject("Your water is boiling!"); 
@@ -331,7 +355,36 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 			}
 		} else {
 			if (NotificationsActivity.numbers != null && NotificationsActivity.numbers.size() > 0) {
-				final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
+				Set<String> textNames = NotificationsActivity.numbers.keySet();
+				Iterator iter = textNames.iterator();
+				ArrayList<String> numbers = new ArrayList<String>();
+				Boolean textSet;
+				int size = 0;
+				String next;
+				while (iter.hasNext()) {
+					next = (String) iter.next();
+					textSet = NotificationsActivity.textOn.get(next);
+					if (textSet != null && textSet == true) {
+						numbers.add(NotificationsActivity.numbers.get(next));
+						size++;
+					}
+				}
+				
+				int counter = 0;
+				String[] toArr = new String[size];// You can add more emails here if necessary
+				for (String name: numbers) {
+					if (name != null) {
+						toArr[counter] = name;
+						counter++;
+					}
+				}
+			
+				final String[] textnum = toArr;
+				Log.d("textnumiswhat", ""+textnum.length);
+				for (String s : textnum) {
+					Log.d("textelement", s);
+				}
+		//		final String[] textnum = NotificationsActivity.numbers.values().toArray(new String[NotificationsActivity.numbers.size()]);
 				//Text message send function.  The phone number is stored in textnum variable.
 				Runnable r = new Runnable() {
 					@Override
