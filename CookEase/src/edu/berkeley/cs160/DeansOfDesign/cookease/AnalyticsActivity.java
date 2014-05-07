@@ -4,12 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.GraphViewSeries;
-import com.jjoe64.graphview.LineGraphView;
-
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +17,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GraphViewSeries;
+import com.jjoe64.graphview.LineGraphView;
 
 public class AnalyticsActivity extends Fragment {
 
@@ -85,7 +86,7 @@ public class AnalyticsActivity extends Fragment {
 		dbTest.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						displayStats(0);
+						displayStats(1);
 					}
 				}
 		);
@@ -94,7 +95,7 @@ public class AnalyticsActivity extends Fragment {
 		graphButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						displayStats(1);
+						displayStats(0);
 					}
 				}
 		);
@@ -104,22 +105,22 @@ public class AnalyticsActivity extends Fragment {
 
         // For demo, fill database with some examples (previous 5 months)
         Log.d("Insert: ", "Inserting .."); 
+        Date dt = new Date();
         // Make the data a little different, so last 5 months, and vary duration randomly
         for (int i = 1; i <= 5; i++) {
-            Date dt = null;
             Calendar c = Calendar.getInstance(); 
             c.setTime(dt); 
             c.add(Calendar.MONTH, -i);
             dt = c.getTime();
             // General pattern for generating a random number between MIN and MAX is
             // Min + (int)(Math.random() * ((Max - Min) + 1))
-            // Ours will be between 1000 and 10 000
-            long length = 1000 + (int)(Math.random()*((10000-1000)+1));
+            // Ours will be between 10000 and 10 0000
+            long length = 10000 + (int)(Math.random()*((100000-10000)+1));
             String duration = String.valueOf(length);            
             db.addAnalyticsData(new AnalyticsData(dt.toString(), duration, String.valueOf(AnalyticsData.WATER))); 
             
             // Do this for microwave as well
-            long length2 = 1000 + (int)(Math.random()*((10000-1000)+1));
+            long length2 = 10000 + (int)(Math.random()*((100000-10000)+1));
             String duration2 = String.valueOf(length2);            
             db.addAnalyticsData(new AnalyticsData(dt.toString(), duration2, String.valueOf(AnalyticsData.MICROWAVE))); 
         }
@@ -183,7 +184,7 @@ public class AnalyticsActivity extends Fragment {
          
         if (statType == STATS_TEXT) {
 	        // Display last 5 sessions
-	        for (int i = listSize - 6; i < listSize; i++) {
+	        for (int i = listSize - 5; i < listSize; i++) {
 	          AnalyticsData d = dataList.get(i);
 	        	// Format date for printing
 	          String date = d.getDate();
@@ -193,11 +194,11 @@ public class AnalyticsActivity extends Fragment {
 	          long duration = Long.parseLong(d.getDuration()) / 1000;
 	          String myDuration = "Duration: "+String.valueOf(duration)+" seconds";
 	          // Format datatype for printing
-	          int dataType = Integer.getInteger(d.getDataType());
+	          String dataType = d.getDataType();
 	          System.out.println("dataType is: "+dataType);
-	          String myDataType = (dataType == AnalyticsData.WATER ? "Water" : "Microwave");
+	          dataType = (dataType.matches("0") ? "Type: Water" : "Type: Microwave");
 	          // append to "stats"
-	          stats += myDate+myDuration+myDataType+"\n\n";
+	          stats += myDate+", "+myDuration+", "+dataType+"\n\n";
 	        }
 	        textViewWater.append("\n"+stats);
         } else {
@@ -218,6 +219,8 @@ public class AnalyticsActivity extends Fragment {
         	graphView.addSeries(exampleSeries); // data
         	graphView.setHorizontalLabels(new String[] {"December 2013", "January 2014", "February 2014", "March 2014", "April 2014", "May 2014"});
         	graphView.setVerticalLabels(new String[] {"30 mins", "15 mins", "0 mins"});
+        	graphView.getGraphViewStyle().setVerticalLabelsColor(Color.BLACK);
+        	graphView.getGraphViewStyle().setHorizontalLabelsColor(Color.BLACK);
 
         	LinearLayout layout = (LinearLayout) act.findViewById(R.id.graph);
         	layout.addView(graphView);

@@ -56,7 +56,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
 	ActionBar.Tab tab1, tab2, tab3;
 	Fragment fragmentTab1 = new MainActivity();
 	Fragment fragmentTab2 = new NotificationsActivity();
-	//Fragment fragmentTab3 = new AnalyticsActivity();
+	Fragment fragmentTab3 = new AnalyticsActivity();
     
     // For audio processing
     protected KitchenEventDetector kitchenEventDetector;
@@ -91,7 +91,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         tab1 = actionBar.newTab().setText("Home");
         tab2 = actionBar.newTab().setText("Notifications");
-       // tab3 = actionBar.newTab().setText("Analytics");
+        tab3 = actionBar.newTab().setText("Analytics");
         final class MyTabListener implements ActionBar.TabListener {
         	Fragment fragment;
         	
@@ -123,11 +123,11 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         }
         tab1.setTabListener(new MyTabListener(fragmentTab1));
         tab2.setTabListener(new MyTabListener(fragmentTab2));
-        //tab3.setTabListener(new MyTabListener(fragmentTab3));
+        tab3.setTabListener(new MyTabListener(fragmentTab3));
         
         actionBar.addTab(tab1);
         actionBar.addTab(tab2);
-        //actionBar.addTab(tab3);
+        actionBar.addTab(tab3);
         
         // Set up audio processing.
         Map<String, Double> sensitivities = new HashMap<String, Double>();
