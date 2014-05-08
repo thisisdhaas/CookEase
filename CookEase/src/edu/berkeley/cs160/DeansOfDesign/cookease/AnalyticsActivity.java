@@ -32,7 +32,7 @@ public class AnalyticsActivity extends Fragment {
 	private static Button microwaveButton;
 	private static Button dbTest;
     private static final int STATS_TEXT = 1;
-    private static final int STATS_GRAPH = 1;
+    private static final int STATS_GRAPH = 0;
 	
 	private Boolean waterListening = false;
 	private Boolean microwaveListening = false;
@@ -86,7 +86,7 @@ public class AnalyticsActivity extends Fragment {
 		dbTest.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						displayStats(1);
+						displayStats(STATS_TEXT);
 					}
 				}
 		);
@@ -95,7 +95,7 @@ public class AnalyticsActivity extends Fragment {
 		graphButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						displayStats(0);
+						displayStats(STATS_GRAPH);
 					}
 				}
 		);
