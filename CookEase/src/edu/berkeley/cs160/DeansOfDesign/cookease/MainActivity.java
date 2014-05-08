@@ -49,6 +49,8 @@ public class MainActivity extends Fragment {
     public ListView taskList;
     private StableArrayAdapter adapter = null;
     private TabActivity act;
+    
+    public AnalyticsTracker at;
     //public boolean inHomeScreen;
     
 	@Override
@@ -58,6 +60,7 @@ public class MainActivity extends Fragment {
 
 		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_main);
+		at = new AnalyticsTracker();
 		// Make a mail object to send email with
 	    //sendMail = new Mail("cookease.app@gmail.com", "deansofdesign");
 		
@@ -142,9 +145,21 @@ public class MainActivity extends Fragment {
 	    	   //@Override
 	    	   public void onClick(View v) {
 	    		   if (act.kitchenEventDetector.isDisabled()) {
+	    			   if (taskList.getCheckedItemPositions().get(0) == true) {
+		    			   at.startTime(AnalyticsData.WATER);	    				   
+	    			   }
+	    			   if (taskList.getCheckedItemPositions().get(1) == true) {
+		    			   at.startTime(AnalyticsData.MICROWAVE);	    				   
+	    			   }
 	    			   act.userGreyedOut = false;
 	    			   act.kitchenEventDetector.enable();
 	    		   } else {
+	    			   if (taskList.getCheckedItemPositions().get(0) == true) {
+		    			   at.finishTime(AnalyticsData.WATER);	    				   
+	    			   }
+	    			   if (taskList.getCheckedItemPositions().get(1) == true) {
+		    			   at.finishTime(AnalyticsData.MICROWAVE);	    				   
+	    			   }
 	    			   act.userGreyedOut = true;
 	    			   act.kitchenEventDetector.disable();
 	    		   }
