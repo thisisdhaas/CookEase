@@ -24,24 +24,29 @@ import com.jjoe64.graphview.LineGraphView;
 
 public class AnalyticsActivity extends Fragment {
 
-	private static TextView textViewWater;
-	private static TextView textViewMicrowave;
+	private static TextView last5Text;
+	private TextView curView;
 	
 	// For analytics testing
 	private static Button waterButton;
 	private static Button microwaveButton;
+	private static Button graphButton;
 	private static Button dbTest;
     private static final int STATS_TEXT = 1;
     private static final int STATS_GRAPH = 0;
 	
 	private Boolean waterListening = false;
 	private Boolean microwaveListening = false;
+	private Boolean textShowing = false;
+	private Boolean graphShowing = false;
 	
-	private long waterTime = 0;
-	private long microwaveTime = 0;
+	private GraphView graphView;
 	
+	
+	static Activity act;
 	DatabaseHandler db;
-	Activity act;
+	
+	AnalyticsTracker at;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,59 +54,64 @@ public class AnalyticsActivity extends Fragment {
 		super.onCreateView(inflater, container, savedInstanceState);
 		act = this.getActivity();
 		act.setContentView(R.layout.activity_analytics);
-		
+		at = new AnalyticsTracker();
 		// Set up test water button
-		waterButton = (Button) act.findViewById(R.id.button1);
-		waterButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						if (waterListening) {
-							waterListening = false;
-							finishTime(AnalyticsData.WATER);
-						} else {
-							waterListening = true;
-							startTime(AnalyticsData.WATER);
-						}
-					}
-				}
-		);
+//		waterButton = (Button) act.findViewById(R.id.button1);
+//		waterButton.setOnClickListener(
+//				new OnClickListener() {
+//					public void onClick(View v) {
+//						if (waterListening) {
+//							waterListening = false;
+//							at.finishTime(AnalyticsData.WATER);
+//						} else {
+//							waterListening = true;
+//							at.startTime(AnalyticsData.WATER);
+//						}
+//					}
+//				}
+//		);
 		
 		// Set up test microwave button
-		microwaveButton = (Button) act.findViewById(R.id.button2);
-		microwaveButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						if (microwaveListening) {
-							microwaveListening = false;
-							finishTime(AnalyticsData.MICROWAVE);
-						} else {
-							microwaveListening = true;
-							startTime(AnalyticsData.MICROWAVE);
-						}
-					}
-				}
-		);
+//		microwaveButton = (Button) act.findViewById(R.id.button2);
+//		microwaveButton.setOnClickListener(
+//				new OnClickListener() {
+//					public void onClick(View v) {
+//						if (microwaveListening) {
+//							microwaveListening = false;
+//							at.finishTime(AnalyticsData.MICROWAVE);
+//						} else {
+//							microwaveListening = true;
+//							at.startTime(AnalyticsData.MICROWAVE);
+//						}
+//					}
+//				}
+//		);
 		// Show 5 previous sessions
-		dbTest = (Button) act.findViewById(R.id.showText);
+		dbTest = (Button) act.findViewById(R.id.button4);
+        dbTest.setBackgroundResource(R.drawable.text);
 		dbTest.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
+						curView.setText("Last 5 sessions");
 						displayStats(STATS_TEXT);
 					}
 				}
 		);
 		// Show graph
-		Button graphButton = (Button) act.findViewById(R.id.button3);
+		graphButton = (Button) act.findViewById(R.id.button3);
+        graphButton.setBackgroundResource(R.drawable.graph);
 		graphButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
+						curView.setText("Graph by Month");
 						displayStats(STATS_GRAPH);
 					}
 				}
 		);
-		textViewWater = (TextView) act.findViewById(R.id.textViewWater);
+		curView = (TextView) act.findViewById(R.id.textView4);
+		last5Text = (TextView) act.findViewById(R.id.last5Text);
 //		displayStats();
-        db = new DatabaseHandler(act);
+        db = AnalyticsTracker.db;
 
         // For demo, fill database with some examples (previous 5 months)
         Log.d("Insert: ", "Inserting .."); 
@@ -124,7 +134,7 @@ public class AnalyticsActivity extends Fragment {
             String duration2 = String.valueOf(length2);            
             db.addAnalyticsData(new AnalyticsData(dt.toString(), duration2, String.valueOf(AnalyticsData.MICROWAVE))); 
         }
-        
+        displayStats(STATS_TEXT);
 		return inflater.inflate(R.layout.activity_main, container, false);
 	}
 	
@@ -147,30 +157,6 @@ public class AnalyticsActivity extends Fragment {
 		act.getMenuInflater().inflate(R.menu.analytics, menu);
 		return true;
 	}
-
-	public void startTime(int dataType) {
-		// Record start time
-		if (dataType == AnalyticsData.WATER) {
-			waterTime = System.currentTimeMillis();
-		} else if (dataType == AnalyticsData.MICROWAVE) {
-			microwaveTime = System.currentTimeMillis();
-		}
-	}
-	
-	public void finishTime(int dataType) {
-		// Record finish time, then subtract from start time to get total duration
-		long duration = System.currentTimeMillis();
-		if (dataType == AnalyticsData.WATER) {
-			duration -= waterTime;
-		} else if (dataType == AnalyticsData.MICROWAVE) {
-			duration -= microwaveTime;
-		}
-		// Put this in database
-		Date date = new Date();
-        Log.d("Insert: ", "Inserting .."); 
-        db.addAnalyticsData(new AnalyticsData(date.toString(), String.valueOf(duration), String.valueOf(dataType)));
-        Log.d("Done inserting: ", "Inserted: " +date+" duration: " +duration+" dataType:"+dataType); 
-	}
 	
 	public void displayStats(int statType) {
 //		TextView waterText = (TextView) act.findViewById(R.id.textView8);
@@ -183,25 +169,44 @@ public class AnalyticsActivity extends Fragment {
         int listSize = dataList.size();
          
         if (statType == STATS_TEXT) {
+        	if (textShowing) {
+        		last5Text.setText("");
+        		textShowing = false;
+        	}
+        	if (graphShowing) {
+            	LinearLayout layout = (LinearLayout) act.findViewById(R.id.graph);
+            	layout.removeView(graphView);
+            	graphShowing = false;
+        	}
 	        // Display last 5 sessions
 	        for (int i = listSize - 5; i < listSize; i++) {
 	          AnalyticsData d = dataList.get(i);
 	        	// Format date for printing
 	          String date = d.getDate();
 	          date = date.substring(4,10)+" " + date.substring(24);
-	          String myDate = "Date: "+ date;
+	          String myDate = date;
 	          // Format duration for printing
 	          long duration = Long.parseLong(d.getDuration()) / 1000;
-	          String myDuration = "Duration: "+String.valueOf(duration)+" seconds";
+	          String myDuration = String.valueOf(duration)+" seconds";
 	          // Format datatype for printing
 	          String dataType = d.getDataType();
 	          System.out.println("dataType is: "+dataType);
-	          dataType = (dataType.matches("0") ? "Type: Water" : "Type: Microwave");
+	          dataType = (dataType.matches("0") ? "Water boiled in " : "Microwave done in ");
 	          // append to "stats"
-	          stats += myDate+", "+myDuration+", "+dataType+"\n\n";
+	          stats += myDate+", "+dataType+myDuration+"\n\n";
 	        }
-	        textViewWater.append("\n"+stats);
+	        last5Text.setText(stats);
+	        textShowing = true;
         } else {
+        	if (textShowing) {
+        		last5Text.setText("");
+        		textShowing = false;
+        	}
+        	if (graphShowing) {
+            	LinearLayout layout = (LinearLayout) act.findViewById(R.id.graph);
+            	layout.removeView(graphView);
+            	graphShowing = false;
+        	}
         	// init example series data
         	GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
         	    new GraphView.GraphViewData(1, 2.0d)
@@ -211,19 +216,21 @@ public class AnalyticsActivity extends Fragment {
         	    , new GraphView.GraphViewData(5, 0.5d)
         	});
 
-        	GraphView graphView = new LineGraphView(
+        	graphView = new LineGraphView(
         	    act // context
         	    , "Average Cooking Duration" // heading
         	);
-        	
+
+        	graphView.getGraphViewStyle().setTextSize(24);
         	graphView.addSeries(exampleSeries); // data
-        	graphView.setHorizontalLabels(new String[] {"December 2013", "January 2014", "February 2014", "March 2014", "April 2014", "May 2014"});
-        	graphView.setVerticalLabels(new String[] {"30 mins", "15 mins", "0 mins"});
+        	graphView.setHorizontalLabels(new String[] {"1/'14", "2/'14", "3/'14", "4/'14", "5/'14", "6/'14"});
+        	graphView.setVerticalLabels(new String[] {"3 mins", "1.5 mins", "0 mins"});
         	graphView.getGraphViewStyle().setVerticalLabelsColor(Color.BLACK);
         	graphView.getGraphViewStyle().setHorizontalLabelsColor(Color.BLACK);
 
         	LinearLayout layout = (LinearLayout) act.findViewById(R.id.graph);
         	layout.addView(graphView);
+        	graphShowing = true;
         }
 	}
 }

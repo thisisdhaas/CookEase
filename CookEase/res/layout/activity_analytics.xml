@@ -11,102 +11,105 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="-40dp"
         android:text="@string/analytics_slogan"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#000000"
         android:textSize="21sp" />
 
    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+       android:layout_width="match_parent"
+       android:layout_height="match_parent" >
 
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="286dp"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+       <TextView
+           android:id="@+id/textView8"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentTop="true"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="200dp"
+           android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView
-            android:id="@+id/textView9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView8"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="63dp"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+       <TextView
+           android:id="@+id/textView9"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/textView8"
+           android:layout_centerHorizontal="true"
+           android:layout_marginTop="63dp"
+           android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView9"
-            android:layout_alignParentBottom="true"
-            android:text="Test Microwave" />
+       <TextView
+           android:id="@+id/textView4"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignBottom="@+id/textView3"
+           android:layout_marginLeft="19dp"
+           android:layout_toRightOf="@+id/textView8"
+           android:text="@string/last_5_sessions"
+           android:textColor="#000000"
+           android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/textView6"
-            android:text="Test Water" />
+       <TextView
+           android:id="@+id/textView3"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignBottom="@+id/textView8"
+           android:layout_marginBottom="106dp"
+           android:layout_toLeftOf="@+id/textView8"
+           android:text="@string/analytics_instruction"
+           android:textAppearance="?android:attr/textAppearanceMedium"
+           android:textColor="#000000" />
+       
+       <LinearLayout
+           android:layout_width="340dp"
+           android:layout_height="200dp"
+	       android:layout_below="@+id/textView4"
+           android:layout_marginTop="26dp"
+           android:layout_centerHorizontal="true"
+           android:orientation="vertical"
+		    android:background="#F1D66A"
+		    android:alpha="0.7" >
+           
+	       <LinearLayout
+	           android:id="@+id/graph"
+           	   android:layout_marginTop="10dp"
+           	   android:layout_marginLeft="10dp"
+	           android:layout_width="320dp"
+	           android:layout_height="180dp"
+			    android:background="#F1D66A"
+			    android:alpha="0.7" >
+	
+		       <TextView
+		           android:id="@+id/last5Text"
+           	   	   android:layout_marginTop="10dp"
+           	       android:layout_marginLeft="10dp"
+		           android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:text="\n\n\n\n\n"/>		    
+	           
+	       </LinearLayout>
+	       
+	   </LinearLayout>
 
+       <Button
+           android:id="@+id/button3"
+           android:layout_width="75dp"
+           android:layout_height="40dp"
+           android:layout_alignParentBottom="true"
+           android:layout_alignRight="@+id/textView3"
+           android:layout_marginBottom="16dp"
+           android:layout_marginRight="19dp" />
 
-        <Button
-            android:id="@+id/showText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/button2"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="17dp"
-            android:text="show text" />
+       <Button
+           android:id="@+id/button4"
+           android:layout_width="75dp"
+           android:layout_height="40dp"
+           android:layout_alignBaseline="@+id/button3"
+           android:layout_alignBottom="@+id/button3"
+           android:layout_alignLeft="@+id/textView4" />
 
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/showText"
-            android:layout_alignBottom="@+id/showText"
-            android:layout_toRightOf="@+id/textViewWater"
-            android:text="Show graph" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/textViewWater"
-            android:layout_alignRight="@+id/textView8"
-            android:layout_marginBottom="17dp"
-            android:text="@string/analytics_instruction"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#000000" />
-
-        <TextView
-            android:id="@+id/textViewWater"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/button1"
-            android:layout_centerVertical="true"
-            android:text="@string/analytics_format"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#000000" />
-
-        <LinearLayout
-            android:id="@+id/graph"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/textView8"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="14dp"
-            android:orientation="vertical" >
-        </LinearLayout>
-
-    </RelativeLayout>
+   </RelativeLayout>
 
     <TextView
         android:id="@+id/textView1"
@@ -114,9 +117,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="sans-serif"
-        android:text="@string/analytics"
+        android:text=""
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#000000"
         android:textSize="55sp" />

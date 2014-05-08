@@ -15,10 +15,13 @@
     <string name="instruction">Tap to listen for events:</string>
     <string name="title_activity_notifications">NotificationsActivity</string>
     <string name="notify_slogan">How should we notify you?</string>
-    <string name="analytics_slogan">Cooking analytics</string>
+    <string name="analytics_slogan">Cooking Analytics</string>
     <string name="notify_instruction">Notify via:</string>
     <string name="analytics_instruction">Currently viewing:</string>
     <string name="analytics_format">Last 5 sessions:</string>
     <string name="title_activity_tab">TabActivity</string>
+    <string name="last_5_sessions">Last 5 sessions</string>
+    <string name="Graph_by_Month">Graph by Month</string>
+    
 
 </resources>
