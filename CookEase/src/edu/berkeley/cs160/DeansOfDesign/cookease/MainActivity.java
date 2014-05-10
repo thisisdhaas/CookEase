@@ -129,6 +129,7 @@ public class MainActivity extends Fragment {
 	    			act.kitchenEventDetector.startDetection(eventClassName);
 	    			TextView instrView = (TextView) act.findViewById(R.id.textView6);
 	    			instrView.setText("Currently Listening for:");
+	    			act.alertedMap.put(eventClassName, false); // reset alerts so the event can get alerted again.
 	    		}
 	    		//setMic(act.kitchenEventDetector.isDetecting());
 	    		setMic(act.areTasksSelected());
