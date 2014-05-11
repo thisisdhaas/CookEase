@@ -51,6 +51,8 @@ public class WekaModelTrainer {
 				AudioFeatures.NO_EVENT);
 		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/noevent2.wav", 
 				AudioFeatures.NO_EVENT);
+		wavToClass.put("/Users/dhaas/Desktop/AudioTrainingData/popcorn.wav",
+				AudioFeatures.MICRO_EXPL);
 	}
 	private static final String arffPath = "/Users/dhaas/Desktop/trainset.arff";
 	private static final String modelPath = "/Users/dhaas/Desktop/event_clf.model";
