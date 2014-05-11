@@ -145,7 +145,7 @@ public class TabActivity extends Activity implements OnKitchenEventListener {
         Map<String, Double> sensitivities = new HashMap<String, Double>();
         sensitivities.put(AudioFeatures.BOILING, 0.25d);
         sensitivities.put(AudioFeatures.MICRO_DONE, 0.04d);
-        sensitivities.put(AudioFeatures.MICRO_EXPL, 0.1d);
+        sensitivities.put(AudioFeatures.MICRO_EXPL, 0.05d);
 		kitchenEventDetector = new KitchenEventDetector(this, sensitivities);
 		kitchenEventDetector.setOnKitchenEventListener(this);
 		alertedMap = new HashMap<String, Boolean>();
