@@ -1,0 +1,1 @@
+CookEase can be run as a project in eclipse.
