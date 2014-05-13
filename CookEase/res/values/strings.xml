@@ -21,7 +21,6 @@
     <string name="analytics_format">Last 5 sessions:</string>
     <string name="title_activity_tab">TabActivity</string>
     <string name="last_5_sessions">Last 5 sessions</string>
-    <string name="Graph_by_Month">Graph by Month</string>
     
 
 </resources>

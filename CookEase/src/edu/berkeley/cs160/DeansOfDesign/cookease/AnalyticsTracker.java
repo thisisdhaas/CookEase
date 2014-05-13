@@ -13,7 +13,9 @@ public class AnalyticsTracker {
 	public AnalyticsTracker() {
 		this.waterTime = 0;
 		this.microwaveTime = 0;
-		db = new DatabaseHandler(AnalyticsActivity.act);
+		if (db == null) {
+			db = new DatabaseHandler(MainActivity.act);
+		}
 	}
 	public void startTime(int dataType) {
 		// Record start time
@@ -34,7 +36,7 @@ public class AnalyticsTracker {
 		}
 		// Put this in database
 		Date date = new Date();
-        Log.d("Insert: ", "Inserting .."); 
+        Log.d("Insert: ", "Inserting .. date: "+date+" duration: "+duration+" dataType: "+dataType); 
         db.addAnalyticsData(new AnalyticsData(date.toString(), String.valueOf(duration), String.valueOf(dataType)));
         Log.d("Done inserting: ", "Inserted: " +date+" duration: " +duration+" dataType:"+dataType); 
 	}

@@ -1,6 +1,8 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +50,10 @@ public class MainActivity extends Fragment {
   
     public ListView taskList;
     private StableArrayAdapter adapter = null;
-    private TabActivity act;
+    static TabActivity act;
     
-    public AnalyticsTracker at;
+    public AnalyticsTracker at_water;
+    public AnalyticsTracker at_microwave;
     //public boolean inHomeScreen;
     
 	@Override
@@ -60,7 +63,8 @@ public class MainActivity extends Fragment {
 
 		act = (TabActivity) this.getActivity();
 		act.setContentView(R.layout.activity_main);
-		at = new AnalyticsTracker();
+		at_water = new AnalyticsTracker();
+		at_microwave = new AnalyticsTracker();
 		// Make a mail object to send email with
 	    //sendMail = new Mail("cookease.app@gmail.com", "deansofdesign");
 		
@@ -123,6 +127,12 @@ public class MainActivity extends Fragment {
 	    			act.kitchenEventDetector.stopDetection(eventClassName);
 	    			act.alertedMap.put(eventClassName, false); // reset alerts so the event can get alerted again.
 	    		} else { //not selected yet
+	    			   if (position == 0) {
+		    			   at_water.startTime(AnalyticsData.WATER);	    				   
+	    			   }
+	    			   if (position == 1) {
+		    			   at_microwave.startTime(AnalyticsData.MICROWAVE);	    				   
+	    			   }
 	    			item.setBackgroundColor(Color.parseColor(green));
 	    			item.setChecked(true);
 	    			TabActivity.tasksToSelected.put(itemText, true);
@@ -146,20 +156,14 @@ public class MainActivity extends Fragment {
 	    	   //@Override
 	    	   public void onClick(View v) {
 	    		   if (act.kitchenEventDetector.isDisabled()) {
-	    			   if (taskList.getCheckedItemPositions().get(0) == true) {
-		    			   at.startTime(AnalyticsData.WATER);	    				   
-	    			   }
-	    			   if (taskList.getCheckedItemPositions().get(1) == true) {
-		    			   at.startTime(AnalyticsData.MICROWAVE);	    				   
-	    			   }
 	    			   act.userGreyedOut = false;
 	    			   act.kitchenEventDetector.enable();
 	    		   } else {
 	    			   if (taskList.getCheckedItemPositions().get(0) == true) {
-		    			   at.finishTime(AnalyticsData.WATER);	    				   
+		    			   at_water.finishTime(AnalyticsData.WATER);	    				   
 	    			   }
 	    			   if (taskList.getCheckedItemPositions().get(1) == true) {
-		    			   at.finishTime(AnalyticsData.MICROWAVE);	    				   
+		    			   at_microwave.finishTime(AnalyticsData.MICROWAVE);	    				   
 	    			   }
 	    			   act.userGreyedOut = true;
 	    			   act.kitchenEventDetector.disable();
@@ -168,6 +172,33 @@ public class MainActivity extends Fragment {
 	    	   }        
 	    	});
 	    
+	   // Analytics stuff for prototype (pre-populate database with stuff)
+	    DatabaseHandler db = AnalyticsTracker.db;
+        // For demo, fill database with some examples (previous 5 months)
+        Log.d("Insert: ", "Inserting .."); 
+        Date dt = new Date();
+        Date dt2 = new Date();
+        // Make the data a little different, so last 5 months, and vary duration randomly
+        for (int i = 1; i <= 5; i++) {
+            Calendar c = Calendar.getInstance(); 
+            c.setTime(dt); 
+            c.add(Calendar.MONTH, -i);
+            c.add(Calendar.DATE, (30-2*i));
+            dt = c.getTime();
+            // General pattern for generating a random number between MIN and MAX is
+            // Min + (int)(Math.random() * ((Max - Min) + 1))
+            // Ours will be between 10000 and 10 0000
+            long length = 10000 + (int)(Math.random()*((100000-10000)+1));
+            String duration = String.valueOf(length);            
+            db.addAnalyticsData(new AnalyticsData(dt.toString(), duration, String.valueOf(AnalyticsData.WATER))); 
+
+            c.add(Calendar.DATE, (2*i));
+            dt2 = c.getTime();
+            // Do this for microwave as well
+            long length2 = 10000 + (int)(Math.random()*((100000-10000)+1));
+            String duration2 = String.valueOf(length2);            
+            db.addAnalyticsData(new AnalyticsData(dt2.toString(), duration2, String.valueOf(AnalyticsData.MICROWAVE))); 
+        }
 	   return inflater.inflate(R.layout.activity_main, container, false);
 	}
 

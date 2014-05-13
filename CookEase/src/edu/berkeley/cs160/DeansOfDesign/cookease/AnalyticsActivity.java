@@ -1,5 +1,7 @@
 package edu.berkeley.cs160.DeansOfDesign.cookease;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +43,9 @@ public class AnalyticsActivity extends Fragment {
 	private Boolean graphShowing = false;
 	
 	private GraphView graphView;
+	
+	private Long curMax = (long) Long.MIN_VALUE;
+	private Long curMin = (long) Long.MAX_VALUE;
 	
 	
 	static Activity act;
@@ -103,7 +108,7 @@ public class AnalyticsActivity extends Fragment {
 		graphButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						curView.setText("Graph by Month");
+						curView.setText("Water by Month");
 						displayStats(STATS_GRAPH);
 					}
 				}
@@ -112,28 +117,6 @@ public class AnalyticsActivity extends Fragment {
 		last5Text = (TextView) act.findViewById(R.id.last5Text);
 //		displayStats();
         db = AnalyticsTracker.db;
-
-        // For demo, fill database with some examples (previous 5 months)
-        Log.d("Insert: ", "Inserting .."); 
-        Date dt = new Date();
-        // Make the data a little different, so last 5 months, and vary duration randomly
-        for (int i = 1; i <= 5; i++) {
-            Calendar c = Calendar.getInstance(); 
-            c.setTime(dt); 
-            c.add(Calendar.MONTH, -i);
-            dt = c.getTime();
-            // General pattern for generating a random number between MIN and MAX is
-            // Min + (int)(Math.random() * ((Max - Min) + 1))
-            // Ours will be between 10000 and 10 0000
-            long length = 10000 + (int)(Math.random()*((100000-10000)+1));
-            String duration = String.valueOf(length);            
-            db.addAnalyticsData(new AnalyticsData(dt.toString(), duration, String.valueOf(AnalyticsData.WATER))); 
-            
-            // Do this for microwave as well
-            long length2 = 10000 + (int)(Math.random()*((100000-10000)+1));
-            String duration2 = String.valueOf(length2);            
-            db.addAnalyticsData(new AnalyticsData(dt.toString(), duration2, String.valueOf(AnalyticsData.MICROWAVE))); 
-        }
         displayStats(STATS_TEXT);
 		return inflater.inflate(R.layout.activity_main, container, false);
 	}
@@ -167,8 +150,9 @@ public class AnalyticsActivity extends Fragment {
         String stats = "";
         List<AnalyticsData> dataList = db.getAllAnalyticsData();    
         int listSize = dataList.size();
-         
+        System.out.println("here heh");
         if (statType == STATS_TEXT) {
+        	System.out.println("Stats_text");
         	if (textShowing) {
         		last5Text.setText("");
         		textShowing = false;
@@ -193,7 +177,7 @@ public class AnalyticsActivity extends Fragment {
 	          System.out.println("dataType is: "+dataType);
 	          dataType = (dataType.matches("0") ? "Water boiled in " : "Microwave done in ");
 	          // append to "stats"
-	          stats += myDate+", "+dataType+myDuration+"\n\n";
+	          stats = myDate+", "+dataType+myDuration+"\n\n" + stats;
 	        }
 	        last5Text.setText(stats);
 	        textShowing = true;
@@ -207,24 +191,20 @@ public class AnalyticsActivity extends Fragment {
             	layout.removeView(graphView);
             	graphShowing = false;
         	}
-        	// init example series data
-        	GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
-        	    new GraphView.GraphViewData(1, 2.0d)
-        	    , new GraphView.GraphViewData(2, 1.5d)
-        	    , new GraphView.GraphViewData(3, 2.5d)
-        	    , new GraphView.GraphViewData(4, 1.0d)
-        	    , new GraphView.GraphViewData(5, 0.5d)
-        	});
+        	GraphViewSeries exampleSeries = getGraphViewSeries();
 
         	graphView = new LineGraphView(
         	    act // context
         	    , "Average Cooking Duration" // heading
         	);
-
         	graphView.getGraphViewStyle().setTextSize(24);
         	graphView.addSeries(exampleSeries); // data
-        	graphView.setHorizontalLabels(new String[] {"1/'14", "2/'14", "3/'14", "4/'14", "5/'14", "6/'14"});
-        	graphView.setVerticalLabels(new String[] {"3 mins", "1.5 mins", "0 mins"});
+        	graphView.setHorizontalLabels(new String[] {"1/'14", "2/'14", "3/'14", "4/'14", "5/'14"});
+        	String maxString = curMax.toString()+"secs";
+        	String minString = curMin.toString()+"secs";
+        	String avgString = ((curMin+curMax)/2)+"secs";
+        	
+        	graphView.setVerticalLabels(new String[] {maxString, avgString, minString});
         	graphView.getGraphViewStyle().setVerticalLabelsColor(Color.BLACK);
         	graphView.getGraphViewStyle().setHorizontalLabelsColor(Color.BLACK);
 
@@ -233,4 +213,77 @@ public class AnalyticsActivity extends Fragment {
         	graphShowing = true;
         }
 	}
+
+    private GraphViewSeries getGraphViewSeries() {
+        List<AnalyticsData> dataList = db.getAllAnalyticsData(); 
+		long[] monthlyAverages = new long[]{(long) 0, (long)0,(long)0,(long)0,(long)0};
+		int[] monthCount = new int[]{0,0,0,0,0};
+        for (AnalyticsData d : dataList) {
+        	// Get monthly averages for last 5 months
+        	if (Integer.valueOf(d.getDataType()) == AnalyticsData.WATER) {
+            	// Get average values per month
+        		System.out.println("substring is: "+d.getDate().substring(4, 7));
+        		if (d.getDate().substring(4, 7).equals("Jan")) {
+        			// add to sum
+        			monthlyAverages[0] += Long.valueOf(d.getDuration());
+        			// Increment month count
+        			monthCount[0] += 1;
+        		}
+        		if (d.getDate().substring(4, 7).equals("Feb")) {
+        			System.out.println("Inside Feb");
+        			// add to sum
+        			monthlyAverages[1] += Long.valueOf(d.getDuration());
+        			// Increment month count
+        			monthCount[1] += 1;
+        			System.out.println("avg is: "+monthlyAverages[1]+" count is: "+monthCount[1]);
+        		}
+        		if (d.getDate().substring(4, 7).equals("Mar")) {
+        			// add to sum
+        			monthlyAverages[2] += Long.valueOf(d.getDuration());
+        			// Increment month count
+        			monthCount[2] += 1;
+        		}
+        		if (d.getDate().substring(4, 7).equals("Apr")) {
+        			// add to sum
+        			monthlyAverages[3] += Long.valueOf(d.getDuration());
+        			// Increment month count
+        			monthCount[3] += 1;
+        		}
+        		if (d.getDate().substring(4, 7).equals("May")) {
+        			// add to sum
+        			monthlyAverages[4] += Long.valueOf(d.getDuration());
+        			// Increment month count
+        			monthCount[4] += 1;
+        		}
+        	}
+        }
+        for (int i = 0; i < 5; i++) {
+        	Long curSum = monthlyAverages[i]/1000;
+        	int curCount = monthCount[i];
+        	Long curAvg = (long)0;
+        	if (curCount != 0) {
+            	curAvg = curSum / curCount;        		
+        	}
+        	monthlyAverages[i] = curAvg;
+        	if (curAvg < curMin) {
+        		curMin = curAvg;
+        	}
+        	if (curAvg > curMax) {
+        		if (i != 4) {
+        			curMax = curAvg;
+        		}
+        	}
+        	System.out.println("monthly Average is: "+i+" "+curAvg+" curCount: "+curCount+" curSum "+curSum);
+        }
+    	// init example series data
+    	GraphViewSeries exampleSeries = new GraphViewSeries(new GraphView.GraphViewData[] {
+    	    new GraphView.GraphViewData(1, monthlyAverages[0])
+    	    , new GraphView.GraphViewData(2, monthlyAverages[1])
+    	    , new GraphView.GraphViewData(3, monthlyAverages[2])
+    	    , new GraphView.GraphViewData(4, monthlyAverages[3])
+    	    , new GraphView.GraphViewData(5, (monthlyAverages[1]+monthlyAverages[2])/2) 
+    	});
+        
+    	return exampleSeries;
+    }
 }

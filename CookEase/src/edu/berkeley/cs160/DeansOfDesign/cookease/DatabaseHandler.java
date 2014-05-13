@@ -115,6 +115,9 @@ public class DatabaseHandler extends SQLiteOpenHelper{
  
     // Updating single contact
     public int updateAnalyticsData(AnalyticsData contact) {
+    	if (this.getWritableDatabase() == null) {
+    		System.out.println("Here's the problem");
+    	}
         SQLiteDatabase db = this.getWritableDatabase();
  
         ContentValues values = new ContentValues();
